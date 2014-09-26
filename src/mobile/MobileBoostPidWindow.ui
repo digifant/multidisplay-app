@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MobileBoostPidWindow</class>
+ <widget class="QMainWindow" name="MobileBoostPidWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MD Boost PID</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="BoostParamGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>150</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Parameter</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QTableWidget" name="BoostPIDTableWidget">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>90</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>90</height>
+          </size>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rowCount">
+          <number>2</number>
+         </property>
+         <property name="columnCount">
+          <number>7</number>
+         </property>
+         <row/>
+         <row/>
+         <column/>
+         <column/>
+         <column/>
+         <column/>
+         <column/>
+         <column/>
+         <column/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="changePidButton">
+         <property name="text">
+          <string>change PID</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="BoostGraphGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Visualization</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFileBoost">
+    <property name="title">
+     <string>FileBoost</string>
+    </property>
+   </widget>
+   <addaction name="menuFileBoost"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionF2">
+   <property name="text">
+    <string>f2</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

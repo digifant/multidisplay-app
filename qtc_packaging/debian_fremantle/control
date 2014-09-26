@@ -1,0 +1,14 @@
+Source: mui
+Section: user/hidden
+Priority: optional
+Maintainer: Dominik Gummel info@gummel-informatics.de
+Build-Depends: debhelper (>= 5), libqt4-dev
+Standards-Version: 3.7.3
+Homepage: http://code.google.com/p/multidisplay/
+
+Package: mui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: graphical UI app for the multidisplay
+ <insert long description, indented with spaces>
+XB-Maemo-Display-Name: mUI

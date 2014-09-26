@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MobileVis1MainWindow</class>
+ <widget class="QMainWindow" name="MobileVis1MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>801</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MD Vis1</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="Vis1PlotBox">
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="ButtonGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="margin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="ReplayFrame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="ReplayPlayButton">
+            <property name="text">
+             <string>play</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ReplayStopButton">
+            <property name="text">
+             <string>stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ReplayPauseButton">
+            <property name="text">
+             <string>pause</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="ReplaySpinBox">
+            <property name="minimum">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="DVMicroLeftButton">
+            <property name="text">
+             <string>&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="DVLeftButton">
+            <property name="text">
+             <string>&lt;&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="DVSlider">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="DVRightButton">
+            <property name="text">
+             <string>&gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="DVMicroRightButton">
+            <property name="text">
+             <string>&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="DVSpinBox">
+            <property name="minimum">
+             <number>10</number>
+            </property>
+            <property name="maximum">
+             <number>100000</number>
+            </property>
+            <property name="singleStep">
+             <number>10</number>
+            </property>
+            <property name="value">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="DelMarkerButton">
+            <property name="text">
+             <string>DM</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionConfig_Visualization1"/>
+    <addaction name="actionShow_first_records"/>
+    <addaction name="actionShow_last_records"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionConfig_Visualization1">
+   <property name="text">
+    <string>Config Visualization1</string>
+   </property>
+  </action>
+  <action name="actionShow_Legend">
+   <property name="text">
+    <string>show Legend</string>
+   </property>
+  </action>
+  <action name="actionReplay">
+   <property name="text">
+    <string>Replay</string>
+   </property>
+  </action>
+  <action name="actionShow_first_records">
+   <property name="text">
+    <string>show first records</string>
+   </property>
+  </action>
+  <action name="actionShow_last_records">
+   <property name="text">
+    <string>show last records</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

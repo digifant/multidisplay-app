@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MultidisplayUIMainWindowClass</class>
+ <widget class="QMainWindow" name="MultidisplayUIMainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>845</width>
+    <height>612</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Multidisplay UI</string>
+  </property>
+  <property name="accessibleName">
+   <string>MultidisplayUI</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QTabWidget" name="DataTableWidget">
+      <property name="currentIndex">
+       <number>4</number>
+      </property>
+      <widget class="QWidget" name="DataTab">
+       <property name="accessibleName">
+        <string>SerialData</string>
+       </property>
+       <attribute name="title">
+        <string>SerialInput</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QPlainTextEdit" name="DataTextEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="BoostPidTab">
+       <attribute name="title">
+        <string>Boost PID</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QFrame" name="BoostParamFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>150</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="BoostGraphGroupBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="VisualizationTab">
+       <attribute name="title">
+        <string>Visualization</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="Data">
+       <attribute name="title">
+        <string>Data</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QTableView" name="DataTableView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="CarPcTab">
+       <attribute name="title">
+        <string>Dashboard</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QGroupBox" name="ReplayGroupBox">
+        <property name="title">
+         <string>Replay</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="ReplayCurPos">
+           <property name="text">
+            <string>cur pos</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="PlayButton">
+           <property name="text">
+            <string>Play</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="PauseButton">
+           <property name="text">
+            <string>Pause</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="StopButton">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="ReplayFactorSpinBox">
+           <property name="minimum">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="CmdGroupBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>Commands</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QPushButton" name="ButtonAPush">
+           <property name="text">
+            <string>A push</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ButtonAHold">
+           <property name="text">
+            <string>A hold</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ButtonBPush">
+           <property name="text">
+            <string>B push</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ButtonBHold">
+           <property name="text">
+            <string>B hold</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="DataViewGroupBox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>165</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string extracomment="test"/>
+        </property>
+        <property name="title">
+         <string>DataView</string>
+        </property>
+        <widget class="QSlider" name="DataViewSlider">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>71</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="invertedAppearance">
+          <bool>true</bool>
+         </property>
+         <property name="invertedControls">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="DataViewWinSizeSpinBox">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>150</y>
+           <width>71</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="minimum">
+          <number>10</number>
+         </property>
+         <property name="maximum">
+          <number>100000</number>
+         </property>
+         <property name="singleStep">
+          <number>10</number>
+         </property>
+         <property name="value">
+          <number>100</number>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>81</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>plot data ]</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>110</y>
+           <width>81</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string># of plotted 
+records:</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="DataViewScrollLeftButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>31</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="DataViewScrollRightButton">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>70</y>
+           <width>31</width>
+           <height>25</height>
+          </rect>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>845</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_New"/>
+    <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
+    <addaction name="action_SaveAs"/>
+    <addaction name="action_Export_as_CSV"/>
+   </widget>
+   <widget class="QMenu" name="menu_Serial">
+    <property name="title">
+     <string>&amp;Serial</string>
+    </property>
+    <addaction name="action_SerialConnect"/>
+    <addaction name="action_SerialDisconnect"/>
+    <addaction name="separator"/>
+    <addaction name="action_SerialOptions"/>
+    <addaction name="action_disable_measurement_data_output"/>
+    <addaction name="action_activate_MD_string_output"/>
+    <addaction name="actionActivate_MD_binary_output"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menu_Evaluation">
+    <property name="title">
+     <string>&amp;Evaluation</string>
+    </property>
+    <addaction name="actionShow_Boost_Lambda"/>
+    <addaction name="actionShow_RPM_Boost"/>
+   </widget>
+   <widget class="QMenu" name="menu_Visualization">
+    <property name="title">
+     <string>&amp;Visualization</string>
+    </property>
+    <addaction name="action_Enable_Zoom_Mode"/>
+    <addaction name="separator"/>
+    <addaction name="action_config_Vis1"/>
+    <addaction name="actionConfigure_DataTable"/>
+   </widget>
+   <widget class="QMenu" name="menuMultidisplay">
+    <property name="title">
+     <string>&amp;Multidisplay V1</string>
+    </property>
+    <addaction name="action_calibrate_LD_measure_environment_pressure"/>
+    <addaction name="action_load_settings_from_EEPROM"/>
+    <addaction name="action_save_settings_to_EEPROM"/>
+    <addaction name="action_set_N75_duty_cycles"/>
+   </widget>
+   <widget class="QMenu" name="menuV2">
+    <property name="title">
+     <string>Multidisplay V&amp;2</string>
+    </property>
+    <widget class="QMenu" name="menu_Digifant_I">
+     <property name="title">
+      <string>&amp;Digifant I</string>
+     </property>
+     <widget class="QMenu" name="menu_map_sensor">
+      <property name="title">
+       <string>&amp;map sensor</string>
+      </property>
+      <addaction name="action100kpa"/>
+      <addaction name="action200kpa"/>
+      <addaction name="action250kpa"/>
+      <addaction name="action300kpa"/>
+      <addaction name="action400kpa"/>
+     </widget>
+     <addaction name="menu_map_sensor"/>
+     <addaction name="actionShow_application_window"/>
+    </widget>
+    <addaction name="actionN75_boost_control"/>
+    <addaction name="actionSettings"/>
+    <addaction name="V2_action_load_settings_from_EEPROM"/>
+    <addaction name="V2_action_save_settings_to_EEPROM"/>
+    <addaction name="separator"/>
+    <addaction name="V2_action_calibrate_LD_measure_environment_pressure"/>
+    <addaction name="actionGearbox_settings"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Digifant_I"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Serial"/>
+   <addaction name="menu_Visualization"/>
+   <addaction name="menu_Evaluation"/>
+   <addaction name="menuMultidisplay"/>
+   <addaction name="menuV2"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="StatusBar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="action_SerialConnect">
+   <property name="text">
+    <string>&amp;Connect</string>
+   </property>
+  </action>
+  <action name="action_SerialDisconnect">
+   <property name="text">
+    <string>&amp;Disconnect</string>
+   </property>
+  </action>
+  <action name="action_SerialOptions">
+   <property name="text">
+    <string>&amp;Options</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_SaveAs">
+   <property name="text">
+    <string>Save &amp;As</string>
+   </property>
+  </action>
+  <action name="action_Export_as_CSV">
+   <property name="text">
+    <string>&amp;Export as CSV</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_New">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="action_Enable_Zoom_Mode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>enable &amp;Zoom Mode</string>
+   </property>
+  </action>
+  <action name="actionShow_EGT0">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>show EGT&amp;0</string>
+   </property>
+  </action>
+  <action name="actionShow_EGT1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>show EGT&amp;1</string>
+   </property>
+  </action>
+  <action name="action_config_Vis1">
+   <property name="text">
+    <string>&amp;configure Visualization 1</string>
+   </property>
+  </action>
+  <action name="actionTest123">
+   <property name="text">
+    <string>test123</string>
+   </property>
+  </action>
+  <action name="actionShow_Boost_Lambda">
+   <property name="text">
+    <string>show Boost / &amp;Lambda</string>
+   </property>
+  </action>
+  <action name="actionShow_RPM_Boost">
+   <property name="text">
+    <string>show RPM / &amp;Boost</string>
+   </property>
+  </action>
+  <action name="action_Replay">
+   <property name="text">
+    <string>&amp;Replay</string>
+   </property>
+  </action>
+  <action name="actionTest_Thread">
+   <property name="text">
+    <string>start Replay Thread</string>
+   </property>
+  </action>
+  <action name="actionStop_Replay_Thread">
+   <property name="text">
+    <string>stop Replay Thread</string>
+   </property>
+  </action>
+  <action name="action_activate_MD_string_output">
+   <property name="text">
+    <string>&amp;activate MD string output</string>
+   </property>
+  </action>
+  <action name="action_calibrate_LD_measure_environment_pressure">
+   <property name="text">
+    <string>&amp;calibrate LD (measure environment pressure)</string>
+   </property>
+  </action>
+  <action name="action_load_settings_from_EEPROM">
+   <property name="text">
+    <string>&amp;load settings from EEPROM</string>
+   </property>
+  </action>
+  <action name="action_save_settings_to_EEPROM">
+   <property name="text">
+    <string>&amp;save settings to EEPROM</string>
+   </property>
+  </action>
+  <action name="action_set_N75_duty_cycles">
+   <property name="text">
+    <string>s&amp;et N75 duty cycles</string>
+   </property>
+  </action>
+  <action name="actionN75_boost_control">
+   <property name="text">
+    <string>n75 &amp;boost control</string>
+   </property>
+  </action>
+  <action name="actionActivate_MD_binary_output">
+   <property name="text">
+    <string>activate MD &amp;binary output</string>
+   </property>
+  </action>
+  <action name="action_disable_measurement_data_output">
+   <property name="text">
+    <string>&amp;disable measurement data output</string>
+   </property>
+  </action>
+  <action name="V2_action_load_settings_from_EEPROM">
+   <property name="text">
+    <string>&amp;load settings from EEPROM</string>
+   </property>
+  </action>
+  <action name="V2_action_save_settings_to_EEPROM">
+   <property name="text">
+    <string>&amp;save settings to EEPROM</string>
+   </property>
+  </action>
+  <action name="V2_action_calibrate_LD_measure_environment_pressure">
+   <property name="text">
+    <string>&amp;calibrate LD (measure environment pressure)</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>&amp;settings</string>
+   </property>
+  </action>
+  <action name="actionGearbox_settings">
+   <property name="text">
+    <string>gearbox settings</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>about</string>
+   </property>
+  </action>
+  <action name="action200kpa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>200kpa</string>
+   </property>
+  </action>
+  <action name="action250kpa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>250kpa</string>
+   </property>
+  </action>
+  <action name="action300kpa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>300kpa</string>
+   </property>
+  </action>
+  <action name="action400kpa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>400kpa</string>
+   </property>
+  </action>
+  <action name="action100kpa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>100kpa</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>use as MD boost sensor</string>
+   </property>
+  </action>
+  <action name="actionShow_application_window">
+   <property name="text">
+    <string>show &amp;application window</string>
+   </property>
+  </action>
+  <action name="actionConfigure_DataTable">
+   <property name="text">
+    <string>configure DataTable</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

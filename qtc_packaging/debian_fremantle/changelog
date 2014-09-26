@@ -1,0 +1,46 @@
+mui (0.2.7) unstable; urgency=low
+  * knock bar, injector duty cycle
+ -- Dominik Gummel <info@gummel-informatics.de>  Sa, 15 Jun 2014 00:00:00 +0200
+
+mui (0.2.6) unstable; urgency=low
+  * support for external gps receiver with 10 Hz frequency
+ -- Dominik Gummel <info@gummel-informatics.de>  Mo, 22 Oct 2013 00:00:00 +0200
+
+mui (0.2.5) unstable; urgency=low
+  * log gps data at maximum possible speed (1Hz)
+  * accelerometer and gps datalogging to the main binary datastructure
+  * speed value changed to double()
+ -- Dominik Gummel <info@gummel-informatics.de>  Mi, 09 Oct 2013 00:00:00 +0200
+
+mui (0.2.4) unstable; urgency=low
+  * basic accelerometer support
+ -- Dominik Gummel <info@gummel-informatics.de>  Mi, 27 Sep 2013 00:00:00 +0200
+
+mui (0.2.3) unstable; urgency=low
+  * bugfix
+  * screensaver activation inhibited
+ -- Dominik Gummel <info@gummel-informatics.de>  Mi, 26 Sep 2013 00:00:00 +0200
+
+mui (0.2.2) unstable; urgency=low
+  * GPS datalogging
+  * new widgets for efr speed and pressure
+  * filename bugfix
+ -- Dominik Gummel <info@gummel-informatics.de>  Mi, 25 Sep 2013 00:00:00 +0200
+
+mui (0.2.1) unstable; urgency=low
+  * some bugfixes
+ -- Dominik Gummel <info@gummel-informatics.de>  Mi, 18 Sep 2013 00:00:00 +0200
+
+mui (0.2.0) unstable; urgency=low
+  * support for new multidisplay V2 binary protocol 95
+  * shows highest egt value
+  * shows Digifant 1 data
+ -- Dominik Gummel <info@gummel-informatics.de>  Fri, 9 Aug 2013 00:33:00 +0200
+
+mui (0.1.0) unstable; urgency=low
+  * multidisplay V2 support
+ -- Dominik Gummel <info@gummel-informatics.de>  Fri, 19 Aug 2012 11:53:52 +0200
+
+mui (0.0.1) unstable; urgency=low
+  * Initial Release.
+ -- Dominik Gummel <info@gummel-informatics.de>  Fri, 19 Aug 2011 11:53:52 +0200
