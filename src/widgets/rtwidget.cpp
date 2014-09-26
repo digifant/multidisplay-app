@@ -150,7 +150,7 @@ MeasurementWidget::MeasurementWidget ( QWidget *parent, QString caption, double 
     wideMode = false;
 
     textPen = QPen ( Qt::black );
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     textFont.setPointSize(20);
     dataFont.setPixelSize(90);
 #else
@@ -201,7 +201,7 @@ void MeasurementWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     QColor bc = overblendBackground();
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
     painter.setBackgroundMode( Qt::TransparentMode );
@@ -213,7 +213,7 @@ void MeasurementWidget::paint() {
     painter.setBackground( QBrush ( bc ) );
 #endif
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 //    painter.setBackgroundMode( Qt::OpaqueMode );
 
     painter.setFont(textFont);
@@ -273,7 +273,7 @@ void MeasurementWidget::paintEvent(QPaintEvent *event) {
 void MeasurementWidget::resizeEvent ( QResizeEvent * event ) {
     //qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
         dataFont.setPointSize( (event->size().width()) / digits );
 #else
         uint ps = 0;
@@ -397,7 +397,7 @@ void MaxEgtWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 //    QColor bc = overblend(loColor, hiColor, value);
     QColor bc = overblend->overblend3(value);
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
@@ -410,7 +410,7 @@ void MaxEgtWidget::paint() {
     painter.setBackground( QBrush ( bc ) );
 #endif
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 //    painter.setBackgroundMode( Qt::OpaqueMode );
 
     painter.setFont(textFont);

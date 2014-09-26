@@ -15,8 +15,9 @@ maemo5 {
 MOBILITY += location systeminfo sensors
 
 android {
-    #necessitas sets Q_WS_ANDROID
+    #necessitas sets Q_OS_ANDROID
     DEFINES += ANDROID
+    #legacy -> remove!
     DEFINES+= Q_WS_ANDROID
     message ("android define set!")
 }

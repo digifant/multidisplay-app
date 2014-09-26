@@ -157,7 +157,7 @@ AppEngine::AppEngine() {
 #endif
 
 
-#if defined (Q_WS_ANDROID)
+#if defined (Q_OS_ANDROID)
     qDebug() << "ANDROID mobile version";
     QDesktopWidget *dw = QApplication::desktop ();
     amw = new AndroidMainWindow ();
@@ -201,13 +201,13 @@ AppEngine::AppEngine() {
 
     connect (replay, SIGNAL(clearPlots()), data, SLOT(clearPlots()) );
 
-#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_WS_ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)
     connect (replay, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)), Qt::QueuedConnection );
 #endif
     connect (replay, SIGNAL(visualizeDataRecord(MdDataRecord*,bool)), data, SLOT(visualizeDataRecord(MdDataRecord*,bool)), Qt::QueuedConnection );
 
 
-#if  defined (Q_WS_MAEMO_5)  || defined (Q_WS_ANDROID)
+#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
     setupMobile();
 #else
     setupPC();
@@ -367,7 +367,7 @@ void AppEngine::setupMobile() {
 #ifdef Q_WS_MAEMO_5
     setupMaemo();
 #endif
-#ifdef Q_WS_ANDROID
+#ifdef Q_OS_ANDROID
     setupAndroid();
 #endif
 }
@@ -529,7 +529,7 @@ void AppEngine::show() {
     //Maemo Stacked Windows
     mmw->show();
 #endif
-#if defined (Q_WS_ANDROID)
+#if defined (Q_OS_ANDROID)
     amw->show();
  #endif
 }

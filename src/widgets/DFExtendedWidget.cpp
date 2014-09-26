@@ -8,7 +8,7 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
                 QColor loColor, QColor midColor, QColor hiColor )
     : MeasurementWidget (parent, caption, lo, mid, hi, loColor, midColor, hiColor) {
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     captionFont.setPointSize(12);
 #else
     captionFont.setPointSize(12);
@@ -91,7 +91,7 @@ void DFExtendedWidget::paint() {
     painter.setFont(textFont);
     QFontMetrics fm = painter.fontMetrics();
     uint h = 0;
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     h = fm.height()/2 + 5;
     //painter.drawText( QPoint(0,textFont.pointSize()), caption );
     painter.drawText( QPoint(0,h), caption );
@@ -158,7 +158,7 @@ void DFExtendedWidget::paint() {
     else if ( df_wot_flag & 0x10 )
         dk = "idle";
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 //    painter.setFont(dataFont);
     painter.setFont(textFont);
     fm = painter.fontMetrics();
@@ -255,7 +255,7 @@ void DFExtendedWidget::paint() {
 void DFExtendedWidget::resizeEvent ( QResizeEvent * event ) {
     qDebug() << "DFExtendedWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
         //ignore it at the moment
 #else
 //        uint ps = calcMaxFontPixelSizeByGivenHeight ( event->size().width(), event->size().height(), 14, 30 );
