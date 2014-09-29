@@ -31,8 +31,6 @@
 #include <QDir>
 
 #include "AppEngine.h"
-#include "MdSerialCom.h"
-#include "MdSerialComBinary.h"
 #include "MdData.h"
 #include "widgets/realtimevis.h"
 #include "VisualizationPlot.h"
@@ -64,6 +62,18 @@
 #include "widgets/MyTableWidget.h"
 #include "widgets/N75PidSettingsWidget.h"
 
+#if QT_VERSION >= 0x050000 && not defined(ANDROID)
+#include "com/MdQextSerialCom.h"
+#endif
+
+#if QT_VERSION < 0x050000
+#include "com/MdQextSerialCom.h"
+#endif
+
+#if defined (ANDROID)
+
+#endif
+
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
 #include "mobile/MobileGPS.h"
 #include "mobile/Accelerometer.h"
@@ -89,8 +99,13 @@ AppEngine::AppEngine() {
     DataViewSpinBox = pcmw->ui.DataViewWinSizeSpinBox;
 
     data = new MdData(pcmw, pcmw->ui.BoostGraphGroupBox, pcmw, pcmw->ui.VisualizationTab, pcmw->ui.DataTableView );
-//    mds = new MdSerialCom(data);
-    mds = (MdSerialCom*) new MdSerialComBinary(data);
+
+#if QT_VERSION >= 0x050000
+    mdcom = new MdQSerialPortCom(this);
+#else
+    mdcom = new MdQextSerialCom(this);
+#endif
+    mds = new MdBinaryProtocol(this, data, mdcom);
 
     mySerialOptionsDialog = new SerialOptionsDialog ();
 
@@ -234,8 +249,6 @@ AppEngine::~AppEngine() {
 void AppEngine::setupPC() {
     connect (pcmw, SIGNAL(writeSettings()), this, SLOT(writeSettings()));
 
-    connect (mds, SIGNAL (lineRead(QString)),  pcmw->ui.DataTextEdit, SLOT(appendPlainText(QString)) );
-
     connect (pcmw->ui.ButtonAHold, SIGNAL(clicked()), mds, SLOT(mdCmdAh() ) );
     connect (pcmw->ui.ButtonAPush, SIGNAL(clicked()), mds, SLOT(mdCmdAp() ) );
     connect (pcmw->ui.ButtonBHold, SIGNAL(clicked()), mds, SLOT(mdCmdBh() ) );
@@ -280,7 +293,6 @@ void AppEngine::setupPC() {
     connect (pcmw->ui.StopButton, SIGNAL(clicked()), replay, SLOT(stop()) );
     connect (pcmw->ui.ReplayFactorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setReplaySpeedUpFactor(double)));
 
-
     connect (data, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)));
     connect (mds, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)));
     connect (mds, SIGNAL(showStatusBarSampleCount(QString)), pcmw, SLOT(showStatusBarSampleCount(QString)));
@@ -291,13 +303,6 @@ void AppEngine::setupPC() {
     pcmw->ui.DataTableView->setAlternatingRowColors(true);
     pcmw->ui.DataTableView->resizeRowsToContents();
     pcmw->ui.DataTableView->resizeColumnsToContents();
-
-    //V1 config stuff
-    connect (pcmw->ui.action_load_settings_from_EEPROM, SIGNAL(triggered()), mds, SLOT(mdCmdReadEeprom()));
-    connect (pcmw->ui.action_calibrate_LD_measure_environment_pressure, SIGNAL(triggered()), mds, SLOT(mdCmdCalBoost()));
-    connect (pcmw->ui.action_save_settings_to_EEPROM, SIGNAL(triggered()), mds, SLOT(mdCmdSave2Eeprom()));
-    connect (pcmw->ui.action_set_N75_duty_cycles, SIGNAL(triggered()), n75OptionsDialog, SLOT(show()));
-    connect (n75OptionsDialog, SIGNAL(accepted()), this, SLOT(setN75dutyCycles()));
 
     //V2 config stuff
     connect (pcmw->ui.actionN75_boost_control, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
@@ -835,6 +840,3 @@ void AppEngine::changeDVSliderMax() {
     DataViewSlider->setValue( DataViewSlider->maximum() );
 }
 
-void AppEngine::setN75dutyCycles() {
-    mds->mdCmdN75ManualDuty (n75OptionsDialog->ui->n75NormalDutySpinBox->value(), n75OptionsDialog->ui->n75RaceDutySpinBox->value() );
-}

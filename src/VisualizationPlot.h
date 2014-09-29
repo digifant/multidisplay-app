@@ -42,7 +42,12 @@ public:
 public slots:
     virtual void pointSelected(QPointF const&);
 	virtual void enableXBottomAutoScale();
+
+    //qwt5
 	void showCurve(QwtPlotItem *item, bool on);
+    //qwt6
+    void showCurve(QVariant info, bool on, int index);
+    void showCurve(QVariant info, int index);
 
     void removeLastMarker ();
 

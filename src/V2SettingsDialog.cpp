@@ -3,7 +3,7 @@
 #include <QDebug>
 #include "ui_V2SettingsDialog.h"
 #include "AppEngine.h"
-#include "MdSerialComBinary.h"
+#include "com/MdBinaryProtocol.h"
 
 V2SettingsDialog::V2SettingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -22,7 +22,7 @@ void V2SettingsDialog::accepted() {
     AppEngine::getInstance()->setActualizeVis1( ui->actualizeVis1CheckBox->isChecked() );
     AppEngine::getInstance()->setActualizeDashboard( ui->actualizeDashboardCheckBox->isChecked() );
 
-    MdSerialComBinary* mds = qobject_cast<MdSerialComBinary*> (AppEngine::getInstance()->getMdSerialCom());
+    MdBinaryProtocol* mds = qobject_cast<MdBinaryProtocol*> (AppEngine::getInstance()->getMdBinaryProtocl());
     if ( mds )
         mds->mdCmdSetSerialFrequency (ui->serialFrequencySpinBox->value(), 0);
     else

@@ -230,10 +230,13 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
 
 #ifndef Q_WS_MAEMO_5
     QwtLegend *legend = new QwtLegend();
+    legend->setDefaultItemMode( QwtLegendData::Clickable );
     //    legend->setItemMode(QwtLegend::CheckableItem);
     insertLegend(legend, QwtPlot::BottomLegend);
 
-    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), SLOT(showCurve(QwtPlotItem *, bool)));
+//    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), SLOT(showCurve(QwtPlotItem *, bool)));
+    connect(legend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(showCurve(QVariant,bool,int)) );
+    connect(legend, SIGNAL(clicked(QVariant,int)), this, SLOT(showCurve(QVariant,int)) );
 #endif
 }
 
@@ -384,12 +387,29 @@ void VisualizationPlot::enableXBottomAutoScale() {
 
 void VisualizationPlot::showCurve(QwtPlotItem *item, bool on) {
     item->setVisible(!on);
-    //qwt6 ?
 //    QWidget *w = legend()->find(item);
 //    if ( w && w->inherits("QwtLegendItem") )
 //        ((QwtLegendItem *)w)->setChecked(on);
 
     replot();
+}
+
+void VisualizationPlot::showCurve(QVariant info, bool on, int index)
+{
+    QwtPlotItem *i = this->infoToItem(info);
+    if ( i ) {
+        i->setVisible(on);
+        replot();
+    }
+}
+
+void VisualizationPlot::showCurve(QVariant info, int index)
+{
+    QwtPlotItem *i = this->infoToItem(info);
+    if ( i ) {
+        i->setVisible( ! i->isVisible() );
+        replot();
+    }
 }
 
 int VisualizationPlot::windowBegin() {

@@ -21,8 +21,7 @@
 #include <QHBoxLayout>
 #include <QDebug>
 #include <QObject>
-#include "MdSerialCom.h"
-#include "MdSerialComBinary.h"
+#include "com/MdBinaryProtocol.h"
 
 N75PidSettingsTableWidget::N75PidSettingsTableWidget (QWidget *parent)
     : MyTableWidget (parent) {
@@ -60,7 +59,7 @@ N75PidSettingsTableWidget::N75PidSettingsTableWidget (QWidget *parent)
 }
 
 
-N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdSerialComBinary* mds) : QGroupBox(parent), mds(mds) {
+N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* mds) : QGroupBox(parent), mds(mds) {
     setLayout( new QHBoxLayout (this) );
     tw = new N75PidSettingsTableWidget (this);
     tw->setBaseSize(200,60);

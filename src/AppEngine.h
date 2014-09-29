@@ -27,13 +27,13 @@
 #else
 #include <QtGui/QMainWindow>
 #endif
-#include "MdSerialCom.h"
-#include "MdSerialComBinary.h"
+#include "com/MdAbstractCom.h"
+#include "com/MdBinaryProtocol.h"
 #include "TransferFunction.h"
 #include "serialoptions.h"
 
 
-class MdSerialCom;
+class MdBinaryProtocol;
 class MdData;
 class CarPcDemoWidget;
 class RealTimeVis;
@@ -85,7 +85,7 @@ public:
     bool getActualizeDashboard() { return actualizeDashboard; }
     void setActualizeDashboard( bool n ) { actualizeDashboard = n; }
 
-    MdSerialCom* getMdSerialCom() { return mds; }
+    MdBinaryProtocol* getMdBinaryProtocl() { return mds; }
 
     EvaluationWindow* getEvalWinBoostLambda () { return evalWinBoostLambda; }
     EvaluationWindow* getEvalWinRPMBoost() { return evalWinRPMBoost; }
@@ -133,8 +133,6 @@ public slots:
 
     void replayData();
 
-    void setN75dutyCycles();
-
 protected:
     void closeEvent ( QCloseEvent * event );
 
@@ -162,7 +160,9 @@ private:
     AboutDialog *aboutDialog;
 
 
-    MdSerialCom *mds;
+    MdAbstractCom *mdcom;
+    MdBinaryProtocol *mds;
+
     MdData *data;
 
     QString filename;

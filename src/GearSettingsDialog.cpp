@@ -1,6 +1,7 @@
 #include "GearSettingsDialog.h"
 #include "ui_GearSettingsDialog.h"
 #include "AppEngine.h"
+#include "com/MdBinaryProtocol.h"
 
 #include <QDebug>
 
@@ -20,7 +21,7 @@ GearSettingsDialog::~GearSettingsDialog()
 
 void GearSettingsDialog::showEvent ( QShowEvent * event ) {
     qDebug() << "GearSettingsDialog::showEvent()";
-    MdSerialComBinary* mds = qobject_cast<MdSerialComBinary*> (AppEngine::getInstance()->getMdSerialCom());
+    MdBinaryProtocol* mds = qobject_cast<MdBinaryProtocol*> (AppEngine::getInstance()->getMdBinaryProtocl());
     connect ( mds, SIGNAL(gearboxSettingsReceived(quint8,double,double,double,double,double,double)),
              this, SLOT(loadMdGearboxData(quint8,double,double,double,double,double,double)));
     connect (this, SIGNAL(writeGearboxData(double,double,double,double,double,double,quint8)),

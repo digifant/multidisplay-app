@@ -26,7 +26,6 @@
 #include <QIcon>
 
 #include "multidisplayuimainwindow.h"
-#include "MdSerialCom.h"
 #include "MdData.h"
 #include "VisualizationPlot.h"
 #include "evaluation/evaluationwindow.h"

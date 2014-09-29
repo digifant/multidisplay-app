@@ -23,7 +23,8 @@
 #include <QObject>
 #include <QGroupBox>
 #include "MyTableWidget.h"
-#include "MdSerialComBinary.h"
+
+class MdBinaryProtocol;
 
 class N75PidSettingsTableWidget : public MyTableWidget {
     Q_OBJECT
@@ -39,7 +40,7 @@ protected:
 class N75PidSettingsWidget : public QGroupBox {
     Q_OBJECT
 public:
-    N75PidSettingsWidget (QWidget *parent = 0, MdSerialComBinary* mds = 0 );
+    N75PidSettingsWidget (QWidget *parent = 0, MdBinaryProtocol* mds = 0 );
 signals:
     void requestN75PidSettings();
     void setN75PidSettings (quint8 serial, double aKp, double aKi, double aKd,
@@ -68,7 +69,7 @@ protected:
     QPushButton *bWrite;
     QPushButton *bReadEeprom;
     QPushButton *bWriteEeprom;
-    MdSerialComBinary *mds;
+    MdBinaryProtocol *mds;
 };
 
 

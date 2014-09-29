@@ -39,7 +39,7 @@ Ui::SerialOptionsDialog* SerialOptionsDialog::getUi() {
 }
 
 void SerialOptionsDialog::showEvent ( QShowEvent * event ) {
-    if ( AppEngine::getInstance()->getMdSerialCom() ) {
-        connect(ui.disconnectPushButton, SIGNAL(clicked()),  AppEngine::getInstance()->getMdSerialCom(), SLOT(closePort()));
+    if ( AppEngine::getInstance()->getMdBinaryProtocl() ) {
+        connect(ui.disconnectPushButton, SIGNAL(clicked()),  AppEngine::getInstance()->getMdBinaryProtocl(), SLOT(closePort()));
     }
 }

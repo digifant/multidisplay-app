@@ -385,15 +385,6 @@ records:</string>
     <addaction name="action_config_Vis1"/>
     <addaction name="actionConfigure_DataTable"/>
    </widget>
-   <widget class="QMenu" name="menuMultidisplay">
-    <property name="title">
-     <string>&amp;Multidisplay V1</string>
-    </property>
-    <addaction name="action_calibrate_LD_measure_environment_pressure"/>
-    <addaction name="action_load_settings_from_EEPROM"/>
-    <addaction name="action_save_settings_to_EEPROM"/>
-    <addaction name="action_set_N75_duty_cycles"/>
-   </widget>
    <widget class="QMenu" name="menuV2">
     <property name="title">
      <string>Multidisplay V&amp;2</string>
@@ -435,7 +426,6 @@ records:</string>
    <addaction name="menu_Serial"/>
    <addaction name="menu_Visualization"/>
    <addaction name="menu_Evaluation"/>
-   <addaction name="menuMultidisplay"/>
    <addaction name="menuV2"/>
    <addaction name="menuHelp"/>
   </widget>

@@ -46,7 +46,6 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     BoostPlot.h \
     MdData.h \
     serialoptions.h \
-    MdSerialCom.h \
     multidisplayuimainwindow.h \
     mdutil.h \
     mobile/mobilemainwindow.h \
@@ -59,7 +58,6 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     thread/workerjob.h \
     widgets/realtimevis.h \
     widgets/rtwidget.h \
-    MdSerialComBinary.h \
     MdDataRecordV2.h \
     Map16x1.h \
     N75OptionsDialog.h \
@@ -80,11 +78,21 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     V2PowerDialog.h \
     MdGpsSerial.h \
     WotEventsDialog.h \
-    widgets/Overlay.h
+    widgets/Overlay.h \
+    com/MdAbstractCom.h \    
+    com/MdBinaryProtocol.h
+
+lessThan(QT_MAJOR_VERSION, 5) {
+    win32|unix:HEADERS+=com/MdQextSerialCom.h
+} else {
+    win32|unix:HEADERS+=com/MdQSerialPortCom.h
+}
+
 
 maemo5:HEADERS+=mobile/MobileEvaluationDialog.h \
     mobile/MobileGPS.h \
-    mobile/Accelerometer.h
+    mobile/Accelerometer.h \
+    com/MdQextSerialCom.h
 
 android:HEADERS+=mobile/MobileGPS.h \
     mobile/Accelerometer.h
@@ -104,7 +112,6 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     BoostPlot.cpp \
     MdData.cpp \
     serialoptions.cpp \
-    MdSerialCom.cpp \
     multidisplayuimainwindow.cpp \
     main.cpp \
     mdutil.cpp \
@@ -118,7 +125,6 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     thread/jobrunnerthread.cpp \
     widgets/realtimevis.cpp \
     widgets/rtwidget.cpp \
-    MdSerialComBinary.cpp \
     MdDataRecordV2.cpp \
     Map16x1.cpp \
     N75OptionsDialog.cpp \
@@ -139,11 +145,20 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     V2PowerDialog.cpp \
     MdGpsSerial.cpp \
     WotEventsDialog.cpp \
-    widgets/Overlay.cpp
+    widgets/Overlay.cpp \
+    com/MdAbstractCom.cpp \
+    com/MdBinaryProtocol.cpp
+
+lessThan(QT_MAJOR_VERSION, 5) {
+    win32|unix:SOURCES+=com/MdQextSerialCom.cpp
+} else {
+    win32|unix:SOURCES+=com/MdQSerialPortCom.cpp
+}
 
 maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
     mobile/MobileGPS.cpp \
-    mobile/Accelerometer.cpp
+    mobile/Accelerometer.cpp \
+    com/MdQextSerialCom.cpp
 
 android:SOURCES+=mobile/MobileGPS.cpp \
     mobile/Accelerometer.cpp

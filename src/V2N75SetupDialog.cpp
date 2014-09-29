@@ -2,7 +2,7 @@
 #include "QDebug"
 #include <QThread>
 #include <QMessageBox>
-#include "MdSerialComBinary.h"
+#include "com/MdBinaryProtocol.h"
 #include "widgets/MyTableWidget.h"
 #include "widgets/N75PidSettingsWidget.h"
 #include "ui_V2N75SetupDialog.h"

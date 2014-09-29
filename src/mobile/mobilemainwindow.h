@@ -23,7 +23,6 @@
 #include <QMainWindow>
 #include "MdData.h"
 #include "serialoptions.h"
-#include "MdSerialCom.h"
 #include "evaluation/evaluationwindow.h"
 
 #if defined (Q_WS_MAEMO_5) || defined (ANDROID)
