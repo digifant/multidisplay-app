@@ -755,19 +755,7 @@ void AppEngine::readSettings () {
     settings.endGroup();
 #endif
 
-
     data->getVisPlot()->readSettings();
-
-    //FIXME v2 settings!
-//    settings.beginGroup("boostpid");
-//    BoostPIDTableWidget->item(1,0)->setText( settings.value ("setpoint", QVariant (1.0).toString() ).toString() );
-//    BoostPIDTableWidget->item(1,2)->setText( settings.value ("output", QVariant (250).toString() ).toString() );
-//    BoostPIDTableWidget->item(1,3)->setText( settings.value ("p", QVariant (3).toString() ).toString() );
-//    BoostPIDTableWidget->item(1,4)->setText( settings.value ("i", QVariant (1).toString() ).toString() );
-//    BoostPIDTableWidget->item(1,5)->setText( settings.value ("d", QVariant (1).toString() ).toString() );
-//    BoostPIDTableWidget->item(1,6)->setText( settings.value ("mode", QVariant ("m").toString() ).toString() );
-
-//    settings.endGroup();
 
 
     mySerialOptionsDialog->getUi()->portComboBox->setCurrentIndex( settings.value ("mdserial/port", 0).toInt() );
