@@ -148,7 +148,8 @@ AppEngine::AppEngine() {
     DataViewSpinBox = mvis1w->ui->DVSpinBox;
 
     data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
-    mds = (MdSerialCom*) new MdSerialComBinary(data);
+    mdcom = new MdQextSerialCom(this);
+    mds = new MdBinaryProtocol(this, data, mdcom);
     mySerialOptionsDialog = new SerialOptionsDialog ();
     mySerialOptionsDialog->setGeometry( dw->availableGeometry() );
     mySerialOptionsDialog->setGeometry( QRect(0,0,700,350) );
@@ -186,6 +187,10 @@ AppEngine::AppEngine() {
     mvis1w = new MobileVis1MainWindow (mbw);
 
     data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
+
+//    mdcom = new MdBluetoothCom(this);
+    mds = new MdBinaryProtocol(this, data, mdcom);
+
     mds = (MdSerialCom*) new MdSerialComBinary(data);
 
     mySerialOptionsDialog = new SerialOptionsDialog ();
