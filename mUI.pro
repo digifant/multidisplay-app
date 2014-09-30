@@ -2,9 +2,11 @@
 TEMPLATE = subdirs
 CONFIG   += ordered
 SUBDIRS  = libs/qwt-6.1.1 \
-	   libs/qextserialport \
 	   src
 
+lessThan(QT_MAJOR_VERSION, 5) {
+    SUBDIRS+=libs/qextserialport
+}
 
 
 OTHER_FILES += \

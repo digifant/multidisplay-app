@@ -29,7 +29,9 @@ JobRunnerThread::JobRunnerThread(QObject *parent, WorkerJob *job) :
     t = new QThread();
     connect (t, SIGNAL(started()), this, SLOT(threadStarted()));
     connect (t, SIGNAL(finished()), this, SLOT(threadFinished()));
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     connect (t, SIGNAL(terminated()), this, SLOT(threadTerminated()));
+#endif
 
     if ( job ) {
         connect (this, SIGNAL(startWork()), job, SLOT(start()) );
@@ -57,6 +59,8 @@ void JobRunnerThread::threadStarted () {
     emit started();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void JobRunnerThread::threadTerminated () {
     emit terminated();
 }
+#endif

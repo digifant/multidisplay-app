@@ -3,6 +3,12 @@ TARGET = mUI
 QT += core \
     gui
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += bluetooth
+    !android: QT += serialport
+}
+
+
 CONFIG += rtti exceptions mobility serialport
 
 
@@ -219,20 +225,21 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
         unix:{
             !android:!maemo5 {
                         message ("UNIX pure")
-                        unix:LIBS += -L ../libs/qextserialport/src/build -lqextserialportd \
-                                     -L../libs/qwt-6.1.1/lib -lqwt
+                        lessThan(QT_MAJOR_VERSION, 5) {
+                            unix:LIBS += -L ../libs/qextserialport/src/build -lqextserialportd
+                        }
+                        unix:LIBS += -L../libs/qwt-6.1.1/lib -lqwt
                       }
             android:  {
                         message("android: static linking!")
-                        unix:LIBS += ../libs/qextserialport/src/build/libqextserialportd.a \
-                                     ../libs/qwt-6.1.1/lib/libqwtd.a
+                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwtd.a
                        }
             maemo5:    {
 #                        message ("Maemo5: static linking!")
 #                        unix:LIBS += ../libs/qextserialport/src/build/libqextserialportd.a \
 #                                     ../libs/qwt-6.1.1/lib/libqwtd.a
-                        message ("Maemo5: dynamic linking!")
-                        unix:LIBS += -L../libs/qwt-6.1.1/lib -L../libs/qextserialport/src/build -lqwt -lqextserialportd
+                        message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
+                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
                         }
         }
 
@@ -243,9 +250,12 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                         unix:LIBS += ../libs/qextserialport/src/build/libqextserialport.a \
                         -L ../libs/qwt-6.1.1/lib -lqwt
         }
-        win32:LIBS += -L $$quote(..\libs\qextserialport\src\build) -lqextserialport1 \
-                  -L $$quote(../libs/qwt-6.1.1/lib) -lqwt
-
+        win32:{
+                lessThan(QT_MAJOR_VERSION, 5) {
+                    LIBS += -L $$quote(..\libs\qextserialport\src\build) -lqextserialport1
+                }
+                    LIBS += -L $$quote(../libs/qwt-6.1.1/lib) -lqwt
+        }
         maemo5: {
             message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
             unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport

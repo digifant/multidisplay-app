@@ -22,11 +22,13 @@
 #define APPENGINE_H
 
 
-#if QT_VERSION >= 0x050000
-#include <QMainWindow>
+#include <qglobal.h>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <QMainWindow>
 #else
-#include <QtGui/QMainWindow>
+    #include <QtGui/QMainWindow>
 #endif
+
 #include "com/MdAbstractCom.h"
 #include "com/MdBinaryProtocol.h"
 #include "TransferFunction.h"

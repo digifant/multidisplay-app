@@ -20,7 +20,7 @@
 #include <QDebug>
 #include "MdQSerialPortCom.h"
 
-#include <QSerialPort>
+#include <QtSerialPort/QSerialPort>
 
 
 
@@ -72,7 +72,7 @@ bool MdQSerialPortCom::changePortSettings (QString sport, QString speed) {
 
 
 void MdQSerialPortCom::transmitMsg(const QString &s) {
-    port->write(s.toAscii(), s.length());
+    port->write(s.toLatin1(), s.length());
 }
 
 void MdQSerialPortCom::transmitMsg(const QByteArray &ba)

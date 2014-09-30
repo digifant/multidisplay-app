@@ -3,13 +3,13 @@
 
 
 #include <QObject>
+#include <com/MdAbstractCom.h>
 
 #if defined ( Q_WS_MAEMO_5 )
 #include <QGeoPositionInfo>
 QTM_USE_NAMESPACE
 #endif
 
-class QextSerialPort;
 class QTimer;
 
 
@@ -30,8 +30,7 @@ public slots:
     void openPort();
 
 protected slots:
-    virtual void onReadyRead();
-    void onDsrChanged(bool status);
+    virtual void incomingData( const QByteArray& bytes);
 
 signals:
     void bytesRead (QByteArray);
@@ -50,11 +49,18 @@ protected:
 
     bool setupPort (QString sport="/dev/rfcomm5", QString speed="115200");
 
-    QextSerialPort *port;
     QString buffer;
     QString parseBuffer;
 
-    void parseLine (QString l);
+    void parseLine ( const QString &l );
+
+    MdAbstractCom *port;
+//#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+//    MdQSerialPortCom *port;
+//#else
+//    MdQextSerialCom *port;
+//#endif
+
 
 #if defined ( Q_WS_MAEMO_5 )
     QGeoCoordinate coordinate;

@@ -62,16 +62,16 @@
 #include "widgets/MyTableWidget.h"
 #include "widgets/N75PidSettingsWidget.h"
 
-#if QT_VERSION >= 0x050000 && not defined(ANDROID)
-#include "com/MdQextSerialCom.h"
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && not defined(Q_OS_ANDROID)
+    #include "com/MdQSerialPortCom.h"
 #endif
 
-#if QT_VERSION < 0x050000
-#include "com/MdQextSerialCom.h"
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    #include "com/MdQextSerialCom.h"
 #endif
 
-#if defined (ANDROID)
-
+#if defined (Q_OS_ANDROID)
+    //todo bluetooth
 #endif
 
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
@@ -100,7 +100,7 @@ AppEngine::AppEngine() {
 
     data = new MdData(pcmw, pcmw->ui.BoostGraphGroupBox, pcmw, pcmw->ui.VisualizationTab, pcmw->ui.DataTableView );
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     mdcom = new MdQSerialPortCom(this);
 #else
     mdcom = new MdQextSerialCom(this);

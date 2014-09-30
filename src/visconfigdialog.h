@@ -21,11 +21,7 @@
 #ifndef VISCONFIGDIALOG_H
 #define VISCONFIGDIALOG_H
 
-#if QT_VERSION >= 0x050000
-#include <QtGui/QDialog>
-#else
 #include <QDialog>
-#endif
 
 #include <QMap>
 #include <QString>

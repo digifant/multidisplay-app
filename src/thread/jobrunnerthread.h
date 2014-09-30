@@ -43,15 +43,18 @@ signals:
 
     void finished ();
     void started ();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     void terminated ();
+#endif
 
 public slots:
     void start();
 
     void threadFinished ();
     void threadStarted ();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     void threadTerminated ();
-
+#endif
 
 
 private:

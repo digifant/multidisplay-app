@@ -20,11 +20,13 @@
 #ifndef SERIALOPTIONS_H
 #define SERIALOPTIONS_H
 
-#if QT_VERSION >= 0x050000
-#include <QDialog>
+#include <qglobal.h>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <QDialog>
 #else
-#include <QtGui/QDialog>
+    #include <QtGui/QDialog>
 #endif
+
 #include "ui_serialoptions.h"
 
 class SerialOptionsDialog : public QDialog

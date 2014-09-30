@@ -3,7 +3,12 @@
 #include <QTime>
 #include <QDebug>
 #include <QStringList>
-#include "qextserialport.h"
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <com/MdQSerialPortCom.h>
+#else
+    #include <com/MdQextSerialCom.h>
+#endif
 
 
 MdGpsSerial::MdGpsSerial()
@@ -17,50 +22,35 @@ MdGpsSerial::~MdGpsSerial() {
 }
 
 bool MdGpsSerial::setupPort (QString sport, QString speed) {
-    //modify the port settings on your own
-    port = new QextSerialPort(sport, QextSerialPort::EventDriven);
-    if ( speed == "115200")
-        port->setBaudRate(BAUD115200);
-    else
-        port->setBaudRate(BAUD57600);
-    port->setFlowControl(FLOW_OFF);
-    port->setParity(PAR_NONE);
-    port->setDataBits(DATA_8);
-    port->setStopBits(STOP_1);
-    //set timeouts to 500 ms
-    port->setTimeout(1000);
+    if ( port )
+        delete port;
 
-    if (port->open(QIODevice::ReadWrite) == true) {
-        connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-        connect(port, SIGNAL(dsrChanged(bool)), this, SLOT(onDsrChanged(bool)));
-        if (!(port->lineStatus() & LS_DSR)) {
-            qDebug() << "MdGpsSerial: warning device is not turned on";
-            return false;
-        }
-        qDebug() << "MdGpsSerial: listening for data on" << port->portName();
-        emit portOpened();
-    }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    port = new MdQSerialPortCom(this);
+#else
+    port = new MdQextSerialCom(this);
+#endif
+    bool r = port->setupPort (sport,speed);
+    connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+
+    if ( r )
+        qDebug() << "MdGpsSerial: listening for data";
     else {
-        qDebug() << "MdGpsSerial: device failed to open:" << port->errorString();
+        qDebug() << "MdGpsSerial: device failed to open";
         return false;
     }
     return true;
 }
 
 bool MdGpsSerial::changePortSettings (QString sport, QString speed) {
+    if ( port )
+        port->changePortSettings (sport, speed);
     closePort();
-    delete (port);
-    setupPort (sport, speed);
-    qDebug() << "MdGpsSerial: changed serial port to " << sport;
     return true;
 }
 
-void MdGpsSerial::onReadyRead()
-{
-    QByteArray bytes;
-    int a = port->bytesAvailable();
-    bytes.resize(a);
-    port->read(bytes.data(), bytes.size());
+void MdGpsSerial::incomingData( const QByteArray& bytes) {
+    int a = bytes.size();
     //    qDebug() << "MdGpsSerial: bytes read:" << bytes.size();
     //    qDebug() << "MdGpsSerial: bytes:" << bytes;
     QString s (bytes);
@@ -88,7 +78,7 @@ void MdGpsSerial::onReadyRead()
     }
 }
 
-void MdGpsSerial::parseLine (QString l) {
+void MdGpsSerial::parseLine ( const QString &l ) {
 //    qDebug() << "MdGpsSerial::parseLine [" << l << "]";
     /*
 "$GPGGA,232241.000,4909.4071,N,00702.2012,E,1,7,1.34,207.8,M,47.8,M,,*5D
@@ -215,20 +205,11 @@ $GPRMC,232241.000,A,4909.4071,N,00702.2012,E,0.33,26.15,201013,,,A*59
 
 }
 
-void MdGpsSerial::onDsrChanged(bool status)
-{
-    if (status)
-        qDebug() << "MdGpsSerial: device was turned on";
-    else
-        qDebug() << "MdGpsSerial: device was turned off";
-}
-
-
 
 void MdGpsSerial::closePort()
 {
-    port->close();
-    qDebug("MdGpsSerial: is open: %d", port->isOpen());
+    if ( port )
+        port->closePort();
     emit showStatusMessage ("MdGpsSerial: Serial Port closed");
     emit portClosed();
 }
@@ -236,12 +217,14 @@ void MdGpsSerial::closePort()
 
 void MdGpsSerial::openPort()
 {
-    port->open(QIODevice::ReadWrite);
-    qDebug("MdGpsSerial: is open: %d", port->isOpen());
-    if ( port->isOpen() ) {
-        emit showStatusMessage( "MdGpsSerial: Serial Port opened" );
-        emit portOpened();
-    } else {
-        emit showStatusMessage( "MdGpsSerial: Could not open Serial Port" );
+    if ( port ) {
+        port->openPort();
     }
+//    qDebug("MdGpsSerial: is open: %d", port->isOpen());
+//    if ( port->isOpen() ) {
+//        emit showStatusMessage( "MdGpsSerial: Serial Port opened" );
+//        emit portOpened();
+//    } else {
+//        emit showStatusMessage( "MdGpsSerial: Could not open Serial Port" );
+//    }
 }

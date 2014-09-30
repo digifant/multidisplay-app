@@ -20,11 +20,13 @@
 #ifndef MULTIDISPLAYUIMAINWINDOW_H
 #define MULTIDISPLAYUIMAINWINDOW_H
 
-#if QT_VERSION >= 0x050000
-#include <QMainWindow>
+#include <qglobal.h>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <QMainWindow>
 #else
-#include <QtGui/QMainWindow>
+    #include <QtGui/QMainWindow>
 #endif
+
 #include <QActionGroup>
 #include "ui_multidisplayuimainwindow.h"
 #include "serialoptions.h"

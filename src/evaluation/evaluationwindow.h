@@ -20,10 +20,11 @@
 #ifndef EVALUATIONWINDOW_H
 #define EVALUATIONWINDOW_H
 
-#if QT_VERSION >= 0x050000
-#include <QWidget>
+#include <qglobal.h>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    #include <QWidget>
 #else
-#include <QtGui/QWidget>
+    #include <QtGui/QWidget>
 #endif
 #include "ui_evaluationwindow.h"
 #include "evaluation/EvalPlot.h"
