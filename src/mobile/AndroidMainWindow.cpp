@@ -1,5 +1,6 @@
 #include <QCloseEvent>
 #include <QtCore/qmath.h>
+#include <QDebug>
 
 #include "AndroidMainWindow.h"
 #include "ui_AndroidMainWindow.h"
@@ -62,9 +63,16 @@ AndroidMainWindow::~AndroidMainWindow()
 }
 
 void AndroidMainWindow::closeEvent(QCloseEvent *event) {
-    emit writeSettings();
+    //segfaults :(
+//    emit writeSettings();
     event->accept();
     QMainWindow::closeEvent ( event );
+}
+
+void AndroidMainWindow::resizeEvent(QResizeEvent *event)
+{
+    qDebug() << "AndroidMainWindow::resizeEvent size=" << event->size() << " old=" << event->oldSize();
+    QMainWindow::resizeEvent(event);
 }
 
 

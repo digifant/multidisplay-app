@@ -83,7 +83,7 @@ void LambdaBarGraphWidget::wotOn() {
 
 /* ************************************ */
 
-#if !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID)
 GLGauge::GLGauge ( QWidget *parent )
     : QGLWidget (parent) {
 //    : QFrame (parent) {
@@ -257,7 +257,7 @@ void MeasurementWidget::paintEvent(QPaintEvent *event) {
 }
 
 void MeasurementWidget::resizeEvent ( QResizeEvent * event ) {
-    //qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
+    qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
 //#ifndef Q_OS_ANDROID
         dataFont.setPointSize( (event->size().width()) / digits );

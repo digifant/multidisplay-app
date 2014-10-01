@@ -177,6 +177,7 @@ AppEngine::AppEngine() {
     qDebug() << "ANDROID mobile version";
     QDesktopWidget *dw = QApplication::desktop ();
     amw = new AndroidMainWindow ();
+    qDebug() << "AndroidMainWindow->setGeometry (" << dw->availableGeometry() << ")";
     amw->setGeometry( dw->availableGeometry() );
 //    mmw->showExpanded();
     pcmw = NULL;
@@ -541,6 +542,7 @@ void AppEngine::show() {
     mmw->show();
 #endif
 #if defined (Q_OS_ANDROID)
+//    amw->showFullScreen();
     amw->show();
  #endif
 }

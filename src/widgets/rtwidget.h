@@ -8,9 +8,7 @@
 
 #include "ColorOverBlend.h"
 
-#ifndef ANDROID
 #include <QtOpenGL>
-#endif
 
 class QwtThermo;
 class MdDataRecord;
@@ -62,7 +60,7 @@ protected:
 };
 
 
-#if !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID)
 class GLGauge : public QGLWidget {
 //class GLGauge : public QFrame {
 #else
