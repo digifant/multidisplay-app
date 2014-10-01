@@ -93,8 +93,7 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     WotEventsDialog.h \
     widgets/Overlay.h \
     com/MdAbstractCom.h \    
-    com/MdBinaryProtocol.h \
-    com/MdBluetoothCom.h
+    com/MdBinaryProtocol.h
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
@@ -109,7 +108,8 @@ maemo5:HEADERS+=mobile/MobileEvaluationDialog.h \
     com/MdQextSerialCom.h
 
 android:HEADERS+=mobile/MobileGPS.h \
-    mobile/Accelerometer.h
+    mobile/Accelerometer.h \
+    com/MdBluetoothCom.h
 
 SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     evaluation/MdSpectrogramData.cpp \
@@ -161,8 +161,7 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     WotEventsDialog.cpp \
     widgets/Overlay.cpp \
     com/MdAbstractCom.cpp \
-    com/MdBinaryProtocol.cpp \
-    com/MdBluetoothCom.cpp
+    com/MdBinaryProtocol.cpp
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp
@@ -176,7 +175,8 @@ maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
     mobile/Accelerometer.cpp
 
 android:SOURCES+=mobile/MobileGPS.cpp \
-    mobile/Accelerometer.cpp
+    mobile/Accelerometer.cpp \
+    com/MdBluetoothCom.cpp
 
 FORMS += evaluation/evaluationwindow.ui \
     visconfigdialog.ui \
