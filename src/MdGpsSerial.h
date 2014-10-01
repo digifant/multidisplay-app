@@ -54,11 +54,7 @@ protected:
 
     void parseLine ( const QString &l );
 
-#if defined Q_OS_ANDROID
-    MdBluetoothCom *port;
-#else
     MdAbstractCom *port;
-#endif
 
 //#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 //    MdQSerialPortCom *port;

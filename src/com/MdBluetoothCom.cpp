@@ -50,8 +50,7 @@ MdBluetoothCom::MdBluetoothCom(QObject *parent)
     }
 }
 
-MdBluetoothCom::~MdBluetoothCom()
-{
+MdBluetoothCom::~MdBluetoothCom() {
 
 }
 
@@ -83,7 +82,8 @@ void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    connect(socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+
+    connect(socket, SIGNAL( disconnected() ), this, SIGNAL( disconnected() ) );
 }
 
 void MdBluetoothCom::closePort()

@@ -162,11 +162,7 @@ private:
     GearSettingsDialog *gearSettingsDialog;
     AboutDialog *aboutDialog;
 
-#if defined Q_OS_ANDROID
-    MdBluetoothCom *mdcom;
-#else
     MdAbstractCom *mdcom;
-#endif
 
     MdBinaryProtocol *mds;
 

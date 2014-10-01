@@ -30,9 +30,10 @@ class QListWidgetItem;
 
 class MdBluetoothCom : public MdAbstractCom
 {
+    Q_OBJECT
 public:
     MdBluetoothCom( QObject* parent );
-    ~MdBluetoothCom();
+    virtual ~MdBluetoothCom();
 
 //signals:
 //    void showStatusMessage ( const QString& );
@@ -44,8 +45,9 @@ public:
 //    //! new data received
 //    void bytesRead ( const QByteArray & );
 
-public slots:
     enum ServiceDiscoveryNeeded { No = 0, Uuid = 1, Name = 2, Yes = 4 };
+
+public slots:
 
     /**
      * @brief searches a spp profile with name "mdv2*" and connect to it (no service discovery!)

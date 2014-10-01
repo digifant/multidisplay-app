@@ -522,8 +522,9 @@ void AppEngine::setupAndroid () {
 
 
     //Dashboard
-    rtvis = new RealTimeVis ( amw->ui->centralwidget );
-    connect (data, SIGNAL(rtNewDaytaRecord(MdDataRecord*)), amw, SLOT(visualize(MdDataRecord*)));
+    amw->ui->mainFrame->setContentsMargins(0,0,0,0);
+    rtvis = new RealTimeVis ( amw->ui->mainFrame );
+    connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), amw, SLOT(visualize(MdDataRecord*)));
 
     //load TEST-DATA
 //    openData ("/home/developer/md/run1");
