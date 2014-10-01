@@ -52,6 +52,7 @@ public slots:
 
 protected slots:
     virtual void onReadyRead() = 0;
+
 };
 
 #endif // MDABSTRACTCOM_H

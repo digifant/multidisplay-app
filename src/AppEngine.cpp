@@ -71,7 +71,7 @@
 #endif
 
 #if defined (Q_OS_ANDROID)
-    //todo bluetooth
+    #include "com/MdBluetoothCom.h"
 #endif
 
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
@@ -188,10 +188,8 @@ AppEngine::AppEngine() {
 
     data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
 
-//    mdcom = new MdBluetoothCom(this);
+    mdcom = new MdBluetoothCom(this);
     mds = new MdBinaryProtocol(this, data, mdcom);
-
-    mds = (MdSerialCom*) new MdSerialComBinary(data);
 
     mySerialOptionsDialog = new SerialOptionsDialog ();
     mySerialOptionsDialog->setGeometry( dw->availableGeometry() );
@@ -496,8 +494,8 @@ void AppEngine::setupAndroid () {
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
-//    connect (mmw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
-//    connect (mmw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(show()));
+    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
+    connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(show()));
 
     connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
     connect (v2N75SetupDialog, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
@@ -518,11 +516,13 @@ void AppEngine::setupAndroid () {
              mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
     connect (mds, SIGNAL(ackReceived (quint8)), v2N75SetupDialog, SLOT(ackReceived(quint8)));
 
-//    connect (mmw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(show()));
-//    connect (mmw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(show()));
+    connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(show()));
+    connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(show()));
+
+
 
     //Dashboard
-//    rtvis = new RealTimeVis ( amw->ui->centralwidget );
+    rtvis = new RealTimeVis ( amw->ui->centralwidget );
     connect (data, SIGNAL(rtNewDaytaRecord(MdDataRecord*)), amw, SLOT(visualize(MdDataRecord*)));
 
     //load TEST-DATA
@@ -760,7 +760,12 @@ void AppEngine::readSettings () {
 
     mySerialOptionsDialog->getUi()->portComboBox->setCurrentIndex( settings.value ("mdserial/port", 0).toInt() );
     mySerialOptionsDialog->getUi()->speedComboBox->setCurrentIndex( settings.value ("mdserial/speed", 0).toInt() );
+#if not defined ( Q_OS_ANDROID )
     mds->changePortSettings( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
+#else
+    //HACK FIXME to open the spp profile with starting name mdv2
+    mds->changePortSettings ("", 0);
+#endif
 
     setActualizeVis1( settings.value ("md/actualizeVis1", true).toBool() );
     setActualizeDashboard( settings.value ("md/actualizeDashboard", true).toBool() );

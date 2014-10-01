@@ -8,13 +8,13 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
                 QColor loColor, QColor midColor, QColor hiColor )
     : MeasurementWidget (parent, caption, lo, mid, hi, loColor, midColor, hiColor) {
 
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
     captionFont.setPointSize(12);
-#else
-    captionFont.setPointSize(12);
-    textFont.setPointSize(8);
-    dataFont.setPointSize(8);
-#endif
+//#else
+//    captionFont.setPointSize(12);
+//    textFont.setPointSize(8);
+//    dataFont.setPointSize(8);
+//#endif
     isvMap = new Map16x1_ISV();
     voltageMap = new Map16x1_Voltage();
     df_ignition_retard = 0;
@@ -91,13 +91,13 @@ void DFExtendedWidget::paint() {
     painter.setFont(textFont);
     QFontMetrics fm = painter.fontMetrics();
     uint h = 0;
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
     h = fm.height()/2 + 5;
     //painter.drawText( QPoint(0,textFont.pointSize()), caption );
     painter.drawText( QPoint(0,h), caption );
-#else
+//#else
 //    painter.drawText( QPoint(0,painter.fontMetrics().height()/2), caption );
-#endif
+//#endif
     textFont.setItalic(false);
     textFont.setBold(false);
 
@@ -158,7 +158,7 @@ void DFExtendedWidget::paint() {
     else if ( df_wot_flag & 0x10 )
         dk = "idle";
 
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
 //    painter.setFont(dataFont);
     painter.setFont(textFont);
     fm = painter.fontMetrics();
@@ -223,19 +223,19 @@ void DFExtendedWidget::paint() {
 
     painter.drawText( QRect(0, textFont.pixelSize() + 12*textFont.pointSize() + 75, this->size().width(), this->size().height() ),
                          Qt::AlignLeft, lc_state);
-#else
-    QFontMetrics fmt = QFontMetrics(textFont);
-    textFont.setPointSize(10);
-    painter.setFont(textFont);
-    //y pos is baseline!
-    h = fmt.height();
-    painter.drawText( QPoint(0,h), caption );
-    h += fmt.height();
-//    painter.drawText( QPoint(0,h), ign);
-//    painter.drawText( QPoint(this->size().width()/2, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
-    h += fmt.height();
+//#else
+//    QFontMetrics fmt = QFontMetrics(textFont);
+//    textFont.setPointSize(10);
+//    painter.setFont(textFont);
+//    //y pos is baseline!
+//    h = fmt.height();
+//    painter.drawText( QPoint(0,h), caption );
+//    h += fmt.height();
+////    painter.drawText( QPoint(0,h), ign);
+////    painter.drawText( QPoint(this->size().width()/2, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
+//    h += fmt.height();
 
-#endif
+//#endif
 
     //KNOCK Bar Test
     const int knockBarHeigth = 40;

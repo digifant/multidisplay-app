@@ -45,6 +45,12 @@
 #include "mobile/MobileGPS.h"
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QDir>
+#include <QStandardPaths>
+#include <QFileDialog>
+#endif
+
 MaxDataSet::MaxDataSet () : p(NULL) {
 
 }

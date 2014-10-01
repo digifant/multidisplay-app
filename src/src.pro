@@ -1,10 +1,12 @@
 TEMPLATE = app
 TARGET = mUI
 QT += core \
-    gui
+    gui \
+    widgets \
+    opengl
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += bluetooth
+    QT += bluetooth sensors positioning
     !android: QT += serialport
 }
 
@@ -12,7 +14,12 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 CONFIG += rtti exceptions mobility serialport
 
 
-!android:QT += opengl
+#!android:QT += opengl
+
+
+android {
+    QT += svg
+}
 
 maemo5 {
     QT += maemo5 mobility svg
@@ -161,6 +168,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp
 } else {
     win32|unix:SOURCES+=com/MdQSerialPortCom.cpp
+    android:SOURCES-=com/MdQSerialPortCom.cpp
 }
 
 maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
@@ -233,7 +241,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                       }
             android:  {
                         message("android: static linking!")
-                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwtd.a
+                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a
                        }
             maemo5:    {
 #                        message ("Maemo5: static linking!")

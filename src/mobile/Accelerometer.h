@@ -6,7 +6,9 @@
 
 #include <QAccelerometer>
 
+#if defined Q_WS_MAEMO5
 QTM_USE_NAMESPACE
+#endif
 
 class Accelerometer : public QObject
 {

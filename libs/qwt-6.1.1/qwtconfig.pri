@@ -75,6 +75,10 @@ QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
 } else {
 	message ("maemo5: static lib (hack)")
 }
+android: {
+	QWT_CONFIG -= QwtDll
+	message ("android: static lib (hack)")
+}
 
 ######################################################################
 # QwtPlot enables all classes, that are needed to use the QwtPlot 
@@ -121,7 +125,9 @@ QWT_CONFIG     += QwtOpenGL
 ######################################################################
 
 !maemo5: {
-	QWT_CONFIG     += QwtDesigner
+	!android: {
+		QWT_CONFIG     += QwtDesigner
+	}
 }
 
 ######################################################################

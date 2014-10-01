@@ -44,7 +44,7 @@ MobileMainWindow::MobileMainWindow(QWidget *parent) :
     grabGesture(Qt::SwipeGesture);
 #endif
 
-#if  defined (Q_WS_MAEMO_5)  || defined (Q_WS_ANDROID)
+#if  defined (Q_WS_MAEMO_5)
     screensaver = new QSystemScreenSaver (this);
     screensaver->setScreenSaverInhibit ();
     qDebug() << "Screensaver deactivated";

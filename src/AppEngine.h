@@ -35,6 +35,7 @@
 #include "serialoptions.h"
 
 
+class MdBluetoothCom;
 class MdBinaryProtocol;
 class MdData;
 class CarPcDemoWidget;
@@ -161,8 +162,12 @@ private:
     GearSettingsDialog *gearSettingsDialog;
     AboutDialog *aboutDialog;
 
-
+#if defined Q_OS_ANDROID
+    MdBluetoothCom *mdcom;
+#else
     MdAbstractCom *mdcom;
+#endif
+
     MdBinaryProtocol *mds;
 
     MdData *data;

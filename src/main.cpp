@@ -24,9 +24,6 @@
 #include <QApplication>
 #include <QDebug>
 
-#ifdef Q_WS_ANDROID
-#include <QAndroidStyle>
-#endif
 
 #include <cxxabi.h>
 #include <iostream>
@@ -36,10 +33,6 @@ int main(int argc, char *argv[]) {
     try {
 #ifdef Q_WS_MAEMO_5
         QApplication::setStyle(QString("Plastique"));
-#endif
-
-#ifdef Q_WS_ANDROID
-        QApplication::setStyle(new QAndroidStyle());
 #endif
 
         QApplication a(argc, argv);

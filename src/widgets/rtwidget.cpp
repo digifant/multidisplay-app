@@ -150,33 +150,19 @@ MeasurementWidget::MeasurementWidget ( QWidget *parent, QString caption, double 
     wideMode = false;
 
     textPen = QPen ( Qt::black );
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
     textFont.setPointSize(20);
     dataFont.setPixelSize(90);
-#else
-    textFont.setPointSize(10);
-    dataFont.setPointSize(50);
-#endif
+//#else
+//    textFont.setPointSize(10);
+//    dataFont.setPointSize(50);
+//#endif
     dataFont.setBold(true);
 
     overblend = new ColorOverBlend (loColor, midColor, hiColor, lo, mid, hi);
 
-//    startBlend = 0;
-//    Q_ASSERT (lo <= startBlend);
 }
 
-//QColor MeasurementWidget::overblend (QColor startColor, QColor stopColor, double value) const {
-//    if ( value < lo ) {
-//        return startColor;
-//    }
-//    if ( value > hi ) {
-//        return stopColor;
-//    }
-//    double t = value - lo;
-//    double w = hi - lo;
-//    short level = (255*t)/w;
-//    return GLGauge::overblend (startColor, stopColor, (short) level);
-//}
 
 MeasurementWidget::~MeasurementWidget () {
     if ( overblend )
@@ -201,19 +187,19 @@ void MeasurementWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
     QColor bc = overblendBackground();
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
     painter.setBackgroundMode( Qt::TransparentMode );
     painter.setBackground( QBrush ( bc ) );
-#else
-    QColor bc = overblendBackground();
-    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
-    painter.setBackgroundMode( Qt::TransparentMode );
-    painter.setBackground( QBrush ( bc ) );
-#endif
+//#else
+//    QColor bc = overblendBackground();
+//    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
+//    painter.setBackgroundMode( Qt::TransparentMode );
+//    painter.setBackground( QBrush ( bc ) );
+//#endif
 
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
 //    painter.setBackgroundMode( Qt::OpaqueMode );
 
     painter.setFont(textFont);
@@ -244,25 +230,25 @@ void MeasurementWidget::paint() {
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );
     }
-#else
-    painter.setFont(textFont);
-    painter.setBrush( QBrush(Qt::SolidPattern)) ;
+//#else
+//    painter.setFont(textFont);
+//    painter.setBrush( QBrush(Qt::SolidPattern)) ;
 
-    QFontMetrics fm = painter.fontMetrics();
-    //y pos is baseline!
-    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
+//    QFontMetrics fm = painter.fontMetrics();
+//    //y pos is baseline!
+//    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
 
-//    textFont.setPointSize(10);
-    painter.setFont(dataFont);
-    fm = painter.fontMetrics();
+////    textFont.setPointSize(10);
+//    painter.setFont(dataFont);
+//    fm = painter.fontMetrics();
 
-    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
-    uint h = fm.height();
+//    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
+//    uint h = fm.height();
 
-    painter.setFont(textFont);
-    fm = painter.fontMetrics();
-    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
-#endif
+//    painter.setFont(textFont);
+//    fm = painter.fontMetrics();
+//    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
+//#endif
     painter.end();
 }
 
@@ -273,18 +259,18 @@ void MeasurementWidget::paintEvent(QPaintEvent *event) {
 void MeasurementWidget::resizeEvent ( QResizeEvent * event ) {
     //qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
         dataFont.setPointSize( (event->size().width()) / digits );
-#else
-        uint ps = 0;
-        if ( caption.size() > 0 )
-            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 10 );
-        else
-            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 0 );
-        qDebug() << "MeasurementWidget::resizeEvent calculated pointSize=" << ps;
-        // FIXME: qt on android: fonts are rendered bigger than the requested point size :(
-        dataFont.setPointSize(ps * 0.3);
-#endif
+//#else
+//        uint ps = 0;
+//        if ( caption.size() > 0 )
+//            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 10 );
+//        else
+//            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 0 );
+//        qDebug() << "MeasurementWidget::resizeEvent calculated pointSize=" << ps;
+//        // FIXME: qt on android: fonts are rendered bigger than the requested point size :(
+//        dataFont.setPointSize(ps * 0.3);
+//#endif
     }
 }
 
@@ -397,21 +383,19 @@ void MaxEgtWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-#ifndef Q_OS_ANDROID
-//    QColor bc = overblend(loColor, hiColor, value);
+//#ifndef Q_OS_ANDROID
     QColor bc = overblend->overblend3(value);
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
     painter.setBackgroundMode( Qt::TransparentMode );
     painter.setBackground( QBrush ( bc ) );
-#else
-    QColor bc = overblend->overblend3(value);
-    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
-    painter.setBackgroundMode( Qt::TransparentMode );
-    painter.setBackground( QBrush ( bc ) );
-#endif
+//#else
+//    QColor bc = overblend->overblend3(value);
+//    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
+//    painter.setBackgroundMode( Qt::TransparentMode );
+//    painter.setBackground( QBrush ( bc ) );
+//#endif
 
-#ifndef Q_OS_ANDROID
-//    painter.setBackgroundMode( Qt::OpaqueMode );
+//#ifndef Q_OS_ANDROID
 
     painter.setFont(textFont);
 
@@ -450,25 +434,25 @@ void MaxEgtWidget::paint() {
                           Qt::AlignRight, valTxt2PaintL2 );
 #endif
     }
-#else
-    painter.setFont(textFont);
-    painter.setBrush( QBrush(Qt::SolidPattern)) ;
+    //#else
+    //    painter.setFont(textFont);
+    //    painter.setBrush( QBrush(Qt::SolidPattern)) ;
 
-    QFontMetrics fm = painter.fontMetrics();
-    //y pos is baseline!
-    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
+    //    QFontMetrics fm = painter.fontMetrics();
+    //    //y pos is baseline!
+    //    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
 
-//    textFont.setPointSize(10);
-    painter.setFont(dataFont);
-    fm = painter.fontMetrics();
+    ////    textFont.setPointSize(10);
+    //    painter.setFont(dataFont);
+    //    fm = painter.fontMetrics();
 
-    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
-    uint h = fm.height();
+    //    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
+    //    uint h = fm.height();
 
-    painter.setFont(textFont);
-    fm = painter.fontMetrics();
-    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
-#endif
+    //    painter.setFont(textFont);
+    //    fm = painter.fontMetrics();
+    //    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
+    //#endif
     painter.end();
 }
 

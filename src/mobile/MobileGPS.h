@@ -6,9 +6,12 @@
 #include <QGeoPositionInfoSource>
 #include <QGeoCoordinate>
 
+
 #include "MdGpsSerial.h"
 
+#if defined Q_WS_MAEMO5
 QTM_USE_NAMESPACE
+#endif
 
 struct MdPos {
     int time;

@@ -6,6 +6,7 @@
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     #include <com/MdQSerialPortCom.h>
+    #include <com/MdBluetoothCom.h>
 #else
     #include <com/MdQextSerialCom.h>
 #endif
@@ -25,11 +26,18 @@ bool MdGpsSerial::setupPort (QString sport, QString speed) {
     if ( port )
         delete port;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) and defined Q_OS_ANDROID
+    port = new MdBluetoothCom(this);
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) and !defined Q_OS_ANDROID
     port = new MdQSerialPortCom(this);
-#else
+#endif
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     port = new MdQextSerialCom(this);
 #endif
+
     bool r = port->setupPort (sport,speed);
     connect(port, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 

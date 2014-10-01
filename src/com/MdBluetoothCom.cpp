@@ -162,12 +162,12 @@ void MdBluetoothCom::startServiceDiscovery(bool force)
 //    te->insertHtml("<span style=\"color:black; font-weight:normal\">start service discovery</span><br>");
     if (!sDiscoveryAgent) {
         sDiscoveryAgent = new QBluetoothServiceDiscoveryAgent(this);
-        connect(sDiscoveryAgent, SIGNAL(serviceDiscovered(QBluetoothServiceInfo)),
-            this, SLOT(serviceDiscovered(QBluetoothServiceInfo)));
-        connect(sDiscoveryAgent, SIGNAL(finished()), this, SLOT(serviceDiscoveryFinished()));
-        connect(sDiscoveryAgent, SIGNAL(canceled()), this, SLOT(serviceDiscoveryCanceled()));
+        connect( sDiscoveryAgent, SIGNAL(serviceDiscovered(QBluetoothServiceInfo) ),
+            this, SLOT(serviceDiscovered(QBluetoothServiceInfo)) );
+        connect(sDiscoveryAgent, SIGNAL(finished()), this, SLOT(serviceDiscoveryFinished()) );
+        connect(sDiscoveryAgent, SIGNAL(canceled()), this, SLOT(serviceDiscoveryCanceled()) );
         connect(sDiscoveryAgent, SIGNAL(error(QBluetoothServiceDiscoveryAgent::Error)),
-                this, SLOT(serviceDiscoveryError(QBluetoothServiceDiscoveryAgent::Error)));
+                this, SLOT(serviceDiscoveryError(QBluetoothServiceDiscoveryAgent::Error)) );
     }
 
     if ( (force) || !( sdNeeded==No ) ) {

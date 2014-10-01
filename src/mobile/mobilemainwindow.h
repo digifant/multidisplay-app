@@ -25,7 +25,7 @@
 #include "serialoptions.h"
 #include "evaluation/evaluationwindow.h"
 
-#if defined (Q_WS_MAEMO_5) || defined (ANDROID)
+#if defined (Q_WS_MAEMO_5)
 #include <QSystemScreenSaver>
 QTM_USE_NAMESPACE
 #endif
@@ -59,7 +59,7 @@ public slots:
 
 private:
     Ui::MobileMainWindow *ui;
-#if  defined (Q_WS_MAEMO_5)  || defined (Q_WS_ANDROID)
+#if  defined (Q_WS_MAEMO_5)
     QSystemScreenSaver *screensaver;
 #endif
 };

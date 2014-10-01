@@ -78,7 +78,7 @@ public slots:
     void startServiceDiscovery(bool force=false);
     void serviceDiscoveryCanceled();
     void serviceDiscovered(const QBluetoothServiceInfo &serviceInfo);
-    void serviceDiscoveryError(QBluetoothServiceDiscoveryAgent::Error error);
+    void serviceDiscoveryError(QBluetoothServiceDiscoveryAgent::Error);
     void serviceDiscoveryFinished();
 
 protected slots:
