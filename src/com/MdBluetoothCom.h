@@ -61,6 +61,8 @@ public slots:
     void sppConnect(const QString &uuid);
     void sppConnect(const QBluetoothServiceInfo &serviceInfo);
 
+    void togglePort();
+
     void closePort();
     void openPort();
 
@@ -70,8 +72,8 @@ public slots:
      * @param speed unused!
      * @return
      */
-    bool setupPort (QString sport="mdv2turbo", QString speed="0");
-    bool changePortSettings (QString sport="mdv2turbo", QString speed="0");
+    bool setupPort (QString sport="mdv2", QString speed="0");
+    bool changePortSettings (QString sport="mdv2", QString speed="0");
 
     void transmitMsg( const QString &s);
     void transmitMsg( const QByteArray &ba);
@@ -88,6 +90,7 @@ protected slots:
 
     void connected();
     void disconnected();
+    void socketStateChanged (QBluetoothSocket::SocketState);
 
 protected:
 

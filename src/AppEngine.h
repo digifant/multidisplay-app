@@ -44,6 +44,7 @@ class EvaluationWindow;
 class MultidisplayUIMainWindow;
 class MobileMainWindow;
 class AndroidMainWindow;
+class AndroidDashboardDialog;
 class MobileBoostPidWindow;
 class MobileVis1MainWindow;
 class QTableWidget;
@@ -178,6 +179,7 @@ private:
     MobileMainWindow *mmw;
     //Android
     AndroidMainWindow *amw;
+    AndroidDashboardDialog* add;
 
     MobileBoostPidWindow *mbw;
     MobileVis1MainWindow *mvis1w;

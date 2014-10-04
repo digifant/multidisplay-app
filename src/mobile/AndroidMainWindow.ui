@@ -23,6 +23,28 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="dashboardPushButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>show DashBoard</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="textEdit">
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -56,6 +78,14 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>mdv2</string>
+    </property>
+    <addaction name="actionBluetoothToggleState"/>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuData"/>
    <addaction name="menuConfig"/>
    <addaction name="menuTop2"/>
    <addaction name="menuAbout"/>
@@ -68,17 +98,17 @@
   </action>
   <action name="actionBluetooth">
    <property name="text">
-    <string>Bluetooth</string>
+    <string>Bluetooth Options</string>
    </property>
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>mdv2</string>
+    <string>mdv2 options</string>
    </property>
   </action>
   <action name="actionV2_N75_Settings">
    <property name="text">
-    <string>boost</string>
+    <string>N75 boost control</string>
    </property>
   </action>
   <action name="actionGearbox_settings">
@@ -89,6 +119,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>about</string>
+   </property>
+  </action>
+  <action name="actionBluetoothToggleState">
+   <property name="text">
+    <string>Bluetooth toggle</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
    </property>
   </action>
  </widget>

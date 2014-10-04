@@ -31,6 +31,7 @@ public:
     ~MdQextSerialCom();
 
 public slots:
+    void togglePort();
     void closePort();
     void openPort();
 

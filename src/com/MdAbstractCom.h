@@ -41,6 +41,7 @@ signals:
 
 
 public slots:
+    virtual void togglePort() = 0;
     virtual void closePort() = 0;
     virtual void openPort() = 0;
 

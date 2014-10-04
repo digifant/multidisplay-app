@@ -19,6 +19,7 @@
 
 #include "AppEngine.h"
 
+
 #include <QLabel>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -41,6 +42,7 @@
 #include "mobile/MobileVis1MainWindow.h"
 #include "mobile/MobileCommandWindow.h"
 #include "mobile/AndroidMainWindow.h"
+#include "mobile/AndroidDashboardDialog.h"
 #include "ui_AndroidMainWindow.h"
 #include "thread/jobrunnerthread.h"
 #include "thread/replayworker.h"
@@ -175,16 +177,12 @@ AppEngine::AppEngine() {
 
 #if defined (Q_OS_ANDROID)
     qDebug() << "ANDROID mobile version";
-    QDesktopWidget *dw = QApplication::desktop ();
     amw = new AndroidMainWindow ();
-    qDebug() << "AndroidMainWindow->setGeometry (" << dw->availableGeometry() << ")";
-    amw->setGeometry( dw->availableGeometry() );
-//    mmw->showExpanded();
+
     pcmw = NULL;
     mmw = NULL;
     //FIXME
     mbw = new MobileBoostPidWindow (amw);
-    mbw->setGeometry( dw->availableGeometry() );
     mvis1w = new MobileVis1MainWindow (mbw);
 
     data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
@@ -193,8 +191,7 @@ AppEngine::AppEngine() {
     mds = new MdBinaryProtocol(this, data, mdcom);
 
     mySerialOptionsDialog = new SerialOptionsDialog ();
-    mySerialOptionsDialog->setGeometry( dw->availableGeometry() );
-    mySerialOptionsDialog->setGeometry( QRect(0,0,700,350) );
+    //mySerialOptionsDialog->setGeometry( QRect(0,0,700,350) );
     mcw = new MobileCommandWindow(amw);
     aboutDialog = new AboutDialog(amw);
 
@@ -482,6 +479,7 @@ void AppEngine::setupMaemo() {
 
 
 void AppEngine::setupAndroid () {
+#if defined Q_OS_ANDROID
     connect (amw, SIGNAL(writeSettings()), this, SLOT(writeSettings()));
 
     //Evaluations
@@ -495,8 +493,8 @@ void AppEngine::setupAndroid () {
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
-    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
-    connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(show()));
+    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
+    connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
 
     connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
     connect (v2N75SetupDialog, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
@@ -517,19 +515,27 @@ void AppEngine::setupAndroid () {
              mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
     connect (mds, SIGNAL(ackReceived (quint8)), v2N75SetupDialog, SLOT(ackReceived(quint8)));
 
-    connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(show()));
-    connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(show()));
+    connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(showMaximized()) );
+    connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(showMaximized()));
 
 
 
     //Dashboard
     amw->ui->mainFrame->setContentsMargins(0,0,0,0);
-    rtvis = new RealTimeVis ( amw->ui->mainFrame );
-    connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), amw, SLOT(visualize(MdDataRecord*)));
 
-    //load TEST-DATA
-//    openData ("/home/developer/md/run1");
+    add = new AndroidDashboardDialog( );
+    rtvis = new RealTimeVis ( add );
+    connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
+    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
+    connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (mdcom, SIGNAL(portClosed()), amw, SLOT(btPortClosed()) );
+    connect (mdcom, SIGNAL(portOpened()), amw, SLOT(btPortOpened()) );
+
+    connect (amw->ui->actionBluetoothToggleState, SIGNAL(triggered()), mdcom, SLOT(togglePort()) );
+    connect (amw->ui->actionSave, SIGNAL(triggered()) , this, SLOT(saveDataAs()) );
+#endif
 }
 
 void AppEngine::show() {
@@ -543,7 +549,8 @@ void AppEngine::show() {
 #endif
 #if defined (Q_OS_ANDROID)
 //    amw->showFullScreen();
-    amw->show();
+    amw->showMaximized();
+//    add->showMaximized();
  #endif
 }
 
@@ -698,7 +705,7 @@ void AppEngine::changeDataWinSize (int ns) {
 void AppEngine::writeSettings () {
     QSettings settings("MultiDisplay", "UI");
 
-#ifndef Q_WS_MAEMO_5
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     settings.beginGroup("MainWindow");
     settings.setValue("size", pcmw->size());
     settings.setValue("pos", pcmw->pos());
@@ -730,7 +737,7 @@ void AppEngine::writeSettings () {
     settings.setValue ("MapSensor", dfBoostTransferFunction->name() );
     settings.endGroup();
 
-#if  defined (Q_WS_MAEMO_5) || defined (ANDROID)
+#if  defined (Q_WS_MAEMO_5) || defined (Q_OS_ANDROID)
     if ( mGps )
         settings.setValue("mobile/use_gps", QVariant(true) );
     else
@@ -740,6 +747,11 @@ void AppEngine::writeSettings () {
         settings.setValue("mobile/use_accel", QVariant(true));
     else
         settings.setValue("mobile/use_accel", QVariant(false));
+#endif
+
+
+#if defined (Q_OS_ANDROID)
+    //TODO fixme save bluetooth config
 #endif
 
     data->writeSettings();

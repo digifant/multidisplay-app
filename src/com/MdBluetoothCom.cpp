@@ -47,6 +47,7 @@ MdBluetoothCom::MdBluetoothCom(QObject *parent)
 
     } else {
         qDebug() << "bluetooth not available!";
+        emit showStatusMessage( "Bluetooth: not available!" );
     }
 }
 
@@ -74,6 +75,7 @@ void MdBluetoothCom::sppConnect(const QString &uuid) {
 void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
     if (!socket) {
         socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol, this);
+        connect (socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)), this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)) );
         qDebug() << "Created socket";
     }
 
@@ -82,8 +84,20 @@ void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
+    connect(socket, SIGNAL( disconnected() ), this, SLOT( disconnected() ) );
+}
 
-    connect(socket, SIGNAL( disconnected() ), this, SIGNAL( disconnected() ) );
+void MdBluetoothCom::togglePort()
+{
+    if ( socket ) {
+        if ( socket->isOpen() )
+            closePort();
+        else {
+            openPort();
+        }
+    } else {
+        setupPort();
+    }
 }
 
 void MdBluetoothCom::closePort()
@@ -92,7 +106,7 @@ void MdBluetoothCom::closePort()
         socket->close();
         qDebug("is open: %d", socket->isOpen());
     }
-    emit showStatusMessage ("Serial Port closed");
+    emit showStatusMessage ("Bluetooth: SPP closed");
     emit portClosed();
 }
 
@@ -102,10 +116,12 @@ void MdBluetoothCom::openPort()
     socket->open(QIODevice::ReadWrite);
     qDebug("is open: %d", socket->isOpen());
     if ( socket->isOpen() ) {
-        emit showStatusMessage( "Serial Port opened" );
-        emit portOpened();
+        if ( socket->state()==QBluetoothSocket::ConnectedState ) {
+            emit showStatusMessage( "Bluetooth: SPP opened" );
+            emit portOpened();
+        }
     } else {
-        emit showStatusMessage( "Could not open bluetooth spp socket" );
+        emit showStatusMessage( "Bluetooth: Could not open spp socket" );
     }
 }
 
@@ -120,6 +136,8 @@ bool MdBluetoothCom::setupPort(QString sport, QString speed)
                 // we found our md bluetooth service!
                 qDebug() << "found mdv2 service on " << si.device().name() << " " << si.device().address().toString();
                 qDebug() << "Service name:" << si.serviceName() << " UUID=" << si.serviceUuid().toString();
+                emit showStatusMessage( "Bluetooth: found mdv2 service on " + si.device().name() + " " + si.device().address().toString() +
+                                        "Service name:" + si.serviceName() + " UUID=" + si.serviceUuid().toString() );
                 sppConnect(si);
                 openPort();
                 sdNeeded = No;
@@ -234,7 +252,7 @@ void MdBluetoothCom::serviceDiscoveryFinished()
             sppConnect(uuid);
             break;
         case Name:
-            sppConnect(mdServiceName);
+            sppConnect();
             break;
     }
 }
@@ -250,11 +268,35 @@ void MdBluetoothCom::onReadyRead()
 
 void MdBluetoothCom::connected()
 {
+    emit portOpened();
+    emit showStatusMessage ("Bluetooth connected!");
     qDebug() << "MdBluetoothCom::connected()";
 }
 
 void MdBluetoothCom::disconnected()
 {
+    emit portClosed();
+    emit showStatusMessage ("Bluetooth disconnected!");
     qDebug() << "MdBluetoothCom::disconnected()";
+}
+
+void MdBluetoothCom::socketStateChanged(QBluetoothSocket::SocketState s)
+{
+    switch (s) {
+    case QBluetoothSocket::ConnectedState:
+        emit showStatusMessage( "Bluetooth: socket connected!");
+        openPort();
+        qDebug() << "socket connected";
+        break;
+    case QBluetoothSocket::UnconnectedState:
+        emit showStatusMessage( "Bluetooth: socket unconnected!");
+        closePort();
+        qDebug() << "socket unconnected";
+        break;
+    case QBluetoothSocket::ConnectingState:
+        emit showStatusMessage( "Bluetooth: socket is attempting to connect to a device.!");
+        qDebug() << "Socket is attempting to connect to a device";
+        break;
+    }
 }
 

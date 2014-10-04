@@ -148,6 +148,14 @@ void RealTimeVis::visualize (MdDataRecord *d) {
 }
 
 void RealTimeVis::paintEvent(QPaintEvent *event) {
-//    qDebug() << "RealTimeVis::paintEvent" << endl;
+    //    qDebug() << "RealTimeVis::paintEvent" << endl;
+}
+
+bool RealTimeVis::event(QEvent *e)
+{
+    if ( e->type() == QEvent::OrientationChange ) {
+        qDebug() << "RealTimeVis::event: orientation change ";
+    }
+    return QWidget::event(e);
 }
 

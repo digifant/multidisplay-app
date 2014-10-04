@@ -36,6 +36,19 @@ MdQSerialPortCom::~MdQSerialPortCom()
     }
 }
 
+void MdQSerialPortCom::togglePort()
+{
+    if ( port ) {
+        if ( port->isOpen() )
+            closePort();
+        else {
+            openPort();
+        }
+    } else {
+        setupPort();
+    }
+}
+
 
 bool MdQSerialPortCom::setupPort (QString sport, QString speed) {
     if ( port )

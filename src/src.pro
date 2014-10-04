@@ -83,7 +83,6 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     widgets/DFExtendedWidget.h \
     TransferFunction.h \
     DigifantApplicationWindow.h \
-    mobile/AndroidMainWindow.h \
     ColorOverBlend.h \
     DataTableConfigDialog.h \
     mobile/MobileSensorRecord.h \
@@ -93,7 +92,8 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     WotEventsDialog.h \
     widgets/Overlay.h \
     com/MdAbstractCom.h \    
-    com/MdBinaryProtocol.h
+    com/MdBinaryProtocol.h \
+    mobile/AndroidMainWindow.h
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
@@ -109,7 +109,8 @@ maemo5:HEADERS+=mobile/MobileEvaluationDialog.h \
 
 android:HEADERS+=mobile/MobileGPS.h \
     mobile/Accelerometer.h \
-    com/MdBluetoothCom.h
+    com/MdBluetoothCom.h \
+    mobile/AndroidDashboardDialog.h
 
 SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     evaluation/MdSpectrogramData.cpp \
@@ -151,7 +152,6 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     widgets/DFExtendedWidget.cpp \
     TransferFunction.cpp \
     DigifantApplicationWindow.cpp \
-    mobile/AndroidMainWindow.cpp \
     ColorOverBlend.cpp \
     DataTableConfigDialog.cpp \
     mobile/MobileSensorRecord.cpp \
@@ -161,7 +161,8 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     WotEventsDialog.cpp \
     widgets/Overlay.cpp \
     com/MdAbstractCom.cpp \
-    com/MdBinaryProtocol.cpp
+    com/MdBinaryProtocol.cpp \
+    mobile/AndroidMainWindow.cpp
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp
@@ -176,7 +177,8 @@ maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
 
 android:SOURCES+=mobile/MobileGPS.cpp \
     mobile/Accelerometer.cpp \
-    com/MdBluetoothCom.cpp
+    com/MdBluetoothCom.cpp \
+    mobile/AndroidDashboardDialog.cpp
 
 FORMS += evaluation/evaluationwindow.ui \
     visconfigdialog.ui \
@@ -191,10 +193,11 @@ FORMS += evaluation/evaluationwindow.ui \
     V2SettingsDialog.ui \
     GearSettingsDialog.ui \
     AboutDialog.ui \
-    mobile/AndroidMainWindow.ui \
     DataTableConfigDialog.ui \
     V2PowerDialog.ui \
-    WotEventsDialog.ui
+    WotEventsDialog.ui \
+    mobile/AndroidMainWindow.ui \
+    mobile/AndroidDashboardDialog.ui
 
 maemo5:FORMS += mobile/MobileEvaluationDialog.ui
 

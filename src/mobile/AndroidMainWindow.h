@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QGridLayout>
 #include <QTime>
+#include <QString>
 #include "MdData.h"
 #include "widgets/rtwidget.h"
 #include "widgets/DFExtendedWidget.h"
@@ -28,7 +29,9 @@ public:
 
 
 public slots:
-    void visualize (MdDataRecord *d);
+    void showStatusMessage ( const QString &msg );
+    void btPortClosed ();
+    void btPortOpened ();
 
 signals:
     void writeSettings();
