@@ -153,9 +153,11 @@ void RealTimeVis::paintEvent(QPaintEvent *event) {
 
 bool RealTimeVis::event(QEvent *e)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     if ( e->type() == QEvent::OrientationChange ) {
         qDebug() << "RealTimeVis::event: orientation change ";
     }
+#endif
     return QWidget::event(e);
 }
 
