@@ -6,9 +6,14 @@
 #include <com/MdAbstractCom.h>
 
 #if defined ( Q_WS_MAEMO_5 )
-#include <QGeoPositionInfo>
-QTM_USE_NAMESPACE
+    #include <QGeoPositionInfo>
+    QTM_USE_NAMESPACE
 #endif
+
+#if defined ( Q_OS_ANDROID )
+    #include <QGeoPositionInfo>
+#endif
+
 
 class QTimer;
 class MdBluetoothCom;
@@ -41,7 +46,7 @@ signals:
     void portOpened();
     void portClosed();
 
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 )  || defined ( Q_OS_ANDROID )
     void positionUpdated(const QGeoPositionInfo &update);
 #endif
 
@@ -63,7 +68,7 @@ protected:
 //#endif
 
 
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 ) || defined (Q_OS_ANDROID)
     QGeoCoordinate coordinate;
     QGeoPositionInfo posInfo;
 #endif

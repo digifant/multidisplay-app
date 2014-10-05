@@ -14,7 +14,11 @@
 
 MdGpsSerial::MdGpsSerial()
 {
+#if defined (Q_OS_ANDROID)
+    setupPort("","");
+#else
     setupPort();
+#endif
 }
 
 MdGpsSerial::~MdGpsSerial() {
@@ -27,7 +31,7 @@ bool MdGpsSerial::setupPort (QString sport, QString speed) {
         delete port;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) and defined Q_OS_ANDROID
-    port = new MdBluetoothCom(this);
+    port = new MdBluetoothCom(this, "Qstarz 818XT");
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) and !defined Q_OS_ANDROID
@@ -100,7 +104,7 @@ $GPRMC,232241.000,A,4909.4071,N,00702.2012,E,0.33,26.15,201013,,,A*59
 */
 
     bool allData = true;
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 )  || defined ( Q_OS_ANDROID )
     posInfo.setCoordinate(coordinate);
 #endif
 //    parseBuffer.append (l);
@@ -147,7 +151,7 @@ $GPRMC,232241.000,A,4909.4071,N,00702.2012,E,0.33,26.15,201013,,,A*59
 //        else
 //            qDebug() << "GPRMC invalid";
 
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 )  || defined ( Q_OS_ANDROID )
         coordinate = QGeoCoordinate(latitudeDeg, longitudeDeg);
         //docu says ground speed, in metres/sec.
         //but internal gps gives km/h
@@ -186,7 +190,7 @@ $GPRMC,232241.000,A,4909.4071,N,00702.2012,E,0.33,26.15,201013,,,A*59
         double DGPSrefStationId = gpggaR.cap(12).toDouble();
         //Checksum	*75	Used by program to check for transmission errors
         QString checksum = gpggaR.cap(13);
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 )  || defined ( Q_OS_ANDROID )
         coordinate.setAltitude(altitude);
 #endif
     } else {
@@ -196,10 +200,10 @@ $GPRMC,232241.000,A,4909.4071,N,00702.2012,E,0.33,26.15,201013,,,A*59
     //$GPGSV
     //GPS Satellites in view
 
-#if defined ( Q_WS_MAEMO_5 )
+#if defined ( Q_WS_MAEMO_5 )  || defined ( Q_OS_ANDROID )
     if ( allData ) {
         //we have valid Data!
-//        qDebug() << "valid data " << posInfo.coordinate().toString();
+        qDebug() << "valid data " << posInfo.coordinate().toString();
 
         /* TODO
         QGeoPositionInfo::Direction

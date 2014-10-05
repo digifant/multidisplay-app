@@ -6,6 +6,7 @@
 
 #include <QVBoxLayout>
 #include <QTime>
+#include <QSettings>
 
 
 RealTimeVis::RealTimeVis(QWidget *parent):
@@ -30,17 +31,21 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     bg3=NULL;
 #endif
 
-    QFrame *fDfWidget = new QFrame (this);
-    fDfWidget->setContentsMargins(0,0,0,0);
-    QVBoxLayout *v2 = new QVBoxLayout();
-    //disable margin around the vbox layout
-    v2->setContentsMargins(0,0,0,0);
-    v2->setSpacing(0);
-    fDfWidget->setLayout(v2);
-    h->addWidget(fDfWidget, 3);
-    dfexW = new DFExtendedWidget (this, "Digifant I");
-    v2->addWidget(dfexW);
-//    dfexw = NULL;
+    QSettings settings;
+    if ( settings.value ("md/ecu", "digifant1").toString() == "digifant1" ) {
+        QFrame *fDfWidget = new QFrame (this);
+        fDfWidget->setContentsMargins(0,0,0,0);
+        QVBoxLayout *v2 = new QVBoxLayout();
+        //disable margin around the vbox layout
+        v2->setContentsMargins(0,0,0,0);
+        v2->setSpacing(0);
+        fDfWidget->setLayout(v2);
+        h->addWidget(fDfWidget, 3);
+        dfexW = new DFExtendedWidget (this, "Digifant I");
+        v2->addWidget(dfexW);
+    } else {
+        dfexW = NULL;
+    }
 
     QFrame *fWidgets1 = new QFrame (this);
     fWidgets1->setContentsMargins(0,0,0,0);
@@ -159,5 +164,10 @@ bool RealTimeVis::event(QEvent *e)
     }
 #endif
     return QWidget::event(e);
+}
+
+void RealTimeVis::resizeEvent(QResizeEvent *event)
+{
+    qDebug() << "RealTimeVis::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
 }
 

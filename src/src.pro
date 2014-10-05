@@ -292,3 +292,8 @@ maemo5 {
     icon48.files += ../maemofiles/mui.png
     INSTALLS += icon48
 }
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/../android
+
+OTHER_FILES += \
+    ../android/AndroidManifest.xml

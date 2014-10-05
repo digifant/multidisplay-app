@@ -18,7 +18,7 @@ MobileGPS::MobileGPS(QObject *parent)
 
     QSettings settings("MultiDisplay", "UI");
     if ( settings.value("mobile/use_gps_internal", QVariant(true)).toBool() ) {
-        qDebug() << "use N900 gps";
+        qDebug() << "using internal gps";
 
         //available only in qt mobility 1.2
         //N900 PR1.2 has 1.1 :(
@@ -41,10 +41,18 @@ MobileGPS::MobileGPS(QObject *parent)
             source->startUpdates();
         }
     } else {
+#if defined (Q_WS_MAEMO_5)
         qDebug() << "use NMEA gps datastream on /dev/rfcomm5";
         gpsSerial = new MdGpsSerial();
         connect(gpsSerial, SIGNAL(positionUpdated(QGeoPositionInfo)),
                 this, SLOT(positionUpdated(QGeoPositionInfo)));
+#endif
+#if defined (Q_OS_ANDROID)
+        qDebug() << "use NMEA gps datastream on bluetooth spp";
+        gpsSerial = new MdGpsSerial();
+        connect(gpsSerial, SIGNAL(positionUpdated(QGeoPositionInfo)),
+                this, SLOT(positionUpdated(QGeoPositionInfo)));
+#endif
 
     }
     freqMeasure = QTime::currentTime();

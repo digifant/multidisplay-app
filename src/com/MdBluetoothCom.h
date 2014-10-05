@@ -32,7 +32,7 @@ class MdBluetoothCom : public MdAbstractCom
 {
     Q_OBJECT
 public:
-    MdBluetoothCom( QObject* parent );
+    MdBluetoothCom( QObject* parent, QString mdServiceName="mdv2" );
     virtual ~MdBluetoothCom();
 
 //signals:

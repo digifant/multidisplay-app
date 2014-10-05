@@ -26,6 +26,7 @@ public slots:
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual bool event(QEvent * e);
+    void resizeEvent ( QResizeEvent * event );
 
 private:
     QwtThermo *boostT;

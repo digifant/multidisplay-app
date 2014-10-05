@@ -35,6 +35,9 @@ int main(int argc, char *argv[]) {
         QApplication::setStyle(QString("Plastique"));
 #endif
 
+        QApplication::setOrganizationName("multidisplay");
+        QCoreApplication::setApplicationName("UI");
+
         QApplication a(argc, argv);
 
         AppEngine *e = AppEngine::getInstance();

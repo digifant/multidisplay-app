@@ -22,8 +22,8 @@
 #include <QListWidgetItem>
 #include <QBluetoothLocalDevice>
 
-MdBluetoothCom::MdBluetoothCom(QObject *parent)
-    : MdAbstractCom(parent), sDiscoveryAgent (0), socket (0), sdNeeded(Yes), mdServiceName("mdv2")
+MdBluetoothCom::MdBluetoothCom(QObject *parent, QString mdServiceName)
+    : MdAbstractCom(parent), sDiscoveryAgent (0), socket (0), sdNeeded(Yes), mdServiceName(mdServiceName)
 {
 
     QBluetoothLocalDevice localDevice;

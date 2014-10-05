@@ -458,7 +458,7 @@ void AppEngine::setupMaemo() {
     rtvis = new RealTimeVis ( mmw->ui->mainFrame );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
-#if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
+#if  defined (Q_WS_MAEMO_5)
     QSettings settings("MultiDisplay", "UI");
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
         mGps = new MobileGPS (this);
@@ -480,6 +480,9 @@ void AppEngine::setupMaemo() {
 
 void AppEngine::setupAndroid () {
 #if defined Q_OS_ANDROID
+    QSettings s;
+    qDebug() << "settings are stored in " << s.fileName();
+
     connect (amw, SIGNAL(writeSettings()), this, SLOT(writeSettings()));
 
     //Evaluations
@@ -527,7 +530,9 @@ void AppEngine::setupAndroid () {
     rtvis = new RealTimeVis ( add );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
-    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
+//    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
+    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showFullScreen()) );
+
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mdcom, SIGNAL(portClosed()), amw, SLOT(btPortClosed()) );
@@ -535,11 +540,22 @@ void AppEngine::setupAndroid () {
 
     connect (amw->ui->actionBluetoothToggleState, SIGNAL(triggered()), mdcom, SLOT(togglePort()) );
     connect (amw->ui->actionSave, SIGNAL(triggered()) , this, SLOT(saveDataAs()) );
+
+    QSettings settings("MultiDisplay", "UI");
+    if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
+        mGps = new MobileGPS (this);
+    else
+        mGps = NULL;
+    if ( settings.value("mobile/use_accel", QVariant(true)).toBool() )
+        accelMeter = new Accelerometer(this);
+    else
+        accelMeter = false;
+
 #endif
 }
 
 void AppEngine::show() {
-#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)
     //Windows / Linux Desktop GUI
     pcmw->show();
 #endif
@@ -548,8 +564,8 @@ void AppEngine::show() {
     mmw->show();
 #endif
 #if defined (Q_OS_ANDROID)
-//    amw->showFullScreen();
-    amw->showMaximized();
+    amw->showFullScreen();
+//    amw->showMaximized();
 //    add->showMaximized();
  #endif
 }
@@ -564,7 +580,7 @@ void AppEngine::saveData () {
 #endif
 
     data->saveData(path);
-#if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
+#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
     if ( mGps )
         mGps->saveTrack (path + ".track");
 #endif
