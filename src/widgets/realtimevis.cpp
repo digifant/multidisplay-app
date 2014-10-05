@@ -12,10 +12,16 @@
 RealTimeVis::RealTimeVis(QWidget *parent):
     QWidget(parent)
 {
+    QHBoxLayout *pl = new QHBoxLayout();
+    pl->setContentsMargins(0,0,0,0);
+    pl->setSpacing(0);
+    parent->setLayout(pl);
+    pl->addWidget(this);
+
     QHBoxLayout *h = new QHBoxLayout();
     h->setContentsMargins(0,0,0,0);
     h->setSpacing(0);
-    parent->setLayout(h);
+    this->setLayout(h);
 
 #if !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
     bg1 = new BoostBarGraphWidget (this);
