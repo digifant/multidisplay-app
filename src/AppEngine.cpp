@@ -132,7 +132,7 @@ AppEngine::AppEngine() {
     qDebug() << "QT_WS_MAEMO_5 mobile version";
     QDesktopWidget *dw = QApplication::desktop ();
     mmw = new MobileMainWindow ();
-    mmw->setGeometry( dw->availableGeometry() );
+//    mmw->setGeometry( dw->availableGeometry() );
 //    mmw->showExpanded();
     pcmw = NULL;
     amw = NULL;
@@ -561,7 +561,8 @@ void AppEngine::show() {
 #endif
 #if  defined (Q_WS_MAEMO_5)
     //Maemo Stacked Windows
-    mmw->show();
+    mmw->showMaximized();
+    mmw->statusBar()->hide();
 #endif
 #if defined (Q_OS_ANDROID)
     amw->showFullScreen();
