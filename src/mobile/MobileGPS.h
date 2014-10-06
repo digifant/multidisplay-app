@@ -18,6 +18,8 @@ struct MdPos {
     int timeDelta;
     QGeoPositionInfo pos;
 };
+QDataStream& operator<< (QDataStream& s, MdPos *p);
+QDataStream& operator>> (QDataStream& s, MdPos *p);
 
 class MobileGPS : public QObject
 {
@@ -26,7 +28,14 @@ class MobileGPS : public QObject
 public:
     MobileGPS(QObject *parent = 0);
 
+    enum { MAGICNUMBER = 0xFEABFEAB, VERSION = 1 };
+
     bool saveTrack (QString fn);
+    bool saveTrackBinary (QString fn);
+    //! broken
+    bool loadTrack (QString fn);
+    bool loadTrackBinary (QString fn);
+    void clearData();
 
     QGeoPositionInfo& lastPos() { return lastPositionInfo; };
     quint32 updateCount () { return gpsUpdateCount; };
@@ -39,6 +48,8 @@ public:
 public slots:
     void positionUpdated(const QGeoPositionInfo &info);
     void mdFrameReceived();
+
+protected:
 
 private:
     QGeoPositionInfoSource *source;

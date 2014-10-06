@@ -581,8 +581,10 @@ void AppEngine::saveData () {
 
     data->saveData(path);
 #if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
-    if ( mGps )
+    if ( mGps ) {
         mGps->saveTrack (path + ".track");
+        mGps->saveTrackBinary (path + ".trackB");
+    }
 #endif
 }
 
@@ -615,8 +617,10 @@ void AppEngine::saveDataAs () {
     if ( fn != "") {
         data->saveData(fn);
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
-        if ( mGps )
+        if ( mGps ) {
             mGps->saveTrack (fn + ".track");
+            mGps->saveTrackBinary (fn + ".trackB");
+        }
 #endif
     }
 }

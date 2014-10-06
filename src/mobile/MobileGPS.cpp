@@ -88,11 +88,11 @@ bool MobileGPS::saveTrack(QString fn) {
     if ( !file.open (QIODevice::WriteOnly | QIODevice::Truncate) )
             return false;
     QTextStream ts (&file);
-    ts << "#md timestamp\tgps gps-timedelta\ttime\tgps coordinate\tgps speed\tgps directon\tGPSHorizontalAccuracy\tGPSVerticalAccuracy" << endl;
+    ts << "#md timestamp\ttimedelta\tgps time\tgps coordinate\tgps speed\tgps directon\tGPSHorizontalAccuracy\tGPSVerticalAccuracy" << endl;
     foreach (MdPos* e , track ) {
         if ( e->pos.isValid() ) {
             ts << e->time << '\t'
-               << e->timeDelta << 't'
+               << e->timeDelta << '\t'
                << e->pos.timestamp().toString() << '\t'
                << e->pos.coordinate().toString() << '\t'
                << e->pos.attribute(QGeoPositionInfo::GroundSpeed) << '\t'
@@ -107,3 +107,106 @@ bool MobileGPS::saveTrack(QString fn) {
     file.close();
     return true;
 }
+
+bool MobileGPS::saveTrackBinary(QString fn)
+{
+    QFile file (fn);
+    if ( !file.open (QIODevice::WriteOnly | QIODevice::Truncate) )
+            return false;
+    QDataStream ds (&file);
+    ds.setVersion(QDataStream::Qt_4_7);
+    ds << MAGICNUMBER;
+    ds << VERSION;
+
+    foreach ( MdPos* p, track ) {
+        ds << p;
+    }
+    file.close();
+    return true;
+}
+
+bool MobileGPS::loadTrack(QString fn)
+{
+    QFile file (fn);
+    if ( !file.open (QIODevice::ReadOnly) )
+        return false;
+    QTextStream ts (&file);
+    QString line;
+    do {
+        line = ts.readLine();
+        if ( !line.isNull() ) {
+            MdPos* pos = new MdPos ();
+            QStringList l = line.split('\t');
+            pos->time = l[0].toInt();
+            pos->timeDelta = l[1].toInt();
+            QString degreesMinutesSecondsWithHemisphereOptionalHeigth = l[3];
+            QStringList dmsHs = degreesMinutesSecondsWithHemisphereOptionalHeigth.split(",");
+            //            51° 5' 60.0" N, 10° 29' 60.0" E, 211.5m
+            QRegExp dmshR ("(\\d+)\\D\\s*(\\d+)\\D\\s*(\\d+)\\D\\s*(\\w)");
+            QRegExp heigthR ("(\\d+\\.\\d+)m");
+
+            QGeoPositionInfo pi;
+            pi.setTimestamp( QDateTime::fromString( QString(line[2])) );
+
+            //TODO fixme
+
+//            pi.setCoordinate( QGeoCoordinate() );
+            track.append(pos);
+        }
+    } while (!line.isNull());
+    file.close();
+}
+
+bool MobileGPS::loadTrackBinary(QString fn)
+{
+    clearData();
+
+    QFile file (fn);
+        if ( !file.open (QIODevice::ReadOnly) )
+            return false;
+
+    QDataStream ds (&file);
+    ds.setVersion(QDataStream::Qt_4_7);
+    quint32 magic, version;
+    ds >> magic;
+    ds >> version;
+
+    if ( (magic == MAGICNUMBER) && (version==VERSION) ) {
+        while ( !ds.atEnd() ) {
+            MdPos *p = new MdPos();
+            ds >> p;
+            track.append(p);
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void MobileGPS::clearData()
+{
+    foreach (MdPos* p , track ) {
+        if ( p )
+            delete (p);
+        track.clear();
+    }
+}
+
+
+QDataStream &operator<<(QDataStream &s, MdPos *p)
+{
+    s << p->time;
+    s << p->timeDelta;
+    s << p->pos;
+    return s;
+}
+
+QDataStream &operator>>(QDataStream &s, MdPos *p)
+{
+    s >> p->time;
+    s >> p->timeDelta;
+    s >> p->pos;
+    return s;
+}
+
+

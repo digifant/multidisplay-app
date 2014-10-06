@@ -98,7 +98,8 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
 } else {
-    win32|unix:HEADERS+=com/MdQSerialPortCom.h
+    win32|unix:HEADERS+=com/MdQSerialPortCom.h \
+    mobile/MobileGPS.h
 }
 
 
@@ -107,8 +108,7 @@ maemo5:HEADERS+=mobile/MobileEvaluationDialog.h \
     mobile/Accelerometer.h \
     com/MdQextSerialCom.h
 
-android:HEADERS+=mobile/MobileGPS.h \
-    mobile/Accelerometer.h \
+android:HEADERS+=mobile/Accelerometer.h \
     com/MdBluetoothCom.h \
     mobile/AndroidDashboardDialog.h
 
@@ -167,7 +167,8 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp
 } else {
-    win32|unix:SOURCES+=com/MdQSerialPortCom.cpp
+    win32|unix:SOURCES+=com/MdQSerialPortCom.cpp \
+                        mobile/MobileGPS.cpp
     android:SOURCES-=com/MdQSerialPortCom.cpp
 }
 
@@ -175,8 +176,7 @@ maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
     mobile/MobileGPS.cpp \
     mobile/Accelerometer.cpp
 
-android:SOURCES+=mobile/MobileGPS.cpp \
-    mobile/Accelerometer.cpp \
+android:SOURCES+=mobile/Accelerometer.cpp \
     com/MdBluetoothCom.cpp \
     mobile/AndroidDashboardDialog.cpp
 
