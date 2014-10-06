@@ -187,25 +187,15 @@ void MeasurementWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-//#ifndef Q_OS_ANDROID
     QColor bc = overblendBackground();
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
     painter.setBackgroundMode( Qt::TransparentMode );
     painter.setBackground( QBrush ( bc ) );
-//#else
-//    QColor bc = overblendBackground();
-//    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
-//    painter.setBackgroundMode( Qt::TransparentMode );
-//    painter.setBackground( QBrush ( bc ) );
-//#endif
-
-//#ifndef Q_OS_ANDROID
-//    painter.setBackgroundMode( Qt::OpaqueMode );
 
     painter.setFont(textFont);
 
     if ( !wideMode )
-        painter.drawText( QPoint(0,textFont.pointSize()), caption );
+        painter.drawText( QPoint(0,QFontMetrics(textFont).lineSpacing()), caption );
 
     int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
     if ( dataFontPointSize > (this->size().width() - 20)/digits )
@@ -230,25 +220,7 @@ void MeasurementWidget::paint() {
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );
     }
-//#else
-//    painter.setFont(textFont);
-//    painter.setBrush( QBrush(Qt::SolidPattern)) ;
 
-//    QFontMetrics fm = painter.fontMetrics();
-//    //y pos is baseline!
-//    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
-
-////    textFont.setPointSize(10);
-//    painter.setFont(dataFont);
-//    fm = painter.fontMetrics();
-
-//    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
-//    uint h = fm.height();
-
-//    painter.setFont(textFont);
-//    fm = painter.fontMetrics();
-//    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
-//#endif
     painter.end();
 }
 
@@ -383,31 +355,25 @@ void MaxEgtWidget::paint() {
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-//#ifndef Q_OS_ANDROID
     QColor bc = overblend->overblend3(value);
     painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
     painter.setBackgroundMode( Qt::TransparentMode );
     painter.setBackground( QBrush ( bc ) );
-//#else
-//    QColor bc = overblend->overblend3(value);
-//    painter.fillRect( QRect(0,0,size().width(),size().height()), bc);
-//    painter.setBackgroundMode( Qt::TransparentMode );
-//    painter.setBackground( QBrush ( bc ) );
-//#endif
-
-//#ifndef Q_OS_ANDROID
 
     painter.setFont(textFont);
 
-#ifndef Q_WS_MAEMO_5
-    if ( !wideMode )
-        painter.drawText( QPoint(0,textFont.pointSize()), caption );
-#else
-    QString maemo_caption = caption;
+//#ifndef Q_WS_MAEMO_5
+//    if ( !wideMode )
+    QString max_caption = caption;
     if ( valTxt2PaintL2 != "" )
-        maemo_caption += " max " +  valTxt2PaintL2;
-    painter.drawText( QPoint(0,textFont.pointSize()), maemo_caption);
-#endif
+        max_caption += " max " +  valTxt2PaintL2;
+    painter.drawText( QPoint(0,QFontMetrics(textFont).lineSpacing()), max_caption );
+//#else
+//    QString maemo_caption = caption;
+//    if ( valTxt2PaintL2 != "" )
+//        maemo_caption += " max " +  valTxt2PaintL2;
+//    painter.drawText( QPoint(0,textFont.pointSize()), maemo_caption);
+//#endif
 
     int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
     if ( dataFontPointSize > (this->size().width() - 20)/digits )

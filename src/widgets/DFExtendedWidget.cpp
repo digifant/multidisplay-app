@@ -89,7 +89,18 @@ void DFExtendedWidget::paint() {
     textFont.setItalic(true);
     textFont.setBold(true);
     painter.setFont(textFont);
+
+    //scale font size to fit heigth
+    //down
+    while ( ( QFontMetrics(textFont).lineSpacing() * 13 ) > height() )
+        textFont.setPointSizeF( textFont.pointSizeF() - 0.5 );
+    //up
+    while ( ( ( QFontMetrics(textFont).lineSpacing() * 14 ) < height() ) &&
+            ( QFontMetrics(textFont).boundingRect(QString("LC OFF   knock detection OFF")).width() < width() ) )
+        textFont.setPointSizeF( textFont.pointSizeF() + 0.5 );
+
     QFontMetrics fm = painter.fontMetrics();
+
     uint h = 0;
     h = fm.height() + fm.leading();
     painter.drawText( QPoint(0,h), caption );
@@ -126,7 +137,7 @@ void DFExtendedWidget::paint() {
     QString warm_startup_enrich = "warm s-en " + QString::number(df_warm_startup_enrich);
 
     quint16 isv_conv = ( 0x1a93 - ( (( isvMap->mapValue(df_isv) * 0xC7 ) / 16 ) + 0xA60 ) ) / 2;
-    QString isv = "ISV " + QString::number(isv_conv) + " usecs";
+    QString isv = "ISV " + QString::number(isv_conv) + " us";
     QString voltage = "Volt " + QString::number(voltageMap->mapValue(df_voltage)) + " V";
     QString lc = "LC ";
     if ( df_lc_flags & 8)
