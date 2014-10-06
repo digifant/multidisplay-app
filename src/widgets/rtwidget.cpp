@@ -194,8 +194,9 @@ void MeasurementWidget::paint() {
 
     painter.setFont(textFont);
 
+    quint16 h = QFontMetrics(textFont).lineSpacing();
     if ( !wideMode )
-        painter.drawText( QPoint(0,QFontMetrics(textFont).lineSpacing()), caption );
+        painter.drawText( QPoint(0,h), caption );
 
     int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
     if ( dataFontPointSize > (this->size().width() - 20)/digits )
@@ -205,18 +206,15 @@ void MeasurementWidget::paint() {
     painter.setFont(dataFont);
 
     if ( valTxt2Paint != "" )
-        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
                           Qt::AlignLeft, valTxt2Paint );
     else
-        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
                           Qt::AlignLeft, QString::number(value) );
 
     if ( valTxt2PaintL2 != "" ) {
         painter.setFont(textFont);
-        //        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + dataFont.pointSize() + 20, this->size().width(), this->size().height() ),
-        //                          Qt::AlignRight, valTxt2PaintL2 );
-        int h = (wideMode==false ? textFont.pointSize() : 0) + dataFont.pointSize() + 20;
-        //no space for a third line on n900
+        int h = (wideMode==false ? QFontMetrics(textFont).lineSpacing() : 0) + QFontMetrics(dataFont).lineSpacing();
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );
     }
