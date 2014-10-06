@@ -198,7 +198,8 @@ void MeasurementWidget::paint() {
     if ( !wideMode )
         painter.drawText( QPoint(0,h), caption );
 
-    int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
+//    int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
+    int dataFontPointSize = this->size().height() - QFontMetrics(textFont).lineSpacing();
     if ( dataFontPointSize > (this->size().width() - 20)/digits )
         dataFontPointSize = (this->size().width() - 20)/digits;
 
@@ -208,9 +209,13 @@ void MeasurementWidget::paint() {
     if ( valTxt2Paint != "" )
         painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
                           Qt::AlignLeft, valTxt2Paint );
-    else
-        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
-                          Qt::AlignLeft, QString::number(value) );
+    else {
+//        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
+//                          Qt::AlignLeft, QString::number(value) );
+        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+                                    Qt::AlignLeft, QString::number(value) );
+//        painter.drawText( QPoint(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing() + QFontMetrics(dataFont).lineSpacing()), QString::number(value) );
+    }
 
     if ( valTxt2PaintL2 != "" ) {
         painter.setFont(textFont);
@@ -218,7 +223,6 @@ void MeasurementWidget::paint() {
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );
     }
-
     painter.end();
 }
 
@@ -360,18 +364,11 @@ void MaxEgtWidget::paint() {
 
     painter.setFont(textFont);
 
-//#ifndef Q_WS_MAEMO_5
-//    if ( !wideMode )
     QString max_caption = caption;
     if ( valTxt2PaintL2 != "" )
         max_caption += " max " +  valTxt2PaintL2;
     painter.drawText( QPoint(0,QFontMetrics(textFont).lineSpacing()), max_caption );
-//#else
-//    QString maemo_caption = caption;
-//    if ( valTxt2PaintL2 != "" )
-//        maemo_caption += " max " +  valTxt2PaintL2;
-//    painter.drawText( QPoint(0,textFont.pointSize()), maemo_caption);
-//#endif
+
 
     int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
     if ( dataFontPointSize > (this->size().width() - 20)/digits )
