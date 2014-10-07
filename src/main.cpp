@@ -24,7 +24,6 @@
 #include <QApplication>
 #include <QDebug>
 
-
 #include <cxxabi.h>
 #include <iostream>
 

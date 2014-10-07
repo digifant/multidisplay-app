@@ -6,6 +6,8 @@
 #include "ui_AndroidMainWindow.h"
 #include "AppEngine.h"
 
+
+
 AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AndroidMainWindow)

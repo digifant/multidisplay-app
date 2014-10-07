@@ -18,7 +18,7 @@ CONFIG += rtti exceptions mobility serialport
 
 
 android {
-    QT += svg
+    QT += svg androidextras
 }
 
 maemo5 {

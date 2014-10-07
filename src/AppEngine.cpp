@@ -74,6 +74,7 @@
 
 #if defined (Q_OS_ANDROID)
     #include "com/MdBluetoothCom.h"
+    #include <QtAndroid>
 #endif
 
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
@@ -550,6 +551,16 @@ void AppEngine::setupAndroid () {
         accelMeter = new Accelerometer(this);
     else
         accelMeter = false;
+
+//    QAndroidJniObject activity = QtAndroid::androidActivity();
+//    Q_ASSERT ( activity.isValid() );
+//    QAndroidJniObject win = activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
+//    //http://qt-project.org/doc/qt-5/qandroidjniobject.html#details
+//    //addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+//    //http://developer.android.com/reference/android/view/WindowManager.LayoutParams.html#FLAG_KEEP_SCREEN_ON
+//    Q_ASSERT ( win.isValid() );
+//#define FLAG_KEEP_SCREEN_ON 128
+//    win.callMethod<void>("addFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
 
 #endif
 }
