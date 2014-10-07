@@ -552,8 +552,8 @@ void AppEngine::setupAndroid () {
     else
         accelMeter = false;
 
-//    QAndroidJniObject activity = QtAndroid::androidActivity();
-//    Q_ASSERT ( activity.isValid() );
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    Q_ASSERT ( activity.isValid() );
 //    QAndroidJniObject win = activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
 //    //http://qt-project.org/doc/qt-5/qandroidjniobject.html#details
 //    //addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -561,6 +561,7 @@ void AppEngine::setupAndroid () {
 //    Q_ASSERT ( win.isValid() );
 //#define FLAG_KEEP_SCREEN_ON 128
 //    win.callMethod<void>("addFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
+    activity.callMethod<void>("setKeepScreenOn", "(B)V", true);
 
 #endif
 }

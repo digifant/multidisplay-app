@@ -268,6 +268,10 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                 }
                     LIBS += -L $$quote(../libs/qwt-6.1.1/lib) -lqwt
         }
+        android:  {
+            message("android: static linking!")
+            unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a
+        }
         maemo5: {
             message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
             unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
