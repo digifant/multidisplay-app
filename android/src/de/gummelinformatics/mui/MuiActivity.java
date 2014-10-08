@@ -19,7 +19,7 @@ public class MuiActivity extends QtActivity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
+		setKeepScreenOn(true);
 	}
 
 	@Override
