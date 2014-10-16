@@ -39,6 +39,8 @@
 #include <QTimer>
 #include <QtCore/qmath.h>
 #include <math.h>
+#include <QSplashScreen>
+#include <QProgressBar>
 
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
 #include "mobile/Accelerometer.h"
@@ -185,6 +187,13 @@ MdData::MdData (QMainWindow* mw_boost, QWidget* parent_boost, QMainWindow* mw_vi
     wotEventsDialog = new WotEventsDialog (mw_vis1);
 
     connect ( wotEventsDialog, SIGNAL(jumpToDataIdx(int)), this, SLOT(showDataListIdx(int)) );
+
+    splash = new QSplashScreen (parent_boost);
+    progressBar = new QProgressBar(parent_boost);
+    splash->setLayout ( new QHBoxLayout () );
+    splashLabel = new QLabel (splash);
+    splash->layout()->addWidget(splashLabel);
+    splash->layout()->addWidget( progressBar );
 }
 
 MdData::~MdData() {
@@ -738,7 +747,16 @@ QList<int> MdData::findInjectorHighDC ( bool showWindow ) {
 }
 
 void MdData::checkData () {
+
+
+    splash->show();
+    splashLabel->setText("Analyzing data...");
+    splash->finish(wotEventsDialog);
+
     int eventCount = 0;
+
+    progressBar->setMaximum(3);
+    progressBar->setValue(0);
 
     //egt
     QList<int> egtL = findHighEGT( false );
@@ -753,6 +771,7 @@ void MdData::checkData () {
     edm["data"] = egtVL;
     edm["icon"] = QVariant("dialog-warning");
     p["EGT"] = edm;
+    progressBar->setValue(1);
 
     //knock
     QList<int> knockL = findKnock( false );
@@ -766,6 +785,7 @@ void MdData::checkData () {
     km["data"] = knockVL;
     km["icon"] = QVariant("dialog-information");
     p["Knock"] = km;
+    progressBar->setValue(2);
 
     QList<int> dcL = findInjectorHighDC( false );
     QList<QVariant> dcVL;
@@ -778,9 +798,12 @@ void MdData::checkData () {
     dcm["data"] = dcVL;
     dcm["icon"] = QVariant("dialog-warning");
     p["Inj duty cycle"] = dcm;
+    progressBar->setValue(3);
 
     if ( eventCount > 0 )
         wotEventsDialog->show ( p );
+    else
+        splash->hide();
 }
 
 void MdData::showCfgVis1 () {
@@ -964,20 +987,15 @@ bool MdData::loadData ( const QString& filename ) {
 }
 
 void MdData::clearData () {
-//	qDebug() << "clear " << data.size() << " items";
-//	while ( !dataList.empty() ) {
-//		delete (*(dataList.begin()));
-//		dataList.pop_front();
-//	}
-//	qDebug() << "size=" << data.size();
-
-	foreach ( MdPlot* p, plotList) {
+    foreach ( MdPlot* p, plotList) {
 		p->clear();
 	}
 
+    beginRemoveRows( QModelIndex(), 0, dataList.size()-1 );
 	foreach ( MdDataRecord* r , dataList )
 			delete (r);
 	dataList.clear();
+    endRemoveRows();
 }
 
 void MdData::addDataRecord (MdDataRecord *nr, bool doReplot) {

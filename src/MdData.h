@@ -53,6 +53,9 @@
 #define MAXVAL_EGT 7
 #define MAXVAL_EFR_SPEED 8
 
+class QSplashScreen;
+class QProgressBar;
+class QLabel;
 class QwtPlot;
 class BoostPidPlot;
 class VisualizationPlot;
@@ -347,6 +350,10 @@ private:
     QList<MdDataRecord*> dataList;
 
     QVector<QString> headerColNames;
+
+    QSplashScreen* splash;
+    QProgressBar* progressBar;
+    QLabel* splashLabel;
 
     QMainWindow* mainWindow;
 
