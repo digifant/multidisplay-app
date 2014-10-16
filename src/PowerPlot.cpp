@@ -323,6 +323,73 @@ void PowerPlot::reCalculate( bool useGpsSpeed ) {
 
     QList<double> rpm;
 
+    qreal am_speed_delta = 0;
+    qreal am_time_delta = 0;
+    qreal am_rpm_delta = 0;
+
+    foreach (quint32 r, rowNums) {
+        MdDataRecord *cur = dataListP->at(r);
+        MdDataRecord *last = cur;
+        if ( lastUsedRow > 0 ) {
+            last = dataListP->at(lastUsedRow);
+            lastUsedRow = r;
+        } else {
+            lastUsedRow = r;
+        }
+
+        if ( last != cur ) {
+            qreal speed_delta = cur->getSensorR()->getSpeed() - last->getSensorR()->getSpeed();
+            if ( useGpsSpeed )
+                speed_delta = cur->getMobileR()->gpsGroundSpeed - last->getMobileR()->gpsGroundSpeed;
+            qreal time_delta = cur->getSensorR()->getTime() - last->getSensorR()->getTime();
+            qreal rpm_delta = cur->getSensorR()->getRpm() - last->getSensorR()->getRpm();
+            am_speed_delta += speed_delta;
+            am_time_delta += time_delta;
+            am_rpm_delta += rpm_delta;
+        }
+    }
+    am_speed_delta = am_speed_delta / rowNums.size();
+    am_time_delta = am_time_delta / rowNums.size();
+    am_rpm_delta = am_rpm_delta / rowNums.size();
+
+    //sigma / standard deviation
+    qreal sd_speed_delta = 0;
+    qreal sd_time_delta = 0;
+    qreal sd_rpm_delta = 0;
+
+    qreal sum_h_s = 0;
+    qreal sum_h_t = 0;
+    qreal sum_h_r = 0;
+    lastUsedRow = 0;
+    foreach (quint32 r, rowNums) {
+        MdDataRecord *cur = dataListP->at(r);
+        MdDataRecord *last = cur;
+        if ( lastUsedRow > 0 ) {
+            last = dataListP->at(lastUsedRow);
+            lastUsedRow = r;
+        } else {
+            lastUsedRow = r;
+        }
+
+        if ( last != cur ) {
+            qreal speed_delta = cur->getSensorR()->getSpeed() - last->getSensorR()->getSpeed();
+            if ( useGpsSpeed )
+                speed_delta = cur->getMobileR()->gpsGroundSpeed - last->getMobileR()->gpsGroundSpeed;
+            qreal time_delta = cur->getSensorR()->getTime() - last->getSensorR()->getTime();
+            qreal rpm_delta = cur->getSensorR()->getRpm() - last->getSensorR()->getRpm();
+            sum_h_s += qPow (speed_delta - am_speed_delta, 2);
+            sum_h_t += qPow (time_delta - am_time_delta, 2);
+            sum_h_r += qPow (rpm_delta - am_rpm_delta, 2);
+        }
+    }
+    sd_speed_delta = qSqrt( (1.0/(rowNums.size()-1)) * sum_h_s);
+    sd_time_delta = qSqrt( (1.0/(rowNums.size()-1)) * sum_h_t);
+    sd_rpm_delta = qSqrt( (1.0/(rowNums.size()-1)) * sum_h_r);
+    qDebug() << "speed delta am=" << am_speed_delta << " sd=" << sd_speed_delta
+             << " | time delta am=" << am_time_delta << " sd=" << sd_time_delta
+             << " | rpm delta am" << am_rpm_delta << " sd=" << sd_rpm_delta;
+
+    lastUsedRow = 0;
     foreach (quint32 r, rowNums) {
         MdDataRecord *cur = dataListP->at(r);
 
@@ -339,28 +406,59 @@ void PowerPlot::reCalculate( bool useGpsSpeed ) {
 
 //        uc = cur->getMobileR()->gpsUpdateCount;
 
-        computePower (cur,last, cp, lastUsedRow, r, useGpsSpeed);
+        bool cancel_item = false;
 
-        if ( ! isnan(cp->kw_engine) ) {
-            boostData->append (curRpm, cur->getSensorR()->getBoost());
-            agtData->append (curRpm, cur->getSensorR()->getEgt4() / 2);
+        const qreal sigma_f = 3.0;
 
-            if ( useGpsSpeed ) {
-//                speedData->append (curRpm, cur->getMobileR()->gpsGroundSpeed);
-                speedData->append (curRpm, smoothedSpeed[r]);
-            } else {
-//                speedData->append (curRpm, cur->getSensorR()->getSpeed());
-                speedData->append (curRpm, smoothedSpeed[r]);
-            }
-
-            lambdaData->append (curRpm, cur->getSensorR()->getLambda());
-
-            dinTorqueData->append( curRpm, cp->torque_engine_din);
-            wheelTorqueData->append( curRpm, cp->torque_wheel);
-            dinPowerData->append( curRpm, cp->kw_engine_din);
-            wheelPowerData->append( curRpm, cp->kw_wheel);
-            rpm.append(curRpm);
+        if ( ((cur->getSensorR()->getRpm() -  last->getSensorR()->getRpm()) < ( am_rpm_delta - sigma_f * sd_rpm_delta ) )
+            || ((cur->getSensorR()->getRpm() -  last->getSensorR()->getRpm()) > ( am_rpm_delta + sigma_f * sd_rpm_delta) ) ) {
+                qDebug() << "rpm delta high deviation at item number " << r;
+                cancel_item = true;
         }
+        if ( useGpsSpeed ) {
+            if ( ((cur->getMobileR()->gpsGroundSpeed -  last->getMobileR()->gpsGroundSpeed) < ( am_speed_delta - sigma_f * sd_speed_delta) )
+                || ((cur->getMobileR()->gpsGroundSpeed -  last->getMobileR()->gpsGroundSpeed) > (am_speed_delta + sigma_f * sd_speed_delta) ) ) {
+                qDebug() << "speed delta high deviation at item number " << r;
+                cancel_item = true;
+            }
+        } else {
+            if ( ((cur->getSensorR()->getSpeed() -  last->getSensorR()->getSpeed()) < ( am_speed_delta - sigma_f * sd_speed_delta) )
+                || ((cur->getSensorR()->getSpeed() -  last->getSensorR()->getSpeed()) > (am_speed_delta + sigma_f * sd_speed_delta) ) ) {
+                qDebug() << "speed delta high deviation at item number " << r;
+                cancel_item = true;
+            }
+        }
+        if ( ((cur->getSensorR()->getTime() -  last->getSensorR()->getTime()) < ( am_time_delta - sigma_f * sd_time_delta) )
+            || ((cur->getSensorR()->getTime() -  last->getSensorR()->getTime()) > ( am_time_delta + sigma_f * sd_time_delta) ) ) {
+            qDebug() << "time delta high deviation at item number " << r;
+            cancel_item = true;
+        }
+
+        if ( !cancel_item ) {
+
+            computePower (cur,last, cp, lastUsedRow, r, useGpsSpeed);
+
+            if ( ! isnan(cp->kw_engine) ) {
+                boostData->append (curRpm, cur->getSensorR()->getBoost());
+                agtData->append (curRpm, cur->getSensorR()->getEgt4() / 2);
+
+                if ( useGpsSpeed ) {
+//                speedData->append (curRpm, cur->getMobileR()->gpsGroundSpeed);
+                    speedData->append (curRpm, smoothedSpeed[r]);
+                } else {
+//                speedData->append (curRpm, cur->getSensorR()->getSpeed());
+                    speedData->append (curRpm, smoothedSpeed[r]);
+                }
+
+                lambdaData->append (curRpm, cur->getSensorR()->getLambda());
+
+                dinTorqueData->append( curRpm, cp->torque_engine_din);
+                wheelTorqueData->append( curRpm, cp->torque_wheel);
+                dinPowerData->append( curRpm, cp->kw_engine_din);
+                wheelPowerData->append( curRpm, cp->kw_wheel);
+                rpm.append(curRpm);
+            }
+        } //cancel_item
 
         lastUsedRow = r;
     }

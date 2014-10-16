@@ -552,9 +552,10 @@ void AppEngine::setupAndroid () {
     else
         accelMeter = false;
 
-    QAndroidJniObject activity = QtAndroid::androidActivity();
-    Q_ASSERT ( activity.isValid() );
-    activity.callMethod<void>("setKeepScreenOn", "(B)V", true);
+    //http://qt-project.org/doc/qt-5/qandroidjniobject.html#details
+//    QAndroidJniObject activity = QtAndroid::androidActivity();
+//    Q_ASSERT ( activity.isValid() );
+//    activity.callMethod<void>("setKeepScreenOn", "(B)V", true);
 #endif
 }
 
