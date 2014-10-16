@@ -979,9 +979,13 @@ bool MdData::loadData ( const QString& filename ) {
 
     emit showStatusMessage ("Data loaded from File " + filename + " (" + QString::number(l) + " rows)");
 
-    //new: CHECK it!
+#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
+    //disabled on mobile
+    ;
+#else
     checkData();
     dataView->resizeColumnsToContents();
+#endif
 
 	return true;
 }
