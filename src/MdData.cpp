@@ -757,6 +757,7 @@ void MdData::checkData () {
 
     progressBar->setMaximum(3);
     progressBar->setValue(0);
+    QCoreApplication::processEvents();
 
     //egt
     QList<int> egtL = findHighEGT( false );
@@ -772,6 +773,7 @@ void MdData::checkData () {
     edm["icon"] = QVariant("dialog-warning");
     p["EGT"] = edm;
     progressBar->setValue(1);
+    QCoreApplication::processEvents();
 
     //knock
     QList<int> knockL = findKnock( false );
@@ -786,6 +788,7 @@ void MdData::checkData () {
     km["icon"] = QVariant("dialog-information");
     p["Knock"] = km;
     progressBar->setValue(2);
+    QCoreApplication::processEvents();
 
     QList<int> dcL = findInjectorHighDC( false );
     QList<QVariant> dcVL;
@@ -799,6 +802,7 @@ void MdData::checkData () {
     dcm["icon"] = QVariant("dialog-warning");
     p["Inj duty cycle"] = dcm;
     progressBar->setValue(3);
+    QCoreApplication::processEvents();
 
     if ( eventCount > 0 )
         wotEventsDialog->show ( p );
