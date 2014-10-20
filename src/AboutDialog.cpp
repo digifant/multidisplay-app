@@ -6,6 +6,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
+//    ui->webView->load (QUrl (QString("http://code.google.com/p/multidisplay/")));
 }
 
 AboutDialog::~AboutDialog()

@@ -17,6 +17,28 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
 //#endif
     isvMap = new Map16x1_ISV();
     voltageMap = new Map16x1_Voltage();
+
+
+    df_wot_flag = 0;
+
+    df_iat = 0;
+    df_ect = 0;
+    df_ignition = 0;
+    df_ignition_retard = 0;
+    df_inj_time = 0;
+    df_voltage = 0;
+    df_boost_raw = 0;
+    df_lambda_raw = 0;
+    df_iat_enrich = 0;
+    df_ect_enrich = 0;
+    df_cold_startup_enrich = 0;
+    df_warm_startup_enrich = 0;
+    df_isv = 0;
+    df_lc_flags = 0;
+    rpm = 0;
+    df_knock_raw = 0;
+    df_inj_duty = 0;
+
     df_ignition_retard = 0;
     maxRetard = 0;
     injduty_max = 0;
@@ -101,7 +123,8 @@ void DFExtendedWidget::paint() {
 
     QFontMetrics fm = painter.fontMetrics();
 
-    uint h = 0;
+    h = 0;
+    w = 0;
     h = fm.height() + fm.leading();
     painter.drawText( QPoint(0,h), caption );
 
@@ -167,17 +190,17 @@ void DFExtendedWidget::paint() {
 
     h += fm.lineSpacing();
     painter.drawText( QPoint (0, h), ign );
-    painter.drawText( QPoint (this->size().width()/2, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint (w, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
 
 
-    h += fm.lineSpacing();;
+    h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), ect );
-    painter.drawText( QPoint(this->size().width()/2,h) ,iat );
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(w,h) ,iat );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), injection );
-//    painter.drawText( QPoint(this->size().width()/2, textFont.pixelSize() + 4*textFont.pointSize() + 15, this->size().width()/2, this->size().height() ),
-//                         Qt::AlignLeft, iat );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), lambda );
@@ -187,15 +210,18 @@ void DFExtendedWidget::paint() {
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), ect_enrich );
-    painter.drawText( QPoint(this->size().width()/2, h), iat_enrich );
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(w, h), iat_enrich );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), cold_startup_enrich );
-    painter.drawText( QPoint(this->size().width()/2, h), warm_startup_enrich );
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(w, h), warm_startup_enrich );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), isv );
-    painter.drawText( QPoint(this->size().width()/2, h), voltage );
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(w, h), voltage );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), dk );
@@ -205,28 +231,19 @@ void DFExtendedWidget::paint() {
     painter.drawText( QPoint(0, h), lc );
 
     QString racemode = "knock detection ON";
+
+    if ( setPositionForCol(fm.lineSpacing(),2) )
+        w = fm.width(lc+2);
     if ( df_lc_flags & 16) {
         racemode = "knock detection OFF";
-        painter.fillRect( QRect(fm.width(lc+2), h - fm.lineSpacing(),
+        painter.fillRect( QRect(w, h - fm.lineSpacing(),
                                 fm.width (racemode), fm.height() ), Qt::red);
     }
-    painter.drawText( QPoint(fm.width(lc+2), h), racemode );
+    painter.drawText( QPoint(w, h), racemode );
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), lc_state);
-//#else
-//    QFontMetrics fmt = QFontMetrics(textFont);
-//    textFont.setPointSize(10);
-//    painter.setFont(textFont);
-//    //y pos is baseline!
-//    h = fmt.height();
-//    painter.drawText( QPoint(0,h), caption );
-//    h += fmt.height();
-////    painter.drawText( QPoint(0,h), ign);
-////    painter.drawText( QPoint(this->size().width()/2, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
-//    h += fmt.height();
 
-//#endif
 
     //KNOCK Bar Test
     const int knockBarHeigth = 40;
@@ -244,14 +261,20 @@ void DFExtendedWidget::paint() {
 }
 
 void DFExtendedWidget::resizeEvent ( QResizeEvent * event ) {
-    qDebug() << "DFExtendedWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
-    if ( event ) {
-#ifndef Q_OS_ANDROID
-        //ignore it at the moment
-#else
-//        uint ps = calcMaxFontPixelSizeByGivenHeight ( event->size().width(), event->size().height(), 14, 30 );
-//        qDebug() << "DFExtendedWidget::resizeEvent calculated pointSize=" << ps;
-//        textFont.setPointSize(ps);
-#endif
+    MeasurementWidget::resizeEvent( event );
+}
+
+bool DFExtendedWidget::setPositionForCol(uint lineSpacing, uint col)
+{
+#if defined (Q_OS_ANDROID)
+    if ( landscape ) {
+        w = this->size().width()/col;
+    } else {
+        w = 0;
+        h += lineSpacing;
     }
+#else
+    w = this->size().width()/col;
+#endif
+    return landscape;
 }

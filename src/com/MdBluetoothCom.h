@@ -72,8 +72,8 @@ public slots:
      * @param speed unused!
      * @return
      */
-    bool setupPort (QString sport="mdv2", QString speed="0");
-    bool changePortSettings (QString sport="mdv2", QString speed="0");
+    bool setupPort (QString sport="", QString speed="0");
+    bool changePortSettings (QString sport="", QString speed="0");
 
     void transmitMsg( const QString &s);
     void transmitMsg( const QByteArray &ba);

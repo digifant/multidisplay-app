@@ -12,20 +12,20 @@ DigifantApplicationWindow::DigifantApplicationWindow(QWidget *parent) :
     l = new QGridLayout(this);
 
     boostw = new MeasurementWidget ( this, QString("Boost [bar]"), -1, 0, 2.0, Qt::darkGreen, Qt::green, Qt::red);
-    boostw->setWideMode(true);
+    boostw->setLowHeigth(true);
     boostw->setDigits(4);
     boostw->resize(100,100);
     l->addWidget(boostw, 0, 0);
     l->setRowStretch(0, 1);
 
     lw = new MeasurementWidget ( this, QString("Lambda"), 0.85, 1.1, 1.36, Qt::green, Qt::yellow, Qt::red);
-    lw->setWideMode(true);
+    lw->setLowHeigth(true);
     lw->setDigits(3.5);
     l->addWidget(lw, 1, 0);
     l->setRowStretch(1, 1);
 
     egtw = new MaxEgtWidget ( this, QString("EGT") );
-    egtw->setWideMode(true);
+    egtw->setLowHeigth(true);
     egtw->setDigits(4);
     egtw->setGeometry( QRect(100,100,100,100) );
     l->addWidget(egtw, 2,0);

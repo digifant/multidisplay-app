@@ -90,10 +90,18 @@ void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
 void MdBluetoothCom::togglePort()
 {
     if ( socket ) {
-        if ( socket->isOpen() )
+//        if ( socket->isOpen() )
+//            closePort();
+//        else {
+//            openPort();
+//        }
+        switch ( socket->state() ) {
+        case QBluetoothSocket::ConnectedState:
             closePort();
-        else {
-            openPort();
+            break;
+        case QBluetoothSocket::UnconnectedState:
+            setupPort();
+            break;
         }
     } else {
         setupPort();
@@ -103,7 +111,8 @@ void MdBluetoothCom::togglePort()
 void MdBluetoothCom::closePort()
 {
     if ( socket ) {
-        socket->close();
+        socket->disconnectFromService();
+//        socket->close();
         qDebug("is open: %d", socket->isOpen());
     }
     emit showStatusMessage ("Bluetooth: SPP closed");
@@ -113,6 +122,7 @@ void MdBluetoothCom::closePort()
 
 void MdBluetoothCom::openPort()
 {
+
     socket->open(QIODevice::ReadWrite);
     qDebug("is open: %d", socket->isOpen());
     if ( socket->isOpen() ) {

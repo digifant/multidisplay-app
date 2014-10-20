@@ -87,8 +87,8 @@ public:
     virtual void setValue (double);
     void setDigits (float d) { digits = d; };
 
-    bool setWideMode ( bool s ) { wideMode = s;}
-    bool getWideMode () { return wideMode;}
+    bool setLowHeigth ( bool s ) { lowHeigth = s;}
+    bool getLowHeigth () { return lowHeigth;}
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
@@ -123,7 +123,10 @@ protected:
 
     ColorOverBlend *overblend;
 
-    bool wideMode;
+    //! if set mostly widget displays only 1 line
+    bool lowHeigth;
+    //! set if widgets width > heigth
+    bool landscape;
 };
 
 class MaxEgtWidget : public MeasurementWidget {

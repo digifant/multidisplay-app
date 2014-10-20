@@ -147,7 +147,8 @@ MeasurementWidget::MeasurementWidget ( QWidget *parent, QString caption, double 
     : GLGauge (parent), caption (caption), lo(lo), mid (mid), hi(hi), value(0),
       loColor(loColor), midColor(midColor),hiColor(hiColor), digits(digits) {
 
-    wideMode = false;
+    lowHeigth = false;
+    landscape = true;
 
     textPen = QPen ( Qt::black );
 //#ifndef Q_OS_ANDROID
@@ -194,32 +195,38 @@ void MeasurementWidget::paint() {
 
     painter.setFont(textFont);
 
-    quint16 h = QFontMetrics(textFont).lineSpacing();
-    if ( !wideMode )
+    quint16 h = QFontMetrics(textFont).leading();
+    if ( !lowHeigth ) {
+        h += QFontMetrics(textFont).lineSpacing();
         painter.drawText( QPoint(0,h), caption );
+        //topline
+        h += QFontMetrics(textFont).leading();
+    }
 
-//    int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
     int dataFontPointSize = this->size().height() - QFontMetrics(textFont).lineSpacing();
     if ( dataFontPointSize > (this->size().width() - 20)/digits )
         dataFontPointSize = (this->size().width() - 20)/digits;
 
+
     dataFont.setPointSize(dataFontPointSize);
     painter.setFont(dataFont);
 
+    int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() ) / 2;
+    if ( m>0 )
+        h += m;
+
     if ( valTxt2Paint != "" )
-        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (lowHeigth==false ? 0 : 0) + h, this->size().width(), this->size().height() ),
                           Qt::AlignLeft, valTxt2Paint );
     else {
-//        painter.drawText( QRect(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing(), this->size().width(), this->size().height() ),
-//                          Qt::AlignLeft, QString::number(value) );
-        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (lowHeigth==false ? 0 : 0) + h, this->size().width(), this->size().height() ),
                                     Qt::AlignLeft, QString::number(value) );
-//        painter.drawText( QPoint(0, (wideMode==false ? 0 : 0) + QFontMetrics(textFont).lineSpacing() + QFontMetrics(dataFont).lineSpacing()), QString::number(value) );
     }
 
+    h += QFontMetrics(textFont).leading() + QFontMetrics(dataFont).lineSpacing();
     if ( valTxt2PaintL2 != "" ) {
         painter.setFont(textFont);
-        int h = (wideMode==false ? QFontMetrics(textFont).lineSpacing() : 0) + QFontMetrics(dataFont).lineSpacing();
+//        int h = (lowHeigth==false ? QFontMetrics(textFont).lineSpacing() : 0) + QFontMetrics(dataFont).lineSpacing();
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );
     }
@@ -233,18 +240,12 @@ void MeasurementWidget::paintEvent(QPaintEvent *event) {
 void MeasurementWidget::resizeEvent ( QResizeEvent * event ) {
     qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
-//#ifndef Q_OS_ANDROID
         dataFont.setPointSize( (event->size().width()) / digits );
-//#else
-//        uint ps = 0;
-//        if ( caption.size() > 0 )
-//            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 10 );
-//        else
-//            ps = calcMaxFontPixelSize( event->size().width(), event->size().height(), 0.7, 0.8, 0 );
-//        qDebug() << "MeasurementWidget::resizeEvent calculated pointSize=" << ps;
-//        // FIXME: qt on android: fonts are rendered bigger than the requested point size :(
-//        dataFont.setPointSize(ps * 0.3);
-//#endif
+
+        if ( event->size().height() > 2 * event->size().width()  )
+            landscape = false;
+        else
+            landscape = true;
     }
 }
 
@@ -378,10 +379,10 @@ void MaxEgtWidget::paint() {
     painter.setFont(dataFont);
 
     if ( valTxt2Paint != "" )
-        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
                           Qt::AlignLeft, valTxt2Paint );
     else
-        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
                           Qt::AlignLeft, QString::number(value) );
 
     if ( valTxt2PaintL2 != "" ) {
@@ -389,7 +390,7 @@ void MaxEgtWidget::paint() {
 #ifndef Q_WS_MAEMO_5
         //        painter.drawText( QRect(0, (wideMode==false ? textFont.pointSize() : 0) + dataFont.pointSize() + 20, this->size().width(), this->size().height() ),
         //                          Qt::AlignRight, valTxt2PaintL2 );
-        int h = (wideMode==false ? textFont.pointSize() : 0) + dataFont.pointSize() + 20;
+        int h = (lowHeigth==false ? textFont.pointSize() : 0) + dataFont.pointSize() + 20;
         //no space for a third line on n900
         painter.drawText( QRect(0, h , this->size().width(), this->size().height()-h ),
                           Qt::AlignRight, valTxt2PaintL2 );

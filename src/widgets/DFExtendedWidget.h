@@ -21,6 +21,8 @@ protected:
     virtual void paint();
     virtual void resizeEvent ( QResizeEvent * event );
 
+    bool setPositionForCol (uint lineSpacing, uint col=2 );
+
     quint8 df_wot_flag;
 
     double df_iat;
@@ -52,6 +54,8 @@ protected:
     double maxRetard;
 
     ColorOverBlend *rawKnockBlend;
+
+    uint h,w;
 };
 
 
