@@ -333,11 +333,11 @@ uint MeasurementWidget::calcMaxFontPointSizeByGivenHeight( uint width, uint heig
             cf.setPointSize( cf.pointSize()/2 );
         if ( th < 0.85 * height ) {
             uint tlw = QFontMetrics(cf).width("9") * lineCharCount;
-            if (  tlw < width * 0.85 ) {
-                if (  tlw < width * 0.5 )
+            if (tlw < width * 0.85) {
+                if ( ( tlw < width * 0.5 ) && ( th < height * 0.5) )
                     cf.setPointSize( cf.pointSize() * 2 );
                 else
-                    if ( tlw < width * 0.7  )
+                    if ( ( tlw < width * 0.7  ) && ( th < height * 0.8) )
                         cf.setPointSize( cf.pointSize() * 1.2 );
                     else
                         cf.setPointSize( cf.pointSize() * 1.05 );
