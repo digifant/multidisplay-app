@@ -149,10 +149,14 @@ MeasurementWidget::MeasurementWidget ( QWidget *parent, QString caption, double 
 
     lowHeigth = false;
     landscape = true;
+    recalcDataFontSize = true;
 
     textPen = QPen ( Qt::black );
-//#ifndef Q_OS_ANDROID
+#if defined ( Q_OS_ANDROID )
+    textFont.setPointSize(16);
+#else
     textFont.setPointSize(20);
+#endif
     dataFont.setPixelSize(90);
 //#else
 //    textFont.setPointSize(10);
@@ -203,12 +207,12 @@ void MeasurementWidget::paint() {
         h += QFontMetrics(textFont).leading();
     }
 
-    int dataFontPointSize = this->size().height() - QFontMetrics(textFont).lineSpacing();
-    if ( dataFontPointSize > (this->size().width() - 20)/digits )
-        dataFontPointSize = (this->size().width() - 20)/digits;
+    if ( recalcDataFontSize ) {
+        uint dataFontPointSize = calcMaxFontPointSizeByGivenHeight (size().width(), size().height(), 1, digits);
+        dataFont.setPointSize(dataFontPointSize);
+        recalcDataFontSize = false;
+    }
 
-
-    dataFont.setPointSize(dataFontPointSize);
     painter.setFont(dataFont);
 
     int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() ) / 2;
@@ -240,6 +244,7 @@ void MeasurementWidget::paintEvent(QPaintEvent *event) {
 void MeasurementWidget::resizeEvent ( QResizeEvent * event ) {
     qDebug() << "MeasurementWidget::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
     if ( event ) {
+        recalcDataFontSize = true;
         dataFont.setPointSize( (event->size().width()) / digits );
 
         if ( event->size().height() > 2 * event->size().width()  )
@@ -309,21 +314,41 @@ uint MeasurementWidget::calcMaxFontPixelSize ( uint width, uint height, float mi
     return cf.pointSize();
 }
 
-uint MeasurementWidget::calcMaxFontPixelSizeByGivenHeight( uint width, uint height, uint lines, uint lineCharCount ) {
+uint MeasurementWidget::calcMaxFontPointSizeByGivenHeight( uint width, uint height, uint lines, float lineCharCount ) {
     QFont cf = QFont ();
     cf.setPointSize(textFont.pointSize());
     QFontMetrics fm = QFontMetrics(cf);
     bool found = false;
+    uint counter = 0;
     while (!found) {
-        uint th = fm.height() * lines;
-        if ( th > 0.95 * height )
+        uint th = fm.lineSpacing() * lines;
+        if ( ( th > 0.95 * height ) || ( QFontMetrics(cf).width("9") * lineCharCount > width ) )
             cf.setPointSize( cf.pointSize()/2 );
-        if ( th < 0.85 * height )
-            cf.setPointSize( cf.pointSize() * 1.5 );
-        else
+        if ( th < 0.85 * height ) {
+            uint tlw = QFontMetrics(cf).width("9") * lineCharCount;
+            if (  tlw < width * 0.85 ) {
+                if (  tlw < width * 0.5 )
+                    cf.setPointSize( cf.pointSize() * 2 );
+                else
+                    if ( tlw < width * 0.7  )
+                        cf.setPointSize( cf.pointSize() * 1.2 );
+                    else
+                        cf.setPointSize( cf.pointSize() * 1.05 );
+            } else {
+                qDebug() << "INFO too wide! w=" << width << " h=" << height << " lines=" << lines << " charcount=" << lineCharCount << " th=" << th << " tlw=" << tlw;
+                if (  tlw < width * 0.95 )
+                    found = true;
+            }
+        } else
             found = true;
 
         fm = QFontMetrics(cf);
+        ++counter;
+
+        if ( counter >= 50 ) {
+            qDebug() << "WARNING possible infinit loop detected!";
+            break;
+        }
     }
     if ( fm.width("9") * lineCharCount > width )
         qDebug() << "MeasurementWidget::calcMaxFontPixelSize( uint width, uint height, uint lines, uint lineCharCount )" << " THIS SOULD not happen!";
@@ -337,7 +362,6 @@ uint MeasurementWidget::calcMaxFontPixelSizeByGivenHeight( uint width, uint heig
 MaxEgtWidget::MaxEgtWidget ( QWidget *parent, QString caption, double lo, double mid, double hi,
                              QColor loColor, QColor midColor, QColor hiColor )
     : MeasurementWidget (parent, caption, lo, mid, hi, loColor, midColor, hiColor) {
-
 }
 
 void MaxEgtWidget::setValue (double value, quint8 idx) {
@@ -368,22 +392,38 @@ void MaxEgtWidget::paint() {
     QString max_caption = caption;
     if ( valTxt2PaintL2 != "" )
         max_caption += " max " +  valTxt2PaintL2;
-    painter.drawText( QPoint(0,QFontMetrics(textFont).lineSpacing()), max_caption );
+    uint h = QFontMetrics(textFont).lineSpacing();
+//    h+= QFontMetrics(textFont).leading();
+    painter.drawText( QPoint(0,h), max_caption );
+    h += QFontMetrics(textFont).leading();
 
 
-    int dataFontPointSize = this->size().height() - textFont.pointSize() - 30;
-    if ( dataFontPointSize > (this->size().width() - 20)/digits )
-        dataFontPointSize = (this->size().width() - 20)/digits;
+    if ( recalcDataFontSize ) {
+        uint dataFontPointSize = calcMaxFontPointSizeByGivenHeight (size().width(), size().height(), 1, digits);
+        dataFont.setPointSize(dataFontPointSize);
+        recalcDataFontSize = false;
+    }
 
-    dataFont.setPointSize(dataFontPointSize);
     painter.setFont(dataFont);
 
+//    int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() ) / 2;
+//    if ( m>0 )
+//        h += m;
+
     if ( valTxt2Paint != "" )
-        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+        painter.drawText( QRect(0, (lowHeigth==false ? 0 : 0) + h, this->size().width(), this->size().height() ),
                           Qt::AlignLeft, valTxt2Paint );
-    else
-        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
-                          Qt::AlignLeft, QString::number(value) );
+    else {
+        painter.drawText( QRect(0, (lowHeigth==false ? 0 : 0) + h, this->size().width(), this->size().height() ),
+                                    Qt::AlignLeft, QString::number(value) );
+    }
+
+//    if ( valTxt2Paint != "" )
+//        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+//                          Qt::AlignLeft, valTxt2Paint );
+//    else
+//        painter.drawText( QRect(0, (lowHeigth==false ? textFont.pointSize() : 0) + 10, this->size().width(), this->size().height() ),
+//                          Qt::AlignLeft, QString::number(value) );
 
     if ( valTxt2PaintL2 != "" ) {
         painter.setFont(textFont);
@@ -396,25 +436,6 @@ void MaxEgtWidget::paint() {
                           Qt::AlignRight, valTxt2PaintL2 );
 #endif
     }
-    //#else
-    //    painter.setFont(textFont);
-    //    painter.setBrush( QBrush(Qt::SolidPattern)) ;
-
-    //    QFontMetrics fm = painter.fontMetrics();
-    //    //y pos is baseline!
-    //    painter.drawText( QPoint(this->size().width() - fm.width(caption), (fm.height()/2)*1.33 + 2 ), caption );
-
-    ////    textFont.setPointSize(10);
-    //    painter.setFont(dataFont);
-    //    fm = painter.fontMetrics();
-
-    //    painter.drawText( QPoint(0, fm.height()/2 + 2 ), valTxt2Paint != "" ? valTxt2Paint : QString::number(value) );
-    //    uint h = fm.height();
-
-    //    painter.setFont(textFont);
-    //    fm = painter.fontMetrics();
-    //    painter.drawText( 0, h + fm.height()/2 + fm.lineSpacing(), valTxt2PaintL2 );
-    //#endif
     painter.end();
 }
 
@@ -544,7 +565,7 @@ QColor PressureWidget::overblendBackground () {
 /* **************************************************** */
 EFRWidget::EFRWidget(QWidget *parent, QString caption, double lo, double mid, double hi,
                      QColor loColor, QColor midColor, QColor hiColor)
-    : MeasurementWidget (parent, caption, lo, mid, hi, loColor, midColor, hiColor) {
+    : MeasurementWidget (parent, caption, lo, mid, hi, loColor, midColor, hiColor, 5) {
 
 }
 

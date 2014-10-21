@@ -98,8 +98,10 @@ protected:
 //    QColor overblend(QColor startColor, QColor stopColor, double value) const;
     virtual void resizeEvent ( QResizeEvent * event );
 
+    //! TODO test me
     uint calcMaxFontPixelSize ( uint width, uint height, float minFac, float maxFac, uint captionPointSize=0 );
-    uint calcMaxFontPixelSizeByGivenHeight ( uint width, uint height, uint lines, uint lineCharCount );
+
+    uint calcMaxFontPointSizeByGivenHeight (uint width, uint height, uint lines, float lineCharCount );
 
     QString caption;
     double lo;
@@ -127,6 +129,7 @@ protected:
     bool lowHeigth;
     //! set if widgets width > heigth
     bool landscape;
+    bool recalcDataFontSize;
 };
 
 class MaxEgtWidget : public MeasurementWidget {

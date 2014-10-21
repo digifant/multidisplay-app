@@ -68,7 +68,7 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     v->addWidget(boostW);
 
     lambdaW = new MeasurementWidget ( this, QString("Lambda"), 0.85, 1.1, 1.36, Qt::green, Qt::yellow, Qt::red);
-    lambdaW->setDigits(4);
+    lambdaW->setDigits(3.8);
     lambdaW->setGeometry( QRect(100,100,100,100) );
     v->addWidget(lambdaW);
 

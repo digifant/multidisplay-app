@@ -246,16 +246,20 @@ void DFExtendedWidget::paint() {
 
 
     //KNOCK Bar Test
+#if defined (Q_OS_ANDROID)
+    const int knockBarHeigth = QFontMetrics(textFont).lineSpacing() + QFontMetrics(textFont).leading() ;
+#else
     const int knockBarHeigth = 40;
+#endif
     painter.fillRect( QRect(0,size().height()-knockBarHeigth, size().width(),size().height()), Qt::white );
     int barW = size().width() * (df_knock_raw/255.0);
     painter.fillRect( QRect(0,size().height()-knockBarHeigth, barW, size().height()), rawKnockBlend->overblend3(df_knock_raw) );
 
-    int textpos = knockBarHeigth - textFont.pointSize();
-    if ( textpos > 0 ) {
-        painter.drawText( QRect(0, size().height()-knockBarHeigth + textFont.pixelSize() + textpos/2, this->size().width(), this->size().height() ),
+//    int textpos = knockBarHeigth - textFont.pointSize();
+//    if ( textpos > 0 ) {
+        painter.drawText( QRect(0, size().height()-knockBarHeigth + QFontMetrics(textFont).leading(), this->size().width(), this->size().height() ),
                           Qt::AlignLeft, "knock " + QString::number (df_knock_raw));
-    }
+//    }
 
     painter.end();
 }
