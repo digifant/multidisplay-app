@@ -215,9 +215,15 @@ void MeasurementWidget::paint() {
 
     painter.setFont(dataFont);
 
-    int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() ) / 2;
-    if ( m>0 )
-        h += m;
+    if ( valTxt2PaintL2 == "" ) {
+        int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() ) / 2;
+        if ( m>0 )
+            h += m;
+    } else {
+        int m = ( size().height() - h - QFontMetrics(dataFont).lineSpacing() - QFontMetrics(textFont).lineSpacing() ) / 2;
+        if ( m>0 )
+            h += m;
+    }
 
     if ( valTxt2Paint != "" )
         painter.drawText( QRect(0, (lowHeigth==false ? 0 : 0) + h, this->size().width(), this->size().height() ),
@@ -228,6 +234,7 @@ void MeasurementWidget::paint() {
     }
 
     h += QFontMetrics(textFont).leading() + QFontMetrics(dataFont).lineSpacing();
+//    h += QFontMetrics(dataFont).lineSpacing();
     if ( valTxt2PaintL2 != "" ) {
         painter.setFont(textFont);
 //        int h = (lowHeigth==false ? QFontMetrics(textFont).lineSpacing() : 0) + QFontMetrics(dataFont).lineSpacing();
