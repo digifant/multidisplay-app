@@ -4,6 +4,13 @@
 #include <QGestureRecognizer>
 #include <QSwipeGesture>
 
+/**
+ * @brief The SwipeGestureRecognizer class
+ * needed because the defalt implementation of swipe is a little bit odd: it only triggers on 3 finger swipes! (5.3)
+ *
+ * http://developer.android.com/design/patterns/gestures.html
+ * http://qt-project.org/doc/qt-5/gestures-overview.html
+ */
 class SwipeGestureRecognizer : public QGestureRecognizer
 {
 public:
