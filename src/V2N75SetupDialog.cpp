@@ -23,19 +23,31 @@ V2N75SetupDialog::V2N75SetupDialog(QWidget *parent) :
     wt(new QTimer(this))
 {
     ui->setupUi(this);
+    ui->frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    ui->frame->setContentsMargins(0,0,0,0);
     n75lowTw = new N75TableWidget (0, ui->n75TableGroupBox);
+    n75lowTw->setMinimumSize(300, 260);
+    n75lowTw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     n75highTw = new N75TableWidget (1, ui->n75TableGroupBox);
+    n75highTw->setMinimumSize(300, 260);
+    n75highTw->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     ui->n75TableGroupBox->layout()->addWidget(n75lowTw);
     ui->n75TableGroupBox->layout()->addWidget(n75highTw);
     ui->n75TableGroupBox->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
 
     if ( ui->n75comboBox->currentIndex() == 0 ) {
-        n75lowTw->show();
+        QSize s = size();
         n75highTw->hide();
+        n75lowTw->show();
+        //workaround: dialog gets too big after switching from high -> low
+        setMinimumSize(s);
+        adjustSize();
     } else {
         n75lowTw->hide();
         n75highTw->show();
     }
+
+
     qDebug() << ui->n75comboBox->currentText();
     connect (ui->n75comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(n75modeChanged(int)) );
     connect (ui->n75WritePushButton, SIGNAL(clicked()), this, SLOT(n75writeSlow()));

@@ -64,7 +64,8 @@ protected:
 
 
     N75PidSettingsTableWidget* tw;
-    QGroupBox *bBox;
+    QFrame *bFrame;
+//    QFrame *bFrame;
     QPushButton *bRead;
     QPushButton *bWrite;
     QPushButton *bReadEeprom;

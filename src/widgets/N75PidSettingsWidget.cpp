@@ -62,37 +62,41 @@ N75PidSettingsTableWidget::N75PidSettingsTableWidget (QWidget *parent)
 N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* mds) : QGroupBox(parent), mds(mds) {
     setLayout( new QHBoxLayout (this) );
     tw = new N75PidSettingsTableWidget (this);
-    tw->setBaseSize(200,60);
-    tw->setFixedHeight(120);
-//    tw->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    tw->setMinimumSize(200,60);
+//    tw->setFixedHeight(120);
+    tw->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
     layout()->addWidget( tw );
     setTitle("PID Parameter");
 
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
 
-    bBox = new QGroupBox (this);
-    layout()->addWidget( bBox );
-    bBox->setLayout( new QVBoxLayout(this) );
-    bBox->setFixedHeight(120);
+    bFrame = new QFrame (this);
+    layout()->addWidget( bFrame );
+    bFrame->setLayout( new QVBoxLayout(this) );
+    bFrame->setMinimumSize(60, 60);
+    bFrame->setMinimumSize(120, 120);
+//    bBox->setFixedHeight(120);
 //    bBox->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
+    bFrame->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+    bFrame->setContentsMargins(0,0,0,0);
 
-    bRead = new QPushButton (bBox);
+    bRead = new QPushButton (bFrame);
     bRead->setText("read");
-    bRead->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
-    bWrite = new QPushButton (bBox);
+    bRead->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+    bWrite = new QPushButton (bFrame);
     bWrite->setText("write");
-    bWrite->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
-    bReadEeprom = new QPushButton (bBox);
+    bWrite->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+    bReadEeprom = new QPushButton (bFrame);
     bReadEeprom->setText("read from Eeprom");
-    bReadEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
-    bWriteEeprom = new QPushButton (bBox);
+    bReadEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+    bWriteEeprom = new QPushButton (bFrame);
     bWriteEeprom->setText("write to EEPROM");
-    bWriteEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed );
+    bWriteEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
-    bBox->layout()->addWidget(bRead);
-    bBox->layout()->addWidget(bWrite);
-    bBox->layout()->addWidget(bReadEeprom);
-    bBox->layout()->addWidget(bWriteEeprom);
+    bFrame->layout()->addWidget(bRead);
+    bFrame->layout()->addWidget(bWrite);
+    bFrame->layout()->addWidget(bReadEeprom);
+    bFrame->layout()->addWidget(bWriteEeprom);
 
     connect (bWrite, SIGNAL(clicked()), this, SLOT(writeIt()));
     connect (bRead, SIGNAL(clicked()), this, SLOT(readSettings()));
