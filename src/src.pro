@@ -93,7 +93,8 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     widgets/Overlay.h \
     com/MdAbstractCom.h \    
     com/MdBinaryProtocol.h \
-    mobile/AndroidMainWindow.h
+    mobile/AndroidMainWindow.h \
+    mobile/SwipeGestureRecognizer.h
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
@@ -162,7 +163,8 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     widgets/Overlay.cpp \
     com/MdAbstractCom.cpp \
     com/MdBinaryProtocol.cpp \
-    mobile/AndroidMainWindow.cpp
+    mobile/AndroidMainWindow.cpp \
+    mobile/SwipeGestureRecognizer.cpp
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp

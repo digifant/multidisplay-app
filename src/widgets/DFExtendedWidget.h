@@ -6,6 +6,7 @@
 #include "Map16x1.h"
 #include "ColorOverBlend.h"
 
+
 class DFExtendedWidget : public MeasurementWidget
 {
 public:
@@ -17,6 +18,9 @@ public:
     void setValue( MdDataRecord *d );
 
 protected:
+    bool event(QEvent *event);
+    bool swipeTriggered(QSwipeGesture *pSwipe);
+    bool gestureEvent(QGestureEvent *event);
     virtual void paintEvent(QPaintEvent *event);
     virtual void paint();
     virtual void resizeEvent ( QResizeEvent * event );
@@ -56,6 +60,8 @@ protected:
     ColorOverBlend *rawKnockBlend;
 
     uint h,w;
+
+    int m_gestureId;
 };
 
 

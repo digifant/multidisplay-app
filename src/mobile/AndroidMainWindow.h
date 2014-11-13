@@ -24,6 +24,8 @@ public:
     explicit AndroidMainWindow(QWidget *parent = 0);
     ~AndroidMainWindow();
 
+    bool event(QEvent *event);
+    bool gestureEvent(QGestureEvent *event);
     void closeEvent(QCloseEvent *event);
     void resizeEvent ( QResizeEvent * event );
 

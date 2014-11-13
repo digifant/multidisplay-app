@@ -3,6 +3,7 @@
 
 #include "DFExtendedWidget.h"
 #include "AppEngine.h"
+#include <mobile/SwipeGestureRecognizer.h>
 
 DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo, double mid, double hi,
                 QColor loColor, QColor midColor, QColor hiColor )
@@ -44,6 +45,78 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
     injduty_max = 0;
 
     rawKnockBlend = new ColorOverBlend (QColor( Qt::green), QColor(Qt::yellow), QColor(Qt::red), 0, 60, 150);
+
+    grabGesture(Qt::TapGesture);
+    grabGesture(Qt::TapAndHoldGesture);
+    grabGesture(Qt::PanGesture);
+    grabGesture(Qt::PinchGesture);
+    grabGesture(Qt::SwipeGesture);
+
+    // Create a SWIPE recognizer because the default SWIPE recognizer
+       // does not really work on Symbian device.
+    QGestureRecognizer* pRecognizer = new SwipeGestureRecognizer();
+    m_gestureId = QGestureRecognizer::registerRecognizer(pRecognizer);
+}
+
+bool DFExtendedWidget::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture)
+        return gestureEvent(static_cast<QGestureEvent*>(event));
+    return QWidget::event(event);
+}
+
+bool DFExtendedWidget::swipeTriggered(QSwipeGesture *pSwipe) {
+    bool result = false;
+
+    if (pSwipe->state() == Qt::GestureFinished) {
+       qDebug("Swipe angle: %f", pSwipe->swipeAngle());
+       switch (SwipeGestureUtil::GetHorizontalDirection(pSwipe)) {
+          case QSwipeGesture::Left:
+             qDebug("Swipe Left detected");
+             result = true;
+             break;
+          case QSwipeGesture::Right:
+             qDebug("Swipe Right detected");
+             result = true;
+             break;
+          default:
+             break;
+       }
+       switch (SwipeGestureUtil::GetVerticalDirection(pSwipe)) {
+          case QSwipeGesture::Up:
+             qDebug("Swipe Up detected");
+             result = true;
+             break;
+          case QSwipeGesture::Down:
+             qDebug("Swipe Down detected");
+             result = true;
+             break;
+          default:
+             break;
+       }
+    }
+    return result;
+}
+
+bool DFExtendedWidget::gestureEvent(QGestureEvent *event)
+{
+    qDebug() << "gestureEvent():" << event->gestures().size();
+    if (QGesture *swipe = event->gesture(Qt::SwipeGesture)) {
+        swipeTriggered(static_cast<QSwipeGesture *>(swipe));
+        qDebug() << "swipe";
+    } else if (QGesture *pan = event->gesture(Qt::PanGesture))
+//        panTriggered(static_cast<QPanGesture *>(pan));
+        qDebug() << "pan";
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+//        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+        qDebug() << "pinch";
+    if (QGesture *tap = event->gesture(Qt::TapGesture))
+//        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+        qDebug() << "tap";
+    else if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture))
+        //        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+                qDebug() << "tap and hold";
+    return true;
 }
 
 void DFExtendedWidget::setValue( MdDataRecord *d )
