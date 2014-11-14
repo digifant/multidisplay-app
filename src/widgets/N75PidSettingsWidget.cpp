@@ -23,8 +23,19 @@
 #include <QObject>
 #include "com/MdBinaryProtocol.h"
 
-N75PidSettingsTableWidget::N75PidSettingsTableWidget (QWidget *parent)
-    : MyTableWidget (parent) {
+
+N75PidSettingsTableWidget::N75PidSettingsTableWidget(QWidget *parent)
+    : MyTableWidget (parent)
+{
+
+}
+
+/* ========================================================================================  */
+
+
+
+N75PidSettingsTableWidgetHorizontal::N75PidSettingsTableWidgetHorizontal (QWidget *parent)
+    : N75PidSettingsTableWidget (parent) {
     setRowCount(2);
     setColumnCount(10);
 
@@ -56,12 +67,54 @@ N75PidSettingsTableWidget::N75PidSettingsTableWidget (QWidget *parent)
             setItem(r,c, wi);
         }
     }
+    resizeColumnsToContents();
 }
 
+/* ========================================================================================  */
+
+
+N75PidSettingsTableWidgetVertical::N75PidSettingsTableWidgetVertical (QWidget *parent)
+    : N75PidSettingsTableWidget (parent) {
+    setRowCount(10);
+    setColumnCount(2);
+
+    QList<QString> tl;
+    tl << "a Kp" << "a Ki" << "a Kd" << "c Kp" << "c Ki" << "c Kd" << "a factor" << "c factor" << "enabled" << "bst limit" ;
+    setVerticalHeaderLabels( tl );
+    tl.clear();
+    tl << "current" << "new";
+    setHorizontalHeaderLabels( tl );
+
+    for ( int i = 0 ; i < rowCount() ; i++ )
+        setRowHeight(i, 20);
+
+    tl.clear();
+    tl << "aggressive Kp" << "aggressive Ki" << "aggressive Kd" << "conservative Kp" << "conservative Ki"
+       << "conservative Kd" << "aggressive activation threshold factor"
+       << "conservative threshold activation factor" << "PID enabled" << "max boost (hard limit)";
+    for ( int i = 0 ; i < rowCount() ; i++ ) {
+//        setColumnWidth(i, 65);
+        verticalHeaderItem(i)->setToolTip(tl.at(i));
+    }
+    for ( int r = 0 ; r < columnCount() ; r++ ) {
+        for ( int c = 0 ; c < rowCount() ; c++ ) {
+            QTableWidgetItem *wi = new MyTableWidgetItem();
+            Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+            if ( r==1 )
+                f=Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+            wi->setFlags(f);
+            setItem(r,c, wi);
+        }
+    }
+    resizeColumnsToContents();
+    resizeRowsToContents();
+}
+
+/* ========================================================================================  */
 
 N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* mds) : QGroupBox(parent), mds(mds) {
     setLayout( new QHBoxLayout (this) );
-    tw = new N75PidSettingsTableWidget (this);
+    tw = new N75PidSettingsTableWidgetHorizontal (this);
     tw->setMinimumSize(200,60);
 //    tw->setFixedHeight(120);
     tw->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
@@ -150,4 +203,6 @@ void N75PidSettingsWidget::writeIt () {
            << " aAT=" << aAT << " cAT=" << cAT << " enable=" << enable << " boost limit=" << maxBoost;
     emit setN75PidSettings (0, aKp, aKi, aKd, cKp, cKi, cKd, aAT, cAT, enable, maxBoost);
 }
+
+
 

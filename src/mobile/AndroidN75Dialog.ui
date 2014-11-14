@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AndroidN75Dialog</class>
+ <widget class="QDialog" name="AndroidN75Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="lowTab">
+      <attribute name="title">
+       <string>low</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="highTab">
+      <attribute name="title">
+       <string>high</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="pidTab">
+      <attribute name="title">
+       <string>PID</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

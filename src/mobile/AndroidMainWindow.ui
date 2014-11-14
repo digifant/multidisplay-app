@@ -55,22 +55,17 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConfig">
     <property name="title">
      <string>Config</string>
     </property>
+    <addaction name="actionV2_N75_Settings"/>
     <addaction name="actionBluetooth"/>
     <addaction name="actionSettings"/>
     <addaction name="actionGearbox_settings"/>
-   </widget>
-   <widget class="QMenu" name="menuTop2">
-    <property name="title">
-     <string>Boost</string>
-    </property>
-    <addaction name="actionV2_N75_Settings"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -87,7 +82,6 @@
    </widget>
    <addaction name="menuData"/>
    <addaction name="menuConfig"/>
-   <addaction name="menuTop2"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

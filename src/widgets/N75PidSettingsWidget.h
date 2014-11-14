@@ -27,15 +27,32 @@
 class MdBinaryProtocol;
 
 class N75PidSettingsTableWidget : public MyTableWidget {
+public:
+    N75PidSettingsTableWidget (QWidget *parent);
+};
+
+class N75PidSettingsTableWidgetHorizontal : public N75PidSettingsTableWidget {
     Q_OBJECT
 public:
-    N75PidSettingsTableWidget (QWidget *parent = 0);
+    N75PidSettingsTableWidgetHorizontal (QWidget *parent = 0);
 signals:
 
 public slots:
 
 protected:
 };
+
+class N75PidSettingsTableWidgetVertical : public N75PidSettingsTableWidget {
+    Q_OBJECT
+public:
+    N75PidSettingsTableWidgetVertical (QWidget *parent = 0);
+signals:
+
+public slots:
+
+protected:
+};
+
 
 class N75PidSettingsWidget : public QGroupBox {
     Q_OBJECT

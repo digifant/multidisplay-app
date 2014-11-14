@@ -80,6 +80,7 @@
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
 #include "mobile/MobileGPS.h"
 #include "mobile/Accelerometer.h"
+#include "mobile/AndroidN75Dialog.h"
 #endif
 
 AppEngine* AppEngine::getInstance() {
@@ -425,7 +426,9 @@ void AppEngine::setupMaemo() {
 
 
     //V2 settings
+//    connect (mmw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
     connect (mmw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
+
     connect (mmw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(show()));
 
     connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
@@ -443,8 +446,10 @@ void AppEngine::setupMaemo() {
              v2N75SetupDialog->n75Settings, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
     connect (v2N75SetupDialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
     connect (v2N75SetupDialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
+
     connect (v2N75SetupDialog->n75Settings, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
              mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
+
     connect (mds, SIGNAL(ackReceived (quint8)), v2N75SetupDialog, SLOT(ackReceived(quint8)));
 
     connect (mmw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(show()));
@@ -497,27 +502,30 @@ void AppEngine::setupAndroid () {
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
-    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
+    AndroidN75Dialog* an75 = new AndroidN75Dialog (amw);
+    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), an75, SLOT(showMaximized()));
+
     connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
 
-    connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
-    connect (v2N75SetupDialog, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
-    connect (mds, SIGNAL( n75DutyMapreceived (quint8, quint8, quint8, QVector<quint8>*)), v2N75SetupDialog, SLOT(n75dutyMap(quint8,quint8,quint8,QVector<quint8>*)));
-    connect (mds, SIGNAL( n75SetpointMapreceived (quint8, quint8, quint8, QVector<double>*)), v2N75SetupDialog, SLOT(n75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
-    connect (v2N75SetupDialog, SIGNAL(n75writeDutyMap(quint8,quint8,quint8,QVector<quint8>*)), mds, SLOT(mdCmdWriteN75DutyMap(quint8,quint8,quint8,QVector<quint8>*)));
-    connect (v2N75SetupDialog, SIGNAL(n75writeSetpointMap(quint8,quint8,quint8,QVector<double>*)), mds, SLOT(mdCmdWriteN75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
+    //    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
+//    connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
+//    connect (v2N75SetupDialog, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
+//    connect (mds, SIGNAL( n75DutyMapreceived (quint8, quint8, quint8, QVector<quint8>*)), v2N75SetupDialog, SLOT(n75dutyMap(quint8,quint8,quint8,QVector<quint8>*)));
+//    connect (mds, SIGNAL( n75SetpointMapreceived (quint8, quint8, quint8, QVector<double>*)), v2N75SetupDialog, SLOT(n75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
+//    connect (v2N75SetupDialog, SIGNAL(n75writeDutyMap(quint8,quint8,quint8,QVector<quint8>*)), mds, SLOT(mdCmdWriteN75DutyMap(quint8,quint8,quint8,QVector<quint8>*)));
+//    connect (v2N75SetupDialog, SIGNAL(n75writeSetpointMap(quint8,quint8,quint8,QVector<double>*)), mds, SLOT(mdCmdWriteN75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
 
-    connect (v2N75SetupDialog->ui->loadEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdLoadN75MapsFromEEprom()));
-    connect (v2N75SetupDialog->ui->writeEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdWriteN75MapsToEEprom()));
+//    connect (v2N75SetupDialog->ui->loadEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdLoadN75MapsFromEEprom()));
+//    connect (v2N75SetupDialog->ui->writeEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdWriteN75MapsToEEprom()));
 
-    connect (v2N75SetupDialog->n75Settings, SIGNAL(requestN75PidSettings()), mds, SLOT(mdCmdReqN75Settings()));
-    connect (mds, SIGNAL(n75SettingsReceived(quint8, double, double, double, double, double, double, double, double, bool,double)),
-             v2N75SetupDialog->n75Settings, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
-    connect (v2N75SetupDialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
-    connect (v2N75SetupDialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
-    connect (v2N75SetupDialog->n75Settings, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
-             mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
-    connect (mds, SIGNAL(ackReceived (quint8)), v2N75SetupDialog, SLOT(ackReceived(quint8)));
+//    connect (v2N75SetupDialog->n75Settings, SIGNAL(requestN75PidSettings()), mds, SLOT(mdCmdReqN75Settings()));
+//    connect (mds, SIGNAL(n75SettingsReceived(quint8, double, double, double, double, double, double, double, double, bool,double)),
+//             v2N75SetupDialog->n75Settings, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
+//    connect (v2N75SetupDialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
+//    connect (v2N75SetupDialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
+//    connect (v2N75SetupDialog->n75Settings, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
+//             mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
+//    connect (mds, SIGNAL(ackReceived (quint8)), v2N75SetupDialog, SLOT(ackReceived(quint8)));
 
     connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(showMaximized()) );
     connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(showMaximized()));

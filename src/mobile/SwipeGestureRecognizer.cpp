@@ -1,4 +1,5 @@
 #include <QMouseEvent>
+#include <QDebug>
 
 #include <math.h>
 #include "SwipeGestureRecognizer.h"
@@ -45,7 +46,7 @@ SwipeGestureRecognizer::recognize(QGesture* pGesture, QObject *pWatched, QEvent 
          pSwipe->setProperty("startPoint", pMouseEvent->localPos());
 #endif
          result = QGestureRecognizer::MayBeGesture;
-         qDebug("Swipe gesture started");
+         qDebug() << "Swipe gesture started (start point=" <<  pSwipe->property("startPoint").toPointF() <<  ")";
       }
       break;
       case QEvent::MouseButtonRelease: {
@@ -62,12 +63,14 @@ SwipeGestureRecognizer::recognize(QGesture* pGesture, QObject *pWatched, QEvent 
          int dx = endPoint.x() - startPoint.x();
          int dy = endPoint.y() - startPoint.y();
 
-         if (!IsValidMove(dx, dy)) {
+         //bugfix: startPoint.isNull because we sometimes get false events with startpoint 0 -> wrong swipe detected!
+         if ( (!IsValidMove(dx, dy)) || ( startPoint.isNull() ) ) {
             // Just a click, so no gesture.
             result = QGestureRecognizer::CancelGesture;
             qDebug("Swipe gesture canceled");
          } else {
             // Compute the angle.
+             qDebug() << " startPoint= " << startPoint << " endPoint=" << endPoint << " dx=" << dx << " dy=" << dy;
             qreal angle = ComputeAngle(dx, dy);
             pSwipe->setSwipeAngle(angle);
             result = QGestureRecognizer::FinishGesture;

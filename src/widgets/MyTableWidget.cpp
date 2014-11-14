@@ -21,6 +21,7 @@
 #include <QKeyEvent>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QHeaderView>
 
 MyTableWidget::MyTableWidget(QWidget *parent) :
     QTableWidget(parent)
@@ -103,6 +104,22 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
 
     setRowCount(12);
     QStringList rl;
+
+#if defined (Q_WS_MAEMO_5) || defined(ANDROID)
+    rl.append("1. %");
+    rl.append("1. bst");
+    rl.append("2. %");
+    rl.append("2. bst");
+    rl.append("3. %");
+    rl.append("3. bst");
+    rl.append("4. %");
+    rl.append("4. bst");
+    rl.append("5. %");
+    rl.append("5. bst");
+    rl.append("6. %");
+    rl.append("6. bst");
+    horizontalHeader()->setStyleSheet("QHeaderView { font-size: 11pt; }");
+#else
     rl.append("1. duty [0-255]");
     rl.append("1. boost setpoint [bar]");
     rl.append("2. duty [0-255]");
@@ -115,6 +132,7 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
     rl.append("5. boost setpoint [bar]");
     rl.append("6. duty [0-255]");
     rl.append("6. boost setpoint [bar]");
+#endif
     setVerticalHeaderLabels(rl);
 
     for ( int i = 0 ; i < rowCount() ; i++ )
@@ -153,6 +171,8 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
     setAlternatingRowColors(true);
 
     connect ( this, SIGNAL(cellChanged(int,int)), this, SLOT(cellChanged(int,int)) );
+
+    resizeColumnsToContents();
 }
 
 N75TableWidget::~N75TableWidget () {
@@ -177,10 +197,21 @@ void N75TableWidget::cellChanged(int r,int c) {
         return;
 
     QColor color;
-    if ( r == 0 || r == 2 || r == 4 || r == 6 || r == 8 || r == 10 )
+    if ( r == 0 || r == 2 || r == 4 || r == 6 || r == 8 || r == 10 ) {
+        //duty
+        if ( cell->text().toDouble() < 0 )
+            cell->setText(0);
+        if ( cell->text().toDouble() > 255 )
+            cell->setText("255");
         color = dutyOb->overblend3( cell->text().toDouble() );
-    else
+    } else {
+        //boost
+        if ( cell->text().toDouble() < 0 )
+            cell->setText(0);
+        if ( cell->text().toDouble() > 5 )
+            cell->setText("5");
         color = setpointOb->overblend3( cell->text().toDouble() );
+    }
     if ( color.isValid() )
         cell->setBackground ( QBrush(color) );
 }
