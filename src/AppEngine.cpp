@@ -502,7 +502,7 @@ void AppEngine::setupAndroid () {
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
-    AndroidN75Dialog* an75 = new AndroidN75Dialog (amw);
+    AndroidN75Dialog* an75 = new AndroidN75Dialog (amw, mds);
     connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), an75, SLOT(showMaximized()));
 
     connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));

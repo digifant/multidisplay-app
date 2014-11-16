@@ -12,13 +12,14 @@ class QGestureEvent;
 class N75TableWidget;
 class N75PidSettingsWidget;
 class QTimer;
+class MdBinaryProtocol;
 
 class AndroidN75Dialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AndroidN75Dialog(QWidget *parent = 0);
+    explicit AndroidN75Dialog(QWidget *parent = 0, MdBinaryProtocol *mds=0);
     ~AndroidN75Dialog();
 
 signals:
@@ -50,6 +51,7 @@ protected:
 
 private:
     Ui::AndroidN75Dialog *ui;
+    MdBinaryProtocol *mds;
 
     bool landscape;
 

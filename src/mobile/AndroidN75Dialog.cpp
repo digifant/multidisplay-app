@@ -6,19 +6,20 @@
 #include <QTimer>
 #include <mobile/SwipeGestureRecognizer.h>
 
+#include <AppEngine.h>
 #include "AndroidN75Dialog.h"
 #include <widgets/MyTableWidget.h>
 #include <widgets/N75PidSettingsWidget.h>
 #include "ui_AndroidN75Dialog.h"
 
-AndroidN75Dialog::AndroidN75Dialog(QWidget *parent) : landscape(false),
+AndroidN75Dialog::AndroidN75Dialog(QWidget *parent, MdBinaryProtocol* mds ) : mds(mds), landscape(false),
     QDialog(parent),
     ui(new Ui::AndroidN75Dialog),
     t (new QTimer(this)),
     wt(new QTimer(this))
 {
     ui->setupUi(this);
-
+    Q_ASSERT(mds != NULL);
 
     QHBoxLayout *ll = new QHBoxLayout();
     ll->setContentsMargins(0,0,0,0);
@@ -47,7 +48,7 @@ AndroidN75Dialog::AndroidN75Dialog(QWidget *parent) : landscape(false),
     pl->setContentsMargins(0,0,0,0);
     pl->setSpacing(0);
     ui->pidTab->setLayout(pl);
-    n75Settings = new N75PidSettingsWidget (ui->pidTab);
+    n75Settings = new N75PidSettingsWidget (ui->pidTab, mds, false );
     pl->addWidget (n75Settings);
 
     grabGesture(Qt::TapAndHoldGesture);
@@ -72,11 +73,12 @@ AndroidN75Dialog::AndroidN75Dialog(QWidget *parent) : landscape(false),
 //    connect (AndroidN75Dialog->n75Settings, SIGNAL(requestN75PidSettings()), mds, SLOT(mdCmdReqN75Settings()));
 //    connect (mds, SIGNAL(n75SettingsReceived(quint8, double, double, double, double, double, double, double, double, bool,double)),
 //             AndroidN75Dialog->n75Settings, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
-//    connect (AndroidN75Dialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
-//    connect (AndroidN75Dialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
 //    connect (AndroidN75Dialog->n75Settings, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
 //             mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
 //    connect (mds, SIGNAL(ackReceived (quint8)), AndroidN75Dialog, SLOT(ackReceived(quint8)));
+
+    //    connect (AndroidN75Dialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
+    //    connect (AndroidN75Dialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
 
 }
 

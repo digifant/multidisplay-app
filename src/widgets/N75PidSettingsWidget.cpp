@@ -112,9 +112,12 @@ N75PidSettingsTableWidgetVertical::N75PidSettingsTableWidgetVertical (QWidget *p
 
 /* ========================================================================================  */
 
-N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* mds) : QGroupBox(parent), mds(mds) {
+N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* mds, bool horizontal) : QGroupBox(parent), mds(mds) {
     setLayout( new QHBoxLayout (this) );
-    tw = new N75PidSettingsTableWidgetHorizontal (this);
+    if ( horizontal )
+        tw = new N75PidSettingsTableWidgetHorizontal (this);
+    else
+        tw = new N75PidSettingsTableWidgetVertical (this);
     tw->setMinimumSize(200,60);
 //    tw->setFixedHeight(120);
     tw->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
@@ -161,6 +164,8 @@ N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* m
         connect (this, SIGNAL(requestN75PidSettings()), (QObject*)mds, SLOT(mdCmdReqN75Settings()));
         connect ( (QObject*) mds, SIGNAL(n75SettingsReceived(quint8,double,double,double,double,double,double,double, double, bool, double)),
                  this, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
+        connect (this, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
+        connect (this, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
     }
 }
 

@@ -57,7 +57,7 @@ protected:
 class N75PidSettingsWidget : public QGroupBox {
     Q_OBJECT
 public:
-    N75PidSettingsWidget (QWidget *parent = 0, MdBinaryProtocol* mds = 0 );
+    N75PidSettingsWidget (QWidget *parent = 0, MdBinaryProtocol* mds = 0 , bool horizontal=true);
 signals:
     void requestN75PidSettings();
     void setN75PidSettings (quint8 serial, double aKp, double aKi, double aKd,
