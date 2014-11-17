@@ -164,6 +164,8 @@ N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* m
         connect (this, SIGNAL(requestN75PidSettings()), (QObject*)mds, SLOT(mdCmdReqN75Settings()));
         connect ( (QObject*) mds, SIGNAL(n75SettingsReceived(quint8,double,double,double,double,double,double,double, double, bool, double)),
                  this, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
+        connect (this, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
+                 mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
         connect (this, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
         connect (this, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
     }
@@ -190,6 +192,10 @@ void N75PidSettingsWidget::n75PidSettings (quint8 serial,
 }
 
 void N75PidSettingsWidget::writeIt () {
+    if ( ! tw->item(1,0)->data(Qt::DisplayRole).isValid() ) {
+        qDebug() << "aKp not valid -> write abort";
+        return;
+    }
     double aKp = tw->item(1,0)->data(Qt::DisplayRole).toDouble();
     double aKi = tw->item(1,1)->data(Qt::DisplayRole).toDouble();
     double aKd = tw->item(1,2)->data(Qt::DisplayRole).toDouble();

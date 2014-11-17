@@ -4,6 +4,7 @@
 #include <QSwipeGesture>
 #include <QMessageBox>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <mobile/SwipeGestureRecognizer.h>
 
 #include <AppEngine.h>
@@ -21,23 +22,60 @@ AndroidN75Dialog::AndroidN75Dialog(QWidget *parent, MdBinaryProtocol* mds ) : md
     ui->setupUi(this);
     Q_ASSERT(mds != NULL);
 
+    QVBoxLayout *vl = new QVBoxLayout();
+    vl->setContentsMargins(0,0,0,0);
+    vl->setSpacing(0);
+    ui->lowTab->setLayout(vl);
+
     QHBoxLayout *ll = new QHBoxLayout();
     ll->setContentsMargins(0,0,0,0);
     ll->setSpacing(0);
-    ui->lowTab->setLayout(ll);
+    vl->addLayout(ll);
     n75lowTw = new N75TableWidget (0, ui->lowTab);
     n75lowTw->setMinimumSize(400, 600);
     n75lowTw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ll->addWidget(n75lowTw);
 
+    QHBoxLayout *lbl = new QHBoxLayout();
+    lbl->setContentsMargins(0,0,0,0);
+    lbl->setSpacing(0);
+    QPushButton *lrb = new QPushButton ("read", ui->lowTab);
+    lbl->addWidget(lrb);
+    QPushButton *lwb = new QPushButton ("write", ui->lowTab);
+    lbl->addWidget(lwb);
+    QPushButton *lerb = new QPushButton ("EEread", ui->lowTab);
+    lbl->addWidget(lerb);
+    QPushButton *lewb = new QPushButton ("EEwrite", ui->lowTab);
+    lbl->addWidget(lewb);
+    vl->addLayout(lbl);
+
+    QVBoxLayout *vh = new QVBoxLayout();
+    vh->setContentsMargins(0,0,0,0);
+    vh->setSpacing(0);
+    ui->highTab->setLayout(vh);
+
     QHBoxLayout *hl = new QHBoxLayout();
     hl->setContentsMargins(0,0,0,0);
     hl->setSpacing(0);
-    ui->highTab->setLayout(hl);
+    vh->addLayout (hl);
     n75highTw = new N75TableWidget (1, ui->highTab);
     n75highTw->setMinimumSize(400, 600);
     n75highTw->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     hl->addWidget(n75highTw);
+
+    QHBoxLayout *hbl = new QHBoxLayout();
+    hbl->setContentsMargins(0,0,0,0);
+    hbl->setSpacing(0);
+    QPushButton *hrb = new QPushButton ("read", ui->lowTab);
+    hbl->addWidget(hrb);
+    QPushButton *hwb = new QPushButton ("write", ui->lowTab);
+    hbl->addWidget(hwb);
+    QPushButton *herb = new QPushButton ("EEread", ui->lowTab);
+    hbl->addWidget(herb);
+    QPushButton *hewb = new QPushButton ("EEwrite", ui->lowTab);
+    hbl->addWidget(hewb);
+    vh->addLayout(hbl);
+
 
     connect (t, SIGNAL(timeout()), this, SLOT(timerUpdateRead()));
     t->setSingleShot(true);
@@ -51,8 +89,8 @@ AndroidN75Dialog::AndroidN75Dialog(QWidget *parent, MdBinaryProtocol* mds ) : md
     n75Settings = new N75PidSettingsWidget (ui->pidTab, mds, false );
     pl->addWidget (n75Settings);
 
-    grabGesture(Qt::TapAndHoldGesture);
-    grabGesture(Qt::SwipeGesture);
+//    grabGesture(Qt::TapAndHoldGesture);
+//    grabGesture(Qt::SwipeGesture);
 
     // Create a SWIPE recognizer because the default SWIPE recognizer
        // does not really work on Symbian device.
@@ -60,25 +98,27 @@ AndroidN75Dialog::AndroidN75Dialog(QWidget *parent, MdBinaryProtocol* mds ) : md
     m_gestureId = QGestureRecognizer::registerRecognizer(pRecognizer);
 
 
-//    connect (AndroidN75Dialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
-//    connect (AndroidN75Dialog, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
-//    connect (mds, SIGNAL( n75DutyMapreceived (quint8, quint8, quint8, QVector<quint8>*)), AndroidN75Dialog, SLOT(n75dutyMap(quint8,quint8,quint8,QVector<quint8>*)));
-//    connect (mds, SIGNAL( n75SetpointMapreceived (quint8, quint8, quint8, QVector<double>*)), AndroidN75Dialog, SLOT(n75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
-//    connect (AndroidN75Dialog, SIGNAL(n75writeDutyMap(quint8,quint8,quint8,QVector<quint8>*)), mds, SLOT(mdCmdWriteN75DutyMap(quint8,quint8,quint8,QVector<quint8>*)));
-//    connect (AndroidN75Dialog, SIGNAL(n75writeSetpointMap(quint8,quint8,quint8,QVector<double>*)), mds, SLOT(mdCmdWriteN75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
+    if ( mds ) {
+        connect (this, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
+        connect (this, SIGNAL(n75reqSetpointMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75SetpointMap(quint8,quint8,quint8)));
+        connect (mds, SIGNAL( n75DutyMapreceived (quint8, quint8, quint8, QVector<quint8>*)), this, SLOT(n75dutyMap(quint8,quint8,quint8,QVector<quint8>*)));
+        connect (mds, SIGNAL( n75SetpointMapreceived (quint8, quint8, quint8, QVector<double>*)), this, SLOT(n75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
+        connect (this, SIGNAL(n75writeDutyMap(quint8,quint8,quint8,QVector<quint8>*)), mds, SLOT(mdCmdWriteN75DutyMap(quint8,quint8,quint8,QVector<quint8>*)));
+        connect (this, SIGNAL(n75writeSetpointMap(quint8,quint8,quint8,QVector<double>*)), mds, SLOT(mdCmdWriteN75SetpointMap(quint8,quint8,quint8,QVector<double>*)));
 
-//    connect (AndroidN75Dialog->ui->loadEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdLoadN75MapsFromEEprom()));
-//    connect (AndroidN75Dialog->ui->writeEepromPushButton, SIGNAL(clicked()), mds, SLOT(mdCmdWriteN75MapsToEEprom()));
+        connect (lerb, SIGNAL(clicked()), mds, SLOT(mdCmdLoadN75MapsFromEEprom()));
+        connect (lewb, SIGNAL(clicked()), mds, SLOT(mdCmdWriteN75MapsToEEprom()));
+        connect (herb, SIGNAL(clicked()), mds, SLOT(mdCmdLoadN75MapsFromEEprom()));
+        connect (hewb, SIGNAL(clicked()), mds, SLOT(mdCmdWriteN75MapsToEEprom()));
+        connect (lrb, SIGNAL(clicked()), this, SLOT(n75readSlow()) );
+        connect (hrb, SIGNAL(clicked()), this, SLOT(n75readSlow()) );
+        connect (lwb, SIGNAL(clicked()), this, SLOT(n75writeSlow()) );
+        connect (hwb, SIGNAL(clicked()), this, SLOT(n75writeSlow()) );
 
-//    connect (AndroidN75Dialog->n75Settings, SIGNAL(requestN75PidSettings()), mds, SLOT(mdCmdReqN75Settings()));
-//    connect (mds, SIGNAL(n75SettingsReceived(quint8, double, double, double, double, double, double, double, double, bool,double)),
-//             AndroidN75Dialog->n75Settings, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
-//    connect (AndroidN75Dialog->n75Settings, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
-//             mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
-//    connect (mds, SIGNAL(ackReceived (quint8)), AndroidN75Dialog, SLOT(ackReceived(quint8)));
+        connect (mds, SIGNAL(ackReceived (quint8)), this, SLOT(ackReceived(quint8)));
 
-    //    connect (AndroidN75Dialog->n75Settings, SIGNAL(writeN75PidSettingsToEeprom()), mds, SLOT(mdCmdWriteN75SettingsToEEprom()));
-    //    connect (AndroidN75Dialog->n75Settings, SIGNAL(readN75PidSettingsFromEeprom()), mds, SLOT(mdCmdReadN75SettingsFromEEprom()));
+        //n75 pid connections are handled in its own class!
+    }
 
 }
 
@@ -298,7 +338,7 @@ void AndroidN75Dialog::timerUpdateWrite () {
         wt->start(25);
     else {
         next_gear_write = 99;
-#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if  !defined (Q_WS_MAEMO_5)
         QMessageBox::information(this, "N75 maps", "write complete", QMessageBox::Ok);
 #endif
 #if  defined (Q_WS_MAEMO_5)
