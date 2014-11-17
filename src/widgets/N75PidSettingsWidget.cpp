@@ -143,10 +143,10 @@ N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* m
     bWrite->setText("write");
     bWrite->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
     bReadEeprom = new QPushButton (bFrame);
-    bReadEeprom->setText("read from Eeprom");
+    bReadEeprom->setText("EE read");
     bReadEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
     bWriteEeprom = new QPushButton (bFrame);
-    bWriteEeprom->setText("write to EEPROM");
+    bWriteEeprom->setText("EE write");
     bWriteEeprom->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
     bFrame->layout()->addWidget(bRead);

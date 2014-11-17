@@ -46,11 +46,11 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
 
     rawKnockBlend = new ColorOverBlend (QColor( Qt::green), QColor(Qt::yellow), QColor(Qt::red), 0, 60, 150);
 
-    grabGesture(Qt::TapGesture);
+//    grabGesture(Qt::TapGesture);
     grabGesture(Qt::TapAndHoldGesture);
-    grabGesture(Qt::PanGesture);
-    grabGesture(Qt::PinchGesture);
-    grabGesture(Qt::SwipeGesture);
+//    grabGesture(Qt::PanGesture);
+//    grabGesture(Qt::PinchGesture);
+//    grabGesture(Qt::SwipeGesture);
 
     // Create a SWIPE recognizer because the default SWIPE recognizer
        // does not really work on Symbian device.
@@ -63,6 +63,16 @@ bool DFExtendedWidget::event(QEvent *event)
     if (event->type() == QEvent::Gesture)
         return gestureEvent(static_cast<QGestureEvent*>(event));
     return QWidget::event(event);
+}
+
+bool DFExtendedWidget::tapAndHoldTriggered(QTapAndHoldGesture *pTapHold)
+{
+    if ( injduty_max > 0 )
+        injduty_max = 0;
+    else
+        injduty_max = 1;
+    qDebug() << "tapAndHoldTriggered injduty_max = " << injduty_max;
+    return true;
 }
 
 bool DFExtendedWidget::swipeTriggered(QSwipeGesture *pSwipe) {
@@ -111,11 +121,12 @@ bool DFExtendedWidget::gestureEvent(QGestureEvent *event)
 //        pinchTriggered(static_cast<QPinchGesture *>(pinch));
         qDebug() << "pinch";
     if (QGesture *tap = event->gesture(Qt::TapGesture))
-//        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+//        tapTriggered(static_cast<QPinchGesture *>(tap));
         qDebug() << "tap";
-    else if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture))
-        //        pinchTriggered(static_cast<QPinchGesture *>(pinch));
-                qDebug() << "tap and hold";
+    else if (QGesture *tapAndHold = event->gesture(Qt::TapAndHoldGesture)) {
+        tapAndHoldTriggered(static_cast<QTapAndHoldGesture *>(tapAndHold));
+        qDebug() << "tap and hold";
+    }
     return true;
 }
 

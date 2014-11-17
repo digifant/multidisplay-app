@@ -106,17 +106,17 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
     QStringList rl;
 
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
-    rl.append("1. %");
+    rl.append("1. dc");
     rl.append("1. bst");
-    rl.append("2. %");
+    rl.append("2. dc");
     rl.append("2. bst");
-    rl.append("3. %");
+    rl.append("3. dc");
     rl.append("3. bst");
-    rl.append("4. %");
+    rl.append("4. dc");
     rl.append("4. bst");
-    rl.append("5. %");
+    rl.append("5. dc");
     rl.append("5. bst");
-    rl.append("6. %");
+    rl.append("6. dc");
     rl.append("6. bst");
     horizontalHeader()->setStyleSheet("QHeaderView { font-size: 11pt; }");
 #else

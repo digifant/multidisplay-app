@@ -19,6 +19,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    bool tapAndHoldTriggered(QTapAndHoldGesture *pTapHold);
     bool swipeTriggered(QSwipeGesture *pSwipe);
     bool gestureEvent(QGestureEvent *event);
     virtual void paintEvent(QPaintEvent *event);
