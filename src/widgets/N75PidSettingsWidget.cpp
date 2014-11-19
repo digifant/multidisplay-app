@@ -161,8 +161,8 @@ N75PidSettingsWidget::N75PidSettingsWidget (QWidget *parent, MdBinaryProtocol* m
 
 
     if (mds) {
-        connect (this, SIGNAL(requestN75PidSettings()), (QObject*)mds, SLOT(mdCmdReqN75Settings()));
-        connect ( (QObject*) mds, SIGNAL(n75SettingsReceived(quint8,double,double,double,double,double,double,double, double, bool, double)),
+        connect (this, SIGNAL(requestN75PidSettings()), mds, SLOT(mdCmdReqN75Settings()));
+        connect ( mds, SIGNAL(n75SettingsReceived(quint8,double,double,double,double,double,double,double, double, bool, double)),
                  this, SLOT(n75PidSettings(quint8, double,double,double,double,double,double,double,double,bool,double)));
         connect (this, SIGNAL(setN75PidSettings(quint8,double,double,double,double,double,double,double,double,bool,double)),
                  mds, SLOT(mdCmdWriteN75Settings(quint8,double,double,double,double,double,double,double,double,bool,double)));
