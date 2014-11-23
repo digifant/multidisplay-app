@@ -308,6 +308,9 @@ void AppEngine::setupPC() {
     pcmw->ui.DataTableView->resizeColumnsToContents();
 
     //V2 config stuff
+    //V2 settings
+//    AndroidN75Dialog* an75 = new AndroidN75Dialog (pcmw, mds);
+//    connect (pcmw->ui.actionN75_boost_control, SIGNAL(triggered()), an75, SLOT(show()));
     connect (pcmw->ui.actionN75_boost_control, SIGNAL(triggered()), v2N75SetupDialog, SLOT(show()));
     connect (pcmw->ui.actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(show()));
     connect (pcmw->ui.V2_action_load_settings_from_EEPROM, SIGNAL(triggered()), mds, SLOT(mdCmdLoadFromEeprom()));

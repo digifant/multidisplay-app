@@ -76,7 +76,7 @@ N75PidSettingsTableWidgetHorizontal::N75PidSettingsTableWidgetHorizontal (QWidge
 N75PidSettingsTableWidgetVertical::N75PidSettingsTableWidgetVertical (QWidget *parent)
     : N75PidSettingsTableWidget (parent) {
     setRowCount(10);
-    setColumnCount(2);
+    setColumnCount(1); //vertical -> only 1 column!
 
     QList<QString> tl;
     tl << "a Kp" << "a Ki" << "a Kd" << "c Kp" << "c Ki" << "c Kd" << "a factor" << "c factor" << "enabled" << "bst limit" ;
@@ -96,11 +96,11 @@ N75PidSettingsTableWidgetVertical::N75PidSettingsTableWidgetVertical (QWidget *p
 //        setColumnWidth(i, 65);
         verticalHeaderItem(i)->setToolTip(tl.at(i));
     }
-    for ( int r = 0 ; r < columnCount() ; r++ ) {
-        for ( int c = 0 ; c < rowCount() ; c++ ) {
+    for ( int r = 0 ; r < rowCount() ; r++ ) {
+        for ( int c = 0 ; c < columnCount() ; c++ ) {
             QTableWidgetItem *wi = new MyTableWidgetItem();
             Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-            if ( r==1 )
+            if ( c==0 ) //vertical -> only 1 column!
                 f=Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
             wi->setFlags(f);
             setItem(r,c, wi);
@@ -175,16 +175,31 @@ void N75PidSettingsWidget::n75PidSettings (quint8 serial,
                                            double aKp, double aKi, double aKd,
                                            double cKp, double cKi, double cKd,
                                            double aAT, double cAT, bool enabled, double maxBoost ) {
-    tw->item(0,0)->setText (QString::number(aKp));
-    tw->item(0,1)->setText (QString::number(aKi));
-    tw->item(0,2)->setText (QString::number(aKd));
-    tw->item(0,3)->setText (QString::number(cKp));
-    tw->item(0,4)->setText (QString::number(cKi));
-    tw->item(0,5)->setText (QString::number(cKd));
-    tw->item(0,6)->setText (QString::number(aAT));
-    tw->item(0,7)->setText (QString::number(cAT));
-    tw->item(0,8)->setText (QString::number(enabled));
-    tw->item(0,9)->setText (QString::number(maxBoost));
+    if ( tw->columnCount() > tw->rowCount() ) {
+        //horizontal
+        tw->item(0,0)->setText (QString::number(aKp));
+        tw->item(0,1)->setText (QString::number(aKi));
+        tw->item(0,2)->setText (QString::number(aKd));
+        tw->item(0,3)->setText (QString::number(cKp));
+        tw->item(0,4)->setText (QString::number(cKi));
+        tw->item(0,5)->setText (QString::number(cKd));
+        tw->item(0,6)->setText (QString::number(aAT));
+        tw->item(0,7)->setText (QString::number(cAT));
+        tw->item(0,8)->setText (QString::number(enabled));
+        tw->item(0,9)->setText (QString::number(maxBoost));
+    } else {
+        //vertical
+        tw->item(0,0)->setText (QString::number(aKp));
+        tw->item(1,0)->setText (QString::number(aKi));
+        tw->item(2,0)->setText (QString::number(aKd));
+        tw->item(3,0)->setText (QString::number(cKp));
+        tw->item(4,0)->setText (QString::number(cKi));
+        tw->item(5,0)->setText (QString::number(cKd));
+        tw->item(6,0)->setText (QString::number(aAT));
+        tw->item(7,0)->setText (QString::number(cAT));
+        tw->item(8,0)->setText (QString::number(enabled));
+        tw->item(9,0)->setText (QString::number(maxBoost));
+    }
 
     qDebug() << "N75PidSettingsWidget::n75PidSettings aKp=" << aKp << " aKi=" << aKi << " aKd" << aKd
              << " cKp" << cKp << " cKi=" << cKi << " cKp=" << cKp << " aAT=" << aAT << " cAT=" << cAT
@@ -196,19 +211,36 @@ void N75PidSettingsWidget::writeIt () {
         qDebug() << "aKp not valid -> write abort";
         return;
     }
-    double aKp = tw->item(1,0)->data(Qt::DisplayRole).toDouble();
-    double aKi = tw->item(1,1)->data(Qt::DisplayRole).toDouble();
-    double aKd = tw->item(1,2)->data(Qt::DisplayRole).toDouble();
-    double cKp = tw->item(1,3)->data(Qt::DisplayRole).toDouble();
-    double cKi = tw->item(1,4)->data(Qt::DisplayRole).toDouble();
-    double cKd = tw->item(1,5)->data(Qt::DisplayRole).toDouble();
-    double aAT = tw->item(1,6)->data(Qt::DisplayRole).toDouble();
-    double cAT = tw->item(1,7)->data(Qt::DisplayRole).toDouble();
-    double enableD = tw->item(1,8)->data(Qt::DisplayRole).toDouble();
+    double aKp, aKi, aKd, cKp, cKi, cKd, aAT, cAT, enableD, maxBoost;
+    if ( tw->columnCount() > tw->rowCount() ) {
+        //horizontal
+        aKp = tw->item(1,0)->data(Qt::DisplayRole).toDouble();
+        aKi = tw->item(1,1)->data(Qt::DisplayRole).toDouble();
+        aKd = tw->item(1,2)->data(Qt::DisplayRole).toDouble();
+        cKp = tw->item(1,3)->data(Qt::DisplayRole).toDouble();
+        cKi = tw->item(1,4)->data(Qt::DisplayRole).toDouble();
+        cKd = tw->item(1,5)->data(Qt::DisplayRole).toDouble();
+        aAT = tw->item(1,6)->data(Qt::DisplayRole).toDouble();
+        cAT = tw->item(1,7)->data(Qt::DisplayRole).toDouble();
+        enableD = tw->item(1,8)->data(Qt::DisplayRole).toDouble();
+        maxBoost = tw->item(1,9)->data(Qt::DisplayRole).toDouble();
+    } else {
+        //vertical -> only 1 column!
+        aKp = tw->item(0,0)->data(Qt::DisplayRole).toDouble();
+        aKi = tw->item(1,0)->data(Qt::DisplayRole).toDouble();
+        aKd = tw->item(2,0)->data(Qt::DisplayRole).toDouble();
+        cKp = tw->item(3,0)->data(Qt::DisplayRole).toDouble();
+        cKi = tw->item(4,0)->data(Qt::DisplayRole).toDouble();
+        cKd = tw->item(5,0)->data(Qt::DisplayRole).toDouble();
+        aAT = tw->item(6,0)->data(Qt::DisplayRole).toDouble();
+        cAT = tw->item(7,0)->data(Qt::DisplayRole).toDouble();
+        enableD = tw->item(8,0)->data(Qt::DisplayRole).toDouble();
+        maxBoost = tw->item(9,0)->data(Qt::DisplayRole).toDouble();
+    }
+
     bool enable = false;
     if (enableD == 1)
         enable = true;
-    double maxBoost = tw->item(1,9)->data(Qt::DisplayRole).toDouble();
     qDebug() << "N75PidSettingsWidget::writeIt aKp=" << aKp << " aKi=" << aKi << " aKd=" << aKd
            << " cKp=" << cKp << " cKi=" << cKi << " cKd=" << cKd
            << " aAT=" << aAT << " cAT=" << cAT << " enable=" << enable << " boost limit=" << maxBoost;
