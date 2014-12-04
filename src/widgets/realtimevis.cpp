@@ -3,6 +3,7 @@
 #include "MdData.h"
 #include "AppEngine.h"
 #include "DFExtendedWidget.h"
+#include <widgets/VR6Widget.h>
 
 #include <QVBoxLayout>
 #include <QTime>
@@ -37,21 +38,34 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     bg3=NULL;
 #endif
 
-    QSettings settings;
-    if ( settings.value ("md/ecu", "digifant1").toString() == "digifant1" ) {
-        QFrame *fDfWidget = new QFrame (this);
-        fDfWidget->setContentsMargins(0,0,0,0);
-        QVBoxLayout *v2 = new QVBoxLayout();
-        //disable margin around the vbox layout
-        v2->setContentsMargins(0,0,0,0);
-        v2->setSpacing(0);
-        fDfWidget->setLayout(v2);
-        h->addWidget(fDfWidget, 3);
-        dfexW = new DFExtendedWidget (this, "Digifant I");
-        v2->addWidget(dfexW);
-    } else {
-        dfexW = NULL;
-    }
+    //Digifant 1 widget
+//        QFrame *fDfWidget = new QFrame (this);
+    fDfWidget = new QFrame (this);
+    fDfWidget->setContentsMargins(0,0,0,0);
+    QVBoxLayout *v2 = new QVBoxLayout();
+    //disable margin around the vbox layout
+    v2->setContentsMargins(0,0,0,0);
+    v2->setSpacing(0);
+    fDfWidget->setLayout(v2);
+    h->addWidget(fDfWidget, 3);
+    dfexW = new DFExtendedWidget (this, "Digifant I");
+    v2->addWidget(dfexW);
+
+    //VR6 widget
+    fVr6Widget = new QFrame (this);
+    fVr6Widget->setContentsMargins(0,0,0,0);
+    QVBoxLayout *v4 = new QVBoxLayout();
+    //disable margin around the vbox layout
+    v4->setContentsMargins(0,0,0,0);
+    v4->setSpacing(0);
+    fVr6Widget->setLayout(v4);
+    h->addWidget(fVr6Widget, 3);
+    vr6W = new VR6Widget (this, "VR6 M3.8.1");
+    v4->addWidget(vr6W);
+
+
+    switchEcu();
+
 
     QFrame *fWidgets1 = new QFrame (this);
     fWidgets1->setContentsMargins(0,0,0,0);
@@ -105,6 +119,9 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     t.start();
 }
 
+void RealTimeVis::possibleCfgChange () {
+    switchEcu();
+}
 
 void RealTimeVis::visualize (MdDataRecord *d) {
     if ( AppEngine::getInstance()->getActualizeDashboard() && d->getSensorR() != NULL ) {
@@ -175,5 +192,22 @@ bool RealTimeVis::event(QEvent *e)
 void RealTimeVis::resizeEvent(QResizeEvent *event)
 {
     qDebug() << "RealTimeVis::resizeEvent width=" << event->size().width() << " height=" << event->size().height();
+}
+
+void RealTimeVis::switchEcu()
+{
+    QSettings settings;
+    QString ecuStr = settings.value("md/ecu", QVariant (QString("Digifant 1"))).toString();
+    if ( ecuStr == "Digifant 1" ) {
+        fDfWidget->setVisible(true);
+        fVr6Widget->setVisible(false);
+    } else if ( ecuStr == "VR6 M3.8.1" ) {
+        fDfWidget->setVisible(false);
+        fVr6Widget->setVisible(true);
+    } else {
+        fDfWidget->setVisible(false);
+        fVr6Widget->setVisible(false);
+    }
+
 }
 

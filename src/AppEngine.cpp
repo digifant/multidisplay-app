@@ -365,6 +365,8 @@ void AppEngine::setupPC() {
     //navigate in vis / data record sheet
     connect (data, SIGNAL(showRecordInVis1 (int)), this, SLOT(changeDataWinMarkToDisplayRecord(int)));
 
+    connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
+
 //    Map16x1_NTC_IAT_ECT *map = new Map16x1_NTC_IAT_ECT();
 //    map->testIt();
 //    delete (map);
@@ -467,6 +469,8 @@ void AppEngine::setupMaemo() {
     rtvis = new RealTimeVis ( mmw->ui->mainFrame );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
+    connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
+
 #if  defined (Q_WS_MAEMO_5)
     QSettings settings("MultiDisplay", "UI");
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
@@ -562,6 +566,8 @@ void AppEngine::setupAndroid () {
         accelMeter = new Accelerometer(this);
     else
         accelMeter = false;
+
+    connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
 
     //http://qt-project.org/doc/qt-5/qandroidjniobject.html#details
 //    QAndroidJniObject activity = QtAndroid::androidActivity();
@@ -740,7 +746,7 @@ void AppEngine::changeDataWinSize (int ns) {
 
 
 void AppEngine::writeSettings () {
-    QSettings settings("MultiDisplay", "UI");
+    QSettings settings;
 
 #if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     settings.beginGroup("MainWindow");

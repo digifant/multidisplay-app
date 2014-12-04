@@ -95,7 +95,8 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     com/MdBinaryProtocol.h \
     mobile/AndroidMainWindow.h \
     mobile/SwipeGestureRecognizer.h \
-    mobile/AndroidN75Dialog.h
+    mobile/AndroidN75Dialog.h \
+    widgets/VR6Widget.h
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
@@ -166,7 +167,8 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     com/MdBinaryProtocol.cpp \
     mobile/AndroidMainWindow.cpp \
     mobile/SwipeGestureRecognizer.cpp \
-    mobile/AndroidN75Dialog.cpp
+    mobile/AndroidN75Dialog.cpp \
+    widgets/VR6Widget.cpp
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp

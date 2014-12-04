@@ -11,6 +11,7 @@
 class BarGraphWidget;
 class MdDataRecord;
 class DFExtendedWidget;
+class VR6Widget;
 
 class RealTimeVis : public QWidget
 {
@@ -22,11 +23,14 @@ signals:
 
 public slots:
     void visualize (MdDataRecord *d);
+    void possibleCfgChange ();
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual bool event(QEvent * e);
     void resizeEvent ( QResizeEvent * event );
+
+    void switchEcu ();
 
 private:
     QwtThermo *boostT;
@@ -40,12 +44,16 @@ private:
     BoostExtendedWidget *bexW;
     DFWidget *dfW;
     DFExtendedWidget *dfexW;
+    VR6Widget *vr6W;
     EFRWidget *efrW;
     PressureWidget *oilW;
     FuelPressureWidget *fuelW;
     MeasurementWidget *rpmW;
 
     Overlay* overlay;
+
+    QFrame *fDfWidget;
+    QFrame *fVr6Widget;
 
     QTime t;
 };

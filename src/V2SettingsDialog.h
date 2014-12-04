@@ -15,6 +15,9 @@ public:
     explicit V2SettingsDialog(QWidget *parent = 0);
     ~V2SettingsDialog();
 
+signals:
+    void cfgDialogAccepted();
+
 protected slots:
     void accepted();
 
