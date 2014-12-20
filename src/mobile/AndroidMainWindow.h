@@ -35,6 +35,8 @@ public slots:
     void btPortClosed ();
     void btPortOpened ();
 
+    void fireSupportForumIntent();
+
 signals:
     void writeSettings();
 

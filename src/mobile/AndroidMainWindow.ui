@@ -72,6 +72,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionMdSupportForum"/>
    </widget>
    <widget class="QMenu" name="menuData">
     <property name="title">
@@ -123,6 +124,11 @@
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionMdSupportForum">
+   <property name="text">
+    <string>md support forum</string>
    </property>
   </action>
  </widget>

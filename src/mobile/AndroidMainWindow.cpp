@@ -6,6 +6,7 @@
 #include "ui_AndroidMainWindow.h"
 #include "AppEngine.h"
 
+#include <QAndroidJniObject>
 
 
 AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
@@ -23,6 +24,8 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
      grabGesture(Qt::PanGesture);
      grabGesture(Qt::PinchGesture);
      grabGesture(Qt::SwipeGesture);
+
+     connect (ui->actionMdSupportForum, SIGNAL(triggered()), this, SLOT(fireSupportForumIntent()) );
 }
 
 AndroidMainWindow::~AndroidMainWindow()
@@ -86,6 +89,17 @@ void AndroidMainWindow::btPortClosed()
 void AndroidMainWindow::btPortOpened()
 {
     ui->actionBluetoothToggleState->setText("Bluetooth disconnect");
+}
+
+void AndroidMainWindow::fireSupportForumIntent()
+{
+    QString s = "http://mdforum.designer2k2.at/";
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject::callStaticMethod( "de/gummelinformatics/mui/MuiIntentHelper",
+                                         "openUrl",
+                                         "(Ljava/lang/String;)V",
+                                         QAndroidJniObject::fromString( s ).object<jstring>() );
+#endif
 }
 
 
