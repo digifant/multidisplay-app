@@ -17,6 +17,14 @@ public class MuiIntentHelper extends QtActivity
 		Intent i = new Intent(Intent.ACTION_VIEW);
 		i.setData(Uri.parse(url));
 		startActivity(i);
+		//return 1;
+	}
+
+	public boolean test() {
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse("http://google.com"));
+		startActivity(i);
+                return true;
 	}
 }
 

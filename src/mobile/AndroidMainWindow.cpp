@@ -6,7 +6,10 @@
 #include "ui_AndroidMainWindow.h"
 #include "AppEngine.h"
 
-#include <QAndroidJniObject>
+#if defined(Q_OS_ANDROID)
+    #include <QAndroidJniObject>
+    #include <QAndroidJniEnvironment>
+#endif
 
 
 AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
@@ -93,12 +96,31 @@ void AndroidMainWindow::btPortOpened()
 
 void AndroidMainWindow::fireSupportForumIntent()
 {
-    QString s = "http://mdforum.designer2k2.at/";
 #ifdef Q_OS_ANDROID
-    QAndroidJniObject::callStaticMethod( "de/gummelinformatics/mui/MuiIntentHelper",
-                                         "openUrl",
-                                         "(Ljava/lang/String;)V",
-                                         QAndroidJniObject::fromString( s ).object<jstring>() );
+    qDebug() << "fireSupportForumIntent()";
+    QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/");
+//    QAndroidJniObject r = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
+//                                         "test",
+//                                         "(V)Z");
+
+    QAndroidJniObject hc ("de/gummelinformatics/mui/MuiIntentHelper");
+    hc.callObjectMethod( "openUrl", "(Ljava/lang/String;)V", s1.object<jstring>() );
+
+//    QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
+//                                         "openUrl",
+//                                         "(Ljava/lang/String;)V",
+//                                         s1.object<jstring>() );
+    QAndroidJniEnvironment env;
+    if (env->ExceptionCheck()) {
+        // Handle exception here.
+        qDebug() << "*** JNI exception ***";
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        env->ExceptionClear();
+    } else {
+        qDebug() << "NO JNI exception";
+    }
+
 #endif
 }
 
