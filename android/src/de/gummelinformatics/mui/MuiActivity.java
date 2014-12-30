@@ -9,6 +9,14 @@ import android.app.Activity;
 
 public class MuiActivity extends QtActivity 
 {
+	private static MuiActivity myActivity;
+
+	public static MuiActivity getActivityInstance() {
+		return myActivity;
+	}
+
+
+	/* https://www.qtdeveloperdays.com/sites/default/files/BogdanVatra_Extending_Qt_Android_Apps_with_JNI.pdf */
         public MuiActivity()
 	{
             //java.lang.RuntimeException: Unable to instantiate activity ComponentInfo{de.gummelinformatics.mui/de.gummelinformatics.mui.MuiActivity}: java.lang.NullPointerException
@@ -18,6 +26,7 @@ public class MuiActivity extends QtActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+		myActivity = this;
 		super.onCreate(savedInstanceState);
 		setKeepScreenOn(true);
 	}
@@ -26,7 +35,7 @@ public class MuiActivity extends QtActivity
 	public void onDestroy()
 	{
 		super.onDestroy();
-
+		myActivity = null;
 	}
 
 	public void setKeepScreenOn(boolean keepScreenOn) {
@@ -36,5 +45,7 @@ public class MuiActivity extends QtActivity
 		this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
+        
+        
 }
 
