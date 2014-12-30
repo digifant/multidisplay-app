@@ -16,6 +16,7 @@ public class MuiIntentHelper extends QtActivity
 
 		//Handler handler = new Handler(Looper.getMainLooper());
 		
+    /* broken */
     public void openUrl(String url) {
 		class myRunnable implements Runnable {
 			String url;

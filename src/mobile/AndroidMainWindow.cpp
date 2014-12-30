@@ -97,29 +97,31 @@ void AndroidMainWindow::btPortOpened()
 void AndroidMainWindow::fireSupportForumIntent()
 {
 #ifdef Q_OS_ANDROID
-    qDebug() << "fireSupportForumIntent()";
-    QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/");
-//    QAndroidJniObject r = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
-//                                         "test",
-//                                         "(V)Z");
+//    qDebug() << "fireSupportForumIntent()";
+//    QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/");
+////    QAndroidJniObject r = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
+////                                         "test",
+////                                         "(V)Z");
 
-    QAndroidJniObject hc ("de/gummelinformatics/mui/MuiIntentHelper");
-    hc.callObjectMethod( "openUrl", "(Ljava/lang/String;)V", s1.object<jstring>() );
+//    QAndroidJniObject hc ("de/gummelinformatics/mui/MuiIntentHelper");
+//    hc.callObjectMethod( "openUrl", "(Ljava/lang/String;)V", s1.object<jstring>() );
 
-//    QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
-//                                         "openUrl",
-//                                         "(Ljava/lang/String;)V",
-//                                         s1.object<jstring>() );
-    QAndroidJniEnvironment env;
-    if (env->ExceptionCheck()) {
-        // Handle exception here.
-        qDebug() << "*** JNI exception ***";
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        env->ExceptionClear();
-    } else {
-        qDebug() << "NO JNI exception";
-    }
+////    QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper",
+////                                         "openUrl",
+////                                         "(Ljava/lang/String;)V",
+////                                         s1.object<jstring>() );
+//    QAndroidJniEnvironment env;
+//    if (env->ExceptionCheck()) {
+//        // Handle exception here.
+//        qDebug() << "*** JNI exception ***";
+//        env->ExceptionDescribe();
+//        env->ExceptionClear();
+//        env->ExceptionClear();
+//    } else {
+//        qDebug() << "NO JNI exception";
+//    }
+
+    QDesktopServices::openUrl( QUrl("http://mdforum.designer2k2.at/") );
 
 #endif
 }
