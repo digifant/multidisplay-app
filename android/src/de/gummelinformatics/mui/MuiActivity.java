@@ -6,12 +6,19 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 
 public class MuiActivity extends QtActivity 
 {
 	private static MuiActivity myActivity;
+        private static final String TAG = MuiActivity.class.getSimpleName();
+        private static final boolean DEBUG = Config.DEBUG;
 
 	public static MuiActivity getActivityInstance() {
+		if ( DEBUG )
+                    Log.d(TAG, "getActivityInstance() " + myActivity );
+
+
 		return myActivity;
 	}
 
@@ -21,6 +28,8 @@ public class MuiActivity extends QtActivity
 	{
             //java.lang.RuntimeException: Unable to instantiate activity ComponentInfo{de.gummelinformatics.mui/de.gummelinformatics.mui.MuiActivity}: java.lang.NullPointerException
 //                setKeepScreenOn(true);
+		if ( DEBUG )
+                        Log.d(TAG, "constructor " );
 	}
 
 	@Override

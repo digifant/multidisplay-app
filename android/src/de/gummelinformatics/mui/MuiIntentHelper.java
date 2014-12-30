@@ -37,12 +37,16 @@ W/System.err( 2798): 	at dalvik.system.NativeStart.run(Native Method)
                             
             //}        
 		class myRunnable implements Runnable {
+			private final String TAG = myRunnable.class.getSimpleName();
+			private static final boolean DEBUG = Config.DEBUG;
 			String url;
 			myRunnable (String u) {url=u;}
 			public void run () {
 				Intent i = new Intent(Intent.ACTION_VIEW);
 				i.setData(Uri.parse(url));
-				startActivity(i);
+                                MuiActivity.getActivityInstance().startActivity(i);
+				if ( DEBUG )
+					Log.d(TAG, "run()" );
 			}
 		}
 		MuiActivity.getActivityInstance().runOnUiThread( new myRunnable(url) );	
@@ -51,9 +55,11 @@ W/System.err( 2798): 	at dalvik.system.NativeStart.run(Native Method)
 // 			{
 // 				getWindow().addFlags( WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON );
 // 		} );
-		Intent i = new Intent(Intent.ACTION_VIEW);
-		i.setData(Uri.parse(url));
-		MuiActivity.getActivityInstance().startActivity(i);
+
+// 		Intent i = new Intent(Intent.ACTION_VIEW);
+// 		i.setData(Uri.parse(url));
+// 		MuiActivity.getActivityInstance().startActivity(i);
+
 		Log.w(TAG, "view intent " + url);
 		
 		if (DEBUG)
