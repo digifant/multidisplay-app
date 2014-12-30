@@ -236,8 +236,10 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
     CONFIG(debug, debug|release) {
         message ("debug")
         #win32 dynamic
-        win32:LIBS += -L $$quote(../libs/qextserialport/src/build) -lqextserialportd1 \
-                      ..\libs\qwt-6.1.1\lib\libqwtd.a
+        lessThan(QT_MAJOR_VERSION, 5) {
+            LIBS += -L $$quote(..\libs\qextserialport\src\build) -lqextserialportd
+        }
+        win32:LIBS += ..\libs\qwt-6.1.1\lib\libqwtd.a
 #        unix:LIBS += -L ../libs/qextserialport/src/build -lqextserialportd \
 #                    ../libs/qwt-6.1.1/lib/libqwtd.a
 
