@@ -5,12 +5,13 @@ import 	android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-
+import android.view.ViewConfiguration;
+import android.os.Build;
 import android.os.Looper;
 
 public class MuiIntentHelper extends QtActivity 
 {
-	private final String TAG = MuiIntentHelper.class.getSimpleName();
+        private static final String TAG = MuiIntentHelper.class.getSimpleName();
         private static final boolean DEBUG = Config.DEBUG;
 
 	private static MuiIntentHelper instance;
@@ -72,5 +73,21 @@ W/System.err( 2798): 	at dalvik.system.NativeStart.run(Native Method)
 		startActivity(i);
                 return true;
 	}
+
+    public static boolean hasPermanentMenuKey()
+    {
+	// action bar: http://developer.android.com/guide/topics/ui/actionbar.html
+        try {
+            boolean pk = Build.VERSION.SDK_INT < 11 || (Build.VERSION.SDK_INT >= 14 &&
+                    (Boolean)ViewConfiguration.class.getMethod("hasPermanentMenuKey").invoke(ViewConfiguration.get( MuiActivity.getActivityInstance() )));
+            if ( DEBUG )
+                Log.d(TAG, "hasPermanentMenuKey(): " + (pk==true?"true":"false"));
+
+            return pk;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
 

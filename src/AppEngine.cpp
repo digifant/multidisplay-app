@@ -546,8 +546,10 @@ void AppEngine::setupAndroid () {
     rtvis = new RealTimeVis ( add );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
-//    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
-    connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showFullScreen()) );
+    if ( QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper", "hasPermanentMenuKey" ))
+        connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showFullScreen()) );
+    else
+        connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
 
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
@@ -587,9 +589,15 @@ void AppEngine::show() {
     mmw->statusBar()->hide();
 #endif
 #if defined (Q_OS_ANDROID)
-    amw->showFullScreen();
-//    amw->showMaximized();
-//    add->showMaximized();
+    jboolean permanentMenuKey = QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper", "hasPermanentMenuKey" );
+    qDebug() << "hasPermanentMenuKey result: " << ( permanentMenuKey==true ? "true" : "false" );
+    if ( permanentMenuKey ) {
+        amw->showFullScreen();
+        add->showFullScreen();
+    } else {
+        amw->showMaximized();
+        add->showMaximized();
+    }
  #endif
 }
 

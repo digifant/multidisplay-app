@@ -11,8 +11,8 @@ import android.util.Log;
 public class MuiActivity extends QtActivity 
 {
 	private static MuiActivity myActivity;
-        private static final String TAG = MuiActivity.class.getSimpleName();
-        private static final boolean DEBUG = Config.DEBUG;
+    private static final String TAG = MuiActivity.class.getSimpleName();
+    private static final boolean DEBUG = Config.DEBUG;
 
 	public static MuiActivity getActivityInstance() {
 		if ( DEBUG )
