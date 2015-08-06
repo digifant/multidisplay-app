@@ -87,7 +87,9 @@ void MyTableWidget::paste() {
 
 /* ======================================== */
 
-#define RPM_MIN_FOR_BOOST_CONTROL 2000
+//#define RPM_MIN_FOR_BOOST_CONTROL 2000
+//#define RPM_MAX_FOR_BOOST_CONTROL 9000
+#define RPM_MIN_FOR_BOOST_CONTROL 0
 #define RPM_MAX_FOR_BOOST_CONTROL 9000
 
 N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
@@ -145,10 +147,12 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
     }
 
     QStringList l;
-    int rpm = RPM_MIN_FOR_BOOST_CONTROL;
+//    int rpm = RPM_MIN_FOR_BOOST_CONTROL;
     for (int i=0 ; i < 16 ; i++) {
-        if ( i > 0 )
-            rpm = rpm + ( (RPM_MAX_FOR_BOOST_CONTROL-RPM_MIN_FOR_BOOST_CONTROL) /16);
+//        if ( i > 0 )
+//            rpm = rpm + ( (RPM_MAX_FOR_BOOST_CONTROL-RPM_MIN_FOR_BOOST_CONTROL) /16);
+        // Calculate rpm this way instead to avoid accumulating rounding errors.
+        int rpm = RPM_MIN_FOR_BOOST_CONTROL + ( i*(RPM_MAX_FOR_BOOST_CONTROL-RPM_MIN_FOR_BOOST_CONTROL) /16);
         l.append( QString::number(rpm) );
         setColumnWidth(i, 40);
     }

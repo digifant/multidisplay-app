@@ -32,6 +32,7 @@ protected:
 
     void switchEcu ();
 
+    bool mdMode();
 private:
     QwtThermo *boostT;
     BarGraphWidget *bg1;

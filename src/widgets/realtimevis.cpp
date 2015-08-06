@@ -112,8 +112,12 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     fuelW = new FuelPressureWidget (this, "Fuel Pres");
     v3->addWidget(fuelW);
     rpmW = new MeasurementWidget (this, "RPM", 0,7200,7500, QColor(Qt::green), QColor(Qt::green), QColor(Qt::red));
-    v3->addWidget(rpmW);
-
+    if ( mdMode() )
+        v3->addWidget(rpmW);
+    else {
+        v->addWidget(rpmW);
+        fWidgets2->hide();
+    }
 
     t = QTime::currentTime();
     t.start();
@@ -211,3 +215,24 @@ void RealTimeVis::switchEcu()
 
 }
 
+bool RealTimeVis::mdMode()
+{
+    QSettings settings;
+    bool mdMode = settings.value("md/md", QVariant (true)).toBool();
+    if ( mdMode ) {
+        egtW->show();
+        bexW->show();
+
+        efrW->show();
+        oilW->show();
+        fuelW->show();
+    } else {
+        egtW->hide();
+        bexW->hide();
+
+        efrW->hide();
+        oilW->hide();
+        fuelW->hide();
+    }
+    return mdMode;
+}

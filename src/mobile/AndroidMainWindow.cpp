@@ -29,6 +29,12 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
      grabGesture(Qt::SwipeGesture);
 
      connect (ui->actionMdSupportForum, SIGNAL(triggered()), this, SLOT(fireSupportForumIntent()) );
+
+     QSettings settings;
+     if ( ! settings.value("md/md", QVariant (true)).toBool() ) {
+         ui->actionV2_N75_Settings->setVisible(false);
+         ui->actionGearbox_settings->setVisible(false);
+     }
 }
 
 AndroidMainWindow::~AndroidMainWindow()
