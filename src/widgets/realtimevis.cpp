@@ -218,7 +218,7 @@ void RealTimeVis::switchEcu()
 bool RealTimeVis::mdMode()
 {
     QSettings settings;
-    bool mdMode = settings.value("md/md", QVariant (true)).toBool();
+    bool mdMode = settings.value("md/md", QVariant (MDMODE)).toBool();
     if ( mdMode ) {
         egtW->show();
         bexW->show();

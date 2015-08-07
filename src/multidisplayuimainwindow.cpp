@@ -120,6 +120,8 @@ void MultidisplayUIMainWindow::newDfBoostTransferFunction (int name) {
         ui.action400kpa->setChecked(true);
         break;
     }
+    QSettings settings;
+    settings.setValue ("Digifant1/MapSensor", name );
 }
 
 void MultidisplayUIMainWindow::dfMapSelected100(bool b) {
@@ -147,4 +149,10 @@ void MultidisplayUIMainWindow::resizeEvent(QResizeEvent *event) {
       -> we must propagate resize information to it */
     if ( overlay )
         overlay->resize( event->size() );
+}
+
+void MultidisplayUIMainWindow::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event);
+    connect (AppEngine::getInstance(), SIGNAL(newDfBoostTransferFunction(int)), this, SLOT(newDfBoostTransferFunction(int)));
 }

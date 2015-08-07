@@ -31,9 +31,12 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
      connect (ui->actionMdSupportForum, SIGNAL(triggered()), this, SLOT(fireSupportForumIntent()) );
 
      QSettings settings;
-     if ( ! settings.value("md/md", QVariant (true)).toBool() ) {
+     if ( settings.value("md/md", QVariant ( MDMODE ).toBool() )  == false ) {
          ui->actionV2_N75_Settings->setVisible(false);
          ui->actionGearbox_settings->setVisible(false);
+
+         ui->menuData->setTitle("Digifant 1");
+         ui->actionMdSupportForum->setText("more information");
      }
 }
 

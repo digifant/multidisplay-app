@@ -55,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>18</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConfig">
@@ -93,22 +93,22 @@
   </action>
   <action name="actionBluetooth">
    <property name="text">
-    <string>Bluetooth Options</string>
+    <string>&amp;bluetooth options</string>
    </property>
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>mdv2 options</string>
+    <string>&amp;options</string>
    </property>
   </action>
   <action name="actionV2_N75_Settings">
    <property name="text">
-    <string>N75 boost control</string>
+    <string>&amp;N75 boost control</string>
    </property>
   </action>
   <action name="actionGearbox_settings">
    <property name="text">
-    <string>gearbox</string>
+    <string>&amp;gearbox</string>
    </property>
   </action>
   <action name="actionAbout">

@@ -31,6 +31,32 @@ void V2SettingsDialog::accepted() {
 
     QSettings settings;
     settings.setValue ("md/ecu", QVariant (ui->comboBoxEcu->currentText()) );
+
+    if ( ui->comboBoxMapSensor->currentText().toInt() != settings.value ("Digifant1/MapSensor", 200) ) {
+        int newDfMap = ui->comboBoxMapSensor->currentText().toInt();
+        settings.setValue("Digifant1/MapSensor", newDfMap);
+        switch (newDfMap) {
+        case 400 :
+            AppEngine::getInstance()->setDfBoostTransferFunction( new TransferFunction400kpa() );
+            break;
+        case 250 :
+            AppEngine::getInstance()->setDfBoostTransferFunction( new TransferFunction250kpa() );
+            break;
+        case 100 :
+            AppEngine::getInstance()->setDfBoostTransferFunction( new TransferFunction100kpa() );
+            break;
+        case 300 :
+            AppEngine::getInstance()->setDfBoostTransferFunction( new TransferFunction300kpa() );
+            break;
+        case 200 :
+        default:
+            AppEngine::getInstance()->setDfBoostTransferFunction( new TransferFunction200kpa() );
+            break;
+        }
+        //in setDfBoostTransferFunction
+        //emit newDfBoostTransferFunction (dfBoostTransferFunction->name());
+    }
+
     emit cfgDialogAccepted();
 }
 
@@ -51,4 +77,17 @@ void V2SettingsDialog::showEvent ( QShowEvent * event ) {
         ui->comboBoxEcu->insertItem(0, ecuStr);
         ui->comboBoxEcu->setCurrentIndex(0);
     }
+
+    int dfMap = settings.value ("Digifant1/MapSensor", 200).toInt();
+    for ( int i = 0 ; i < ui->comboBoxMapSensor->count() ; i++ ) {
+        if ( ui->comboBoxMapSensor->itemText(i).toInt() == dfMap ) {
+            ui->comboBoxMapSensor->setCurrentIndex(i);
+        }
+    }
+#if defined ( Q_OS_ANDROID)
+    {
+        ui->groupBoxFrequency->hide();
+        ui->groupBoxEnergy->hide();
+    }
+#endif
 }

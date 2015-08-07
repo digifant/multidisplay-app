@@ -34,6 +34,7 @@
 #include "TransferFunction.h"
 #include "serialoptions.h"
 
+#define MDMODE true
 
 class MdBluetoothCom;
 class MdBinaryProtocol;
@@ -101,7 +102,7 @@ public:
     Accelerometer *getAccelerometer () { return accelMeter; };
 
     TransferFunction* getDfBoostTransferFunction() { return dfBoostTransferFunction; }
-    void setDfBoostTransferFunction( TransferFunction* t ) { delete (dfBoostTransferFunction); dfBoostTransferFunction=t; }
+    void setDfBoostTransferFunction( TransferFunction* t ) { delete (dfBoostTransferFunction); dfBoostTransferFunction=t; emit newDfBoostTransferFunction (dfBoostTransferFunction->name()); }
 
     quint8 numConnectedTypeK;
 

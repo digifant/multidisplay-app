@@ -850,6 +850,9 @@ void AppEngine::readSettings () {
     case 100 :
         dfBoostTransferFunction = new TransferFunction100kpa();
         break;
+    case 300 :
+        dfBoostTransferFunction = new TransferFunction300kpa();
+        break;
     case 200 :
     default:
         dfBoostTransferFunction = new TransferFunction200kpa();
