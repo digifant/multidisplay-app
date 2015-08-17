@@ -354,7 +354,7 @@ void AppEngine::setupPC() {
 //    demo1 = new CarPcDemoWidget (pcmw->ui.CarPcTab);
 
     //Dashboard
-    rtvis = new RealTimeVis ( dynamic_cast<QWidget*>(pcmw->ui.CarPcTab) );
+    rtvis = new RealTimeVis ( dynamic_cast<QWidget*>(pcmw->ui.DashboardTab) );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
     //Digifant-1 stuff

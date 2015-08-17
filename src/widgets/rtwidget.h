@@ -87,7 +87,7 @@ public:
     virtual void setValue (double);
     void setDigits (float d) { digits = d; };
 
-    bool setLowHeigth ( bool s ) { lowHeigth = s;}
+    void setLowHeigth ( bool s ) { lowHeigth = s;}
     bool getLowHeigth () { return lowHeigth;}
 
 protected:

@@ -57,7 +57,8 @@ MdBluetoothCom::~MdBluetoothCom() {
 
 void MdBluetoothCom::sppConnect() {
     foreach ( QBluetoothServiceInfo si, m_discoveredServices.values() ) {
-        if ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) && ( si.serviceName() == "Serial Port Profile") ) {
+        if ( ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
+             && ( si.serviceName() == "Serial Port Profile") ) {
             // we found our md bluetooth service!
             qDebug() << "found mdv2 service on " << si.device().name() << " " << si.device().address().toString();
             qDebug() << "Service name:" << si.serviceName() << " UUID=" << si.serviceUuid().toString();
@@ -142,7 +143,8 @@ bool MdBluetoothCom::setupPort(QString sport, QString speed)
         sdNeeded = Name;
         //mdv2
         foreach ( QBluetoothServiceInfo si, m_discoveredServices.values() ) {
-            if ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) && ( si.serviceName() == "Serial Port Profile") ) {
+            if ( ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
+                 && ( si.serviceName() == "Serial Port Profile") ) {
                 // we found our md bluetooth service!
                 qDebug() << "found mdv2 service on " << si.device().name() << " " << si.device().address().toString();
                 qDebug() << "Service name:" << si.serviceName() << " UUID=" << si.serviceUuid().toString();

@@ -73,6 +73,8 @@ MultidisplayUIMainWindow::MultidisplayUIMainWindow(QWidget *parent)
 
     overlay = NULL;
 //    overlay = new Overlay (this);
+
+    //ui.DataTab->setStyleSheet ("background: url(/home/bofh/1280x720dfo_yt_landscape.png)");
 }
 
 

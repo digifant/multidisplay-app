@@ -7,6 +7,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- must match target name of qt app! -->
             <meta-data android:name="android.app.lib_name" android:value="mUI"/>
             <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
             <meta-data android:name="android.app.repository" android:value="default"/>
@@ -29,7 +30,6 @@
             <!--  Messages maps -->
 
             <!-- Splash screen -->
-
             <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/splash_hochkant"/>
 
             <!-- Splash screen -->

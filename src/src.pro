@@ -1,5 +1,6 @@
 TEMPLATE = app
 TARGET = mUI
+#TARGET = digifantview
 QT += core \
     gui \
     widgets \

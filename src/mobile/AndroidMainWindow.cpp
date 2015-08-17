@@ -108,19 +108,16 @@ void AndroidMainWindow::fireSupportForumIntent()
 #ifdef Q_OS_ANDROID
 //    qDebug() << "fireSupportForumIntent()";
     QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/viewtopic.php?f=15&t=334");
+    QSettings settings;
+    if ( settings.value("md/md", QVariant ( MDMODE ).toBool() )  == false ) {
+        s1 = QAndroidJniObject::fromString("http://digifant-einzelabstimmung.de/bofh-ng/de/digifant-1/live-daten-auslesen");
+    }
 
 
     QAndroidJniObject::callStaticMethod<void>( "de/gummelinformatics/mui/MuiIntentHelper",
                                            "openUrl",
                                            "(Ljava/lang/String;)V",
                                             s1.object<jstring>() );
-
-//    jboolean r = QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper",
-//                                           "test");
-//    if ( r )
-//        qDebug() << "fireSupportForumIntent() debug TRUE";
-//    else
-//        qDebug() << "fireSupportForumIntent() debug FALSE";
 
     QAndroidJniEnvironment env;
     if (env->ExceptionCheck()) {

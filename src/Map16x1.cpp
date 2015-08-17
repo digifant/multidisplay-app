@@ -24,6 +24,9 @@
 Map16x1::Map16x1() {
 }
 
+Map16x1::~Map16x1() {
+
+}
 
 double Map16x1::mapValue ( int dval ) {
     int idx = dval >> 4;

@@ -26,6 +26,7 @@ class Map16x1
 {
 public:
     Map16x1();
+    virtual ~Map16x1();
     double mapValue ( int dval );
     virtual void testIt ();
 

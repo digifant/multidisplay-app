@@ -155,6 +155,7 @@ bool MobileGPS::loadTrack(QString fn)
         }
     } while (!line.isNull());
     file.close();
+    return true;
 }
 
 bool MobileGPS::loadTrackBinary(QString fn)
