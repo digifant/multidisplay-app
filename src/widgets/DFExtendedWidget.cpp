@@ -221,8 +221,8 @@ void DFExtendedWidget::paint() {
 
     //attention, QtCreator has to be in utf8 encoding (qt5) or in latin1 (qt4)
     //we should better use QTranslator http://qt-project.org/doc/qt-5/qtranslator.html#details
-    QString ect = "ECT " + QString::number(df_ect, 'f', 1) + " °C";
-    QString iat = "IAT " + QString::number(df_iat, 'f', 1) + " °C";
+    QString ect = "ECT " + QString::number(df_ect, 'f', 1) + " " + QChar(0x00B0) + "C";
+    QString iat = "IAT " + QString::number(df_iat, 'f', 1) + " " + QChar(0x00B0) + "C";
 
 
     qreal df_inj_time_ms = df_inj_time / 1000.0;

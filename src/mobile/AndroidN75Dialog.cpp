@@ -342,7 +342,8 @@ void AndroidN75Dialog::timerUpdateWrite () {
         QMessageBox::information(this, "N75 maps", "write complete", QMessageBox::Ok);
 #endif
 #if  defined (Q_WS_MAEMO_5)
-        QMaemo5InformationBox::information ( this, "write complete", 0 );
+//        QMaemo5InformationBox::information ( this, "write complete", 0 );
+        QMessageBox::information(this, "N75 maps", "write complete", QMessageBox::Ok);
 #endif
     }
 }
