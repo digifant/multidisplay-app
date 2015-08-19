@@ -144,7 +144,7 @@ void WotEventsDialog::showEGT ( QList<int> idxL ) {
         ui->tableWidget->setItem (row,2,wi);
 
         wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["temp"] )
-                                   + "°C (" + QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["idx"]) + ")");
+                                   + " " + QChar(0x00B0) + "C (" + QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["idx"]) + ")");
         wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         ui->tableWidget->setItem (row,3,wi);
 
@@ -214,7 +214,7 @@ void WotEventsDialog::show ( QMap<QString,QMap<QString,QVariant > > &d ) {
             ui->tableWidget->setItem (row,3,wi);
 
             wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["temp"] )
-                                       + "°C (" + QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["idx"]) + ")");
+                                       + " " + QChar(0x00B0) + "C (" + QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getHighestEgt()["idx"]) + ")");
             ui->tableWidget->setItem (row,4,wi);
 
             wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->df_ignition_total_retard ) );
