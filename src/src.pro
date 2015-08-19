@@ -14,6 +14,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 CONFIG += rtti exceptions mobility serialport
 
+#qDebug() to console
+win32: CONFIG += console
 
 #!android:QT += opengl
 

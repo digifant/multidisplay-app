@@ -438,7 +438,7 @@ void PowerPlot::reCalculate( bool useGpsSpeed ) {
 
             computePower (cur,last, cp, lastUsedRow, r, useGpsSpeed);
 
-            if ( ! isnan(cp->kw_engine) ) {
+            if ( ! std::isnan(cp->kw_engine) ) {
                 boostData->append (curRpm, cur->getSensorR()->getBoost());
                 agtData->append (curRpm, cur->getSensorR()->getEgt4() / 2);
 
