@@ -457,6 +457,8 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
     double df_ect = dfEctMap->mapValue( df_ect_raw );
     double df_iat = dfIatMap->mapValue( df_iat_raw );
     double df_ignition = (df_ign_raw *-0.351563)+73.9;
+    if ( (df_lc_flags & 3)==1 )
+        df_ignition = (2*df_ign_raw *-0.351563)+73.9;
     double df_voltage = dfVoltageMap->mapValue(df_voltage_raw);
 
 

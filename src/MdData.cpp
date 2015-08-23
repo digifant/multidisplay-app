@@ -161,7 +161,8 @@ MdData::MdData (QMainWindow* mw_boost, QWidget* parent_boost, QMainWindow* mw_vi
         dataViewContextMenuCalc100to200GPS = dataViewContextMenu->addAction("Calc 100-200km/h time (GPS)");
         dataViewContextMenuFindWotEvents = dataViewContextMenu->addAction("find WOT events");
         dataViewContextMenuFindKnockEvents = dataViewContextMenu->addAction("find Knock events");
-        dataViewContextMenuFindHighEGTEvents = dataViewContextMenu->addAction("find high EGT (>950�C) events");
+        dataViewContextMenuFindHighEGTEvents = dataViewContextMenu->addAction("find high EGT (>950 " + QString(QChar(0x00B0)) + "C) events");
+        dataViewContextMenuFindLcEvents = dataViewContextMenu->addAction("find LC events");
         dataViewContextMenuCheckEvents = dataViewContextMenu->addAction("check");
     }
 
@@ -479,6 +480,9 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
     if ( a == dataViewContextMenuFindHighEGTEvents ) {
         findHighEGT();
     }
+    if ( a == dataViewContextMenuFindLcEvents ) {
+        findLc();
+    }
     if ( a == dataViewContextMenuCheckEvents ) {
         checkData();
     }
@@ -741,10 +745,59 @@ QList<int> MdData::findInjectorHighDC ( bool showWindow ) {
                  << " ("<< dataList[i]->getSensorR()->getHighestEgt()["idx"] << ")";
     }
 //    if ( showWindow )
-//        wotEventsDialog->showEGT ( dcIdxL );
+//        wotEventsDialog->show ( lcIdxL );
 
     return dcIdxL;
 }
+
+
+QList<int> MdData::findLc ( bool showWindow ) {
+    QList <int> lcIdxL;
+    #define STATE_NO_LC 1
+    #define STATE_LC_START 2
+    #define STATE_LC_FOUND 3
+    quint8 state = STATE_NO_LC;
+    int lc_start_time = 0;
+    int lc_end_time = 0;
+    int lc_start_idx = 0;
+
+    for ( int i = 0 ; i < dataList.size() ; i++ ) {
+        switch ( state ) {
+            case STATE_NO_LC:
+            if ( (dataList.at(i)->getSensorR()->df_lc_flags & 3) == 1 ) {
+                state = STATE_LC_START;
+                lc_start_time = dataList[i]->getSensorR()->getTime();
+                lc_start_idx = i;
+            }
+            break;
+            case STATE_LC_START:
+            if (  ((dataList.at(i)->getSensorR()->df_lc_flags & 3) == 1) )
+                state = STATE_NO_LC;
+            else {
+                if ( lc_start_time + 1000 < dataList[i]->getSensorR()->getTime()  ) {
+                    //2 secs lc
+                    state = STATE_LC_FOUND;
+                    lcIdxL.append(lc_start_idx);
+                }
+            }
+            break;
+            case STATE_LC_FOUND:
+            if ( (dataList.at(i)->getSensorR()->df_lc_flags & 3) == 0 ) {
+                state = STATE_NO_LC;
+                lc_end_time = dataList[i]->getSensorR()->getTime();
+            }
+            break;
+        }
+    }
+
+    foreach ( int i, lcIdxL ) {
+        qDebug() << "LC event @ " << dataList[i]->getSensorR()->getTime() << " RPM=" << dataList[i]->getSensorR()->getRpm() << " boost=" << dataList[i]->getSensorR()->getBoost();
+    }
+    if ( showWindow )
+            wotEventsDialog->show(lcIdxL);
+    return lcIdxL;
+}
+
 
 void MdData::checkData () {
 
@@ -798,6 +851,7 @@ void MdData::checkData () {
     eventCount += dcL.size();
 
     QMap<QString,QVariant> dcm;
+
     dcm["data"] = dcVL;
     dcm["icon"] = QVariant("dialog-warning");
     p["Inj duty cycle"] = dcm;

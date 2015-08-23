@@ -310,6 +310,7 @@ public:
     int getLastTime ();
 
     void findWot ();
+    QList<int> findLc (bool showWindow=true);
     QList<int> findKnock ( bool showWindow=true );
     QList<int> findHighEGT ( bool showWindow=true);
     QList<int> findInjectorHighDC ( bool showWindow=true);
@@ -386,6 +387,7 @@ private:
     QAction *dataViewContextMenuFindWotEvents;
     QAction *dataViewContextMenuFindKnockEvents;
     QAction *dataViewContextMenuFindHighEGTEvents;
+    QAction *dataViewContextMenuFindLcEvents;
     QAction *dataViewContextMenuCheckEvents;
 
     DataTableConfigDialog* dataTableConfigDialog;
