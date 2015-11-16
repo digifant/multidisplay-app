@@ -558,6 +558,9 @@ void AppEngine::setupAndroid () {
 
     connect (amw->ui->actionBluetoothToggleState, SIGNAL(triggered()), mdcom, SLOT(togglePort()) );
     connect (amw->ui->actionSave, SIGNAL(triggered()) , this, SLOT(saveDataAs()) );
+    connect (amw->ui->actionOpen_Replay, SIGNAL(triggered()) , this, SLOT(openData()) );
+    connect (amw->ui->actionClear, SIGNAL(triggered()) , this, SLOT(clearData()) );
+
 
     QSettings settings("MultiDisplay", "UI");
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
@@ -685,20 +688,30 @@ void AppEngine::openData ( QString fn ) {
         mmw->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
 #endif
 
-#if !defined (Q_WS_MAEMO_5)
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
         emit showStatusBarSampleCount( QString::number(data->size()) );
 #endif
 
+#if defined Q_OS_ANDROID
+        //start replay on android
+        replayData();
+#else
         DataViewSlider->setValue(0);
         DataViewSpinBox->setValue(100);
         changeDataWinSize( 100 );
+#endif
     }
 }
 
 void AppEngine::clearData () {
     mds->closePort();
     data->clearData();
-#ifndef Q_WS_MAEMO_5
+
+#if defined Q_OS_ANDROID
+    if ( replay && ( replayThread->isRunning() || replayThread->isFinished() ) )
+        replay->stop();
+#endif
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     emit showStatusMessage( QString::number(data->size()) );
 #endif
 }
@@ -874,10 +887,11 @@ void AppEngine::closeEvent(QCloseEvent *event) {
 
 
 void AppEngine::replayData() {
-#ifdef Q_WS_MAEMO_5
+#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     replaySpeedUpFactor = mvis1w->ui->ReplaySpinBox->value();
     replayStartAtPos = data->getVisPlot()->windowBegin();
-#else
+#endif
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     if ( !pcmw->ui.ReplayCurPos->isChecked() )
         replayStartAtPos = 0;
     else
@@ -886,7 +900,10 @@ void AppEngine::replayData() {
 //    replayThreadStopRequested = false;
 
     replayThread->start();
+
+#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
     DataViewSlider->setValue( DataViewSlider->minimum() );
+#endif
 }
 
 void AppEngine::changeDVSliderUp() {

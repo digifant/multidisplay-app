@@ -130,6 +130,8 @@ void ReplayWorker::stop () {
     replayedItemCount = 0;
 
     QList<MdDataRecord*> *dataList = &(controller->getData()->getData());
+    if ( dataList->isEmpty()  )
+        return;
 
     for ( QList<MdDataRecord*>::iterator it = replayIt ; it != dataList->end() ; it++ ) {
         if ( *it == dataList->last() )

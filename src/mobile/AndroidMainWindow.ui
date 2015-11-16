@@ -87,6 +87,8 @@ p, li { white-space: pre-wrap; }
     </property>
     <addaction name="actionBluetoothToggleState"/>
     <addaction name="actionSave"/>
+    <addaction name="actionOpen_Replay"/>
+    <addaction name="actionClear"/>
    </widget>
    <addaction name="menuData"/>
    <addaction name="menuConfig"/>
@@ -136,6 +138,16 @@ p, li { white-space: pre-wrap; }
   <action name="actionMdSupportForum">
    <property name="text">
     <string>md support forum</string>
+   </property>
+  </action>
+  <action name="actionOpen_Replay">
+   <property name="text">
+    <string>Open and Replay</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
    </property>
   </action>
  </widget>
