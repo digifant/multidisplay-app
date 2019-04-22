@@ -566,11 +566,11 @@ void AppEngine::setupAndroid () {
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
         mGps = new MobileGPS (this);
     else
-        mGps = NULL;
+        mGps = nullptr;
     if ( settings.value("mobile/use_accel", QVariant(true)).toBool() )
         accelMeter = new Accelerometer(this);
     else
-        accelMeter = false;
+        accelMeter = nullptr;
 
     connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
 
@@ -637,12 +637,21 @@ void AppEngine::saveDataAsCSV() {
 }
 
 void AppEngine::saveDataAs () {
+    QString path;
 #if QT_VERSION >= 0x050000
-    QString path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
+#if not defined (ANDROID)
+    path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
-#else
+#endif
+#if defined (ANDROID)
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+    qDebug() << "android save path 2019: " << path;
+#endif
 
-    QString path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
+#else
+    //Qt 4.x
+    path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 
