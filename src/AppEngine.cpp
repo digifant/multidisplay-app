@@ -237,6 +237,11 @@ AppEngine::AppEngine() {
 #else
     directory = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation);
 #endif
+#if defined Q_OS_ANDROID
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    directory = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+    qDebug() << "android save path 2019: " << directory;
+#endif
 
     //load TEST-DATA
 //    openData ("/home/bofh/dev/multidisplay/2/log/incoming/2014-05-21T2252-977Grad_AGT.mdv2");
