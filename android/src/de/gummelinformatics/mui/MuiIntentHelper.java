@@ -1,13 +1,15 @@
 package de.gummelinformatics.mui;
 
 import org.qtproject.qt5.android.bindings.QtActivity;
-import 	android.content.Intent;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewConfiguration;
 import android.os.Build;
 import android.os.Looper;
+import android.os.Environment;
+import java.io.File;
 
 public class MuiIntentHelper extends QtActivity
 {
