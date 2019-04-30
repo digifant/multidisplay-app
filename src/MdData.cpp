@@ -924,8 +924,16 @@ bool MdData::saveDataCSV ( const QString& filename ) {
                 return false;
         QTextStream ts (&file);
 
+        int throttleCol = -1;
+        for(int i = 0; i < columnCount(); i++)
+        {
+          if ( headerData(i, Qt::Horizontal).toString() == "Throttle" )
+              throttleCol = i;
+        }
+
         //Header
         bool first = true;
+
         foreach (QString col, headerColNames) {
             if ( first ) {
                 ts << col;
@@ -936,14 +944,22 @@ bool MdData::saveDataCSV ( const QString& filename ) {
         ts << "\n";
 
 
-        for ( int r = 0 ; r < rowCount() ; ++r ) {
+        //for ( int r = 0 ; r < rowCount() ; ++r ) {
+        //backward
+        for ( int r = rowCount()-1 ; r>= 0 ; --r ) {
             first = true;
             for ( int c = 0 ; c < columnCount() ; ++c ) {
                 if ( first ) {
                     ts << data(QAbstractItemModel::createIndex(r,c)).toString();
                     first = false;
-                } else
-                    ts << "\t" << data(QAbstractItemModel::createIndex(r,c)).toString();
+                } else {
+                    if ( c != throttleCol )
+                        ts << "\t" << data(QAbstractItemModel::createIndex(r,c)).toString();
+                    else {
+                        //export only number, throw string to /dev/null " | WOT"
+                        ts << "\t" << data(QAbstractItemModel::createIndex(r,c)).toString().split(" |")[0];
+                    }
+                }
             }
             ts << "\n";
         }
