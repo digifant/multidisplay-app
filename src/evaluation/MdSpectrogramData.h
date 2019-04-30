@@ -41,6 +41,8 @@ public:
     QRectF boundingRect ( ) const;
 //    QSize rasterHint ( const QwtDoubleRect &rect ) const;
 
+    double getMaxVal() { return maxVal; };
+
 private:
 
 	double xlower;

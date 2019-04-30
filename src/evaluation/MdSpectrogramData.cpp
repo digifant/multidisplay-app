@@ -35,6 +35,8 @@ MdSpectrogramData::MdSpectrogramData( double xlower, double xupper, double ylowe
 	data = new QVector< QVector<double>* > ( xcount + 1, NULL );
 	for ( int i = 0 ; i < data->size() ; i++ )
 		(*data)[i] = new QVector<double> ( ycount + 1, NULL );
+
+    setInterval( Qt::ZAxis, QwtInterval( 0.0, 10.0 ) );
 }
 
 MdSpectrogramData::~MdSpectrogramData() {
@@ -61,14 +63,14 @@ QRectF MdSpectrogramData::boundingRect( ) const {
 //}
 
 double MdSpectrogramData::value(double x, double y) const {
-	qDebug() << "MdSpectrogram::value x=" << x << " y=" << y;
+    //qDebug() << "MdSpectrogram::value x=" << x << " y=" << y;
 	if ( (x >= xlower) && (x <= xupper) && (y >= ylower) && (y <= yupper) ) {
 		uint xindex = (x - xlower) / step;
 		uint yindex = (y - ylower) / step;
 //		return ((*data)[xindex])->at(yindex);
 		double val = (*((*data)[xindex]))[yindex] ;
 		double val2 = mapValue(val);
-		qDebug() << val2;
+        //qDebug() << val2;
 		return val2;
 	}
 	return 0;

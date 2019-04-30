@@ -115,7 +115,7 @@ AppEngine::AppEngine() {
 
     evalWinBoostLambda = new EvaluationWindow (NULL, data, EvaluationWindow::BoostLambda );
     evalWinRPMBoost = new EvaluationWindow (NULL, data, EvaluationWindow::RPMBoost );
-    //	evalWinBoostLambdaSpectro = new EvaluationWindow (NULL, data, EvaluationWindow::SpectroBoostLambda );
+    evalWinBoostLambdaSpectro = new EvaluationWindow (NULL, data, EvaluationWindow::SpectroBoostLambda );
     n75OptionsDialog = new N75OptionsDialog(pcmw);
     v2N75SetupDialog = new V2N75SetupDialog(pcmw);
     v2SettingsDialog = new V2SettingsDialog(pcmw);
@@ -283,7 +283,7 @@ void AppEngine::setupPC() {
 
     connect (pcmw->ui.actionShow_Boost_Lambda, SIGNAL(triggered()), evalWinBoostLambda, SLOT(show()) );
     connect (pcmw->ui.actionShow_RPM_Boost, SIGNAL(triggered()), evalWinRPMBoost, SLOT(show()) );
-    //	connect (pcmw->ui.actionShow_Boost_Lambda_Spectrogram, SIGNAL(triggered()), evalWinBoostLambdaSpectro, SLOT(show()) );
+    connect (pcmw->ui.actionShow_Boost_Lambda_Spectrogram, SIGNAL(triggered()), evalWinBoostLambdaSpectro, SLOT(show()) );
 
     connect (pcmw->ui.actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(show()));
 

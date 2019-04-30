@@ -33,21 +33,26 @@ EvalSpectrogramPlot::EvalSpectrogramPlot( QMainWindow* mw, QWidget *parent ) : E
 
     es = new QwtPlotSpectrogram();
 
-    colorMap = new QwtLinearColorMap(Qt::black, Qt::red);
-    colorMap->addColorStop(0.2, Qt::gray);
+    setTitle ("Boost / Lambda Spectogram");
+
+    colorMap = new QwtLinearColorMap(Qt::blue, Qt::red);
+    colorMap->addColorStop(0.1, Qt::cyan);
     colorMap->addColorStop(0.6, Qt::green);
     colorMap->addColorStop(0.95, Qt::yellow);
 
     es->setColorMap( (QwtColorMap*) colorMap);
 
 	setAxisTitle(QwtPlot::xBottom, "Boost");
-	setAxisScale(QwtPlot::xBottom, 0, 1.6);
+    setAxisScale(QwtPlot::xBottom, 0, 2);
 	setAxisTitle(QwtPlot::yLeft, "Lambda");
 	setAxisScale(QwtPlot::yLeft, 0.69, 1.34);
 
 
 
-    data = new MdSpectrogramData(0, 1.6, 0.69, 1.34, 0.01);
+    //data = new MdSpectrogramData(0, 2.0, 0.69, 1.34, 0.01);
+    data = new MdSpectrogramData(0, 2.0, 0.69, 1.34, 0.025);
+    //data = new MdSpectrogramData(0, 2.0, 0.69, 1.34, 0.05);
+    //data = new MdSpectrogramData(0, 2.0, 0.69, 1.34, 0.1);
     es->setData( data );
     es->attach(this);
 
@@ -56,6 +61,18 @@ EvalSpectrogramPlot::EvalSpectrogramPlot( QMainWindow* mw, QWidget *parent ) : E
         contourLevels += level;
     es->setContourLevels(contourLevels);
 
+    const QwtInterval zInterval = es->data()->interval( Qt::ZAxis );
+    // A color bar on the right axis
+    QwtScaleWidget *rightAxis = axisWidget( QwtPlot::yRight );
+    rightAxis->setTitle( "Intensity" );
+    rightAxis->setColorBarEnabled( true );
+    rightAxis->setColorMap( zInterval, colorMap );
+
+    setAxisScale( QwtPlot::yRight, zInterval.minValue(), zInterval.maxValue() );
+    enableAxis( QwtPlot::yRight );
+    plotLayout()->setAlignCanvasToScales( true );
+
+    /*
     // A color bar on the right axis
     QwtScaleWidget *rightAxis = axisWidget(QwtPlot::yRight);
     rightAxis->setTitle("Intensity");
@@ -69,13 +86,14 @@ EvalSpectrogramPlot::EvalSpectrogramPlot( QMainWindow* mw, QWidget *parent ) : E
     enableAxis(QwtPlot::yRight);
 
     plotLayout()->setAlignCanvasToScales(true);
+    */
 
     es->setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
     // QPen(Qt::NoPen)
     es->setDefaultContourPen( QPen() );
 
 
-//    replot();
+    replot();
 
 //    // LeftButton for the zooming
 //    // MidButton for the panning
@@ -128,26 +146,25 @@ void EvalSpectrogramPlot::compute ( MdData *md ) {
 
 	//calc sample intervall!
 	long time = 0;
-        qint32 samples = 0;
+    qint32 samples = 0;
 
 	if ( dl.size() > 0 ) {
-		foreach ( MdDataRecord* r , dl ) {
-                    if ( r->getSensorR() != NULL ) {
-			if ( r->getSensorR()->getThrottle() >= 90 ) {
-//				double rpm = round_nplaces( r->getSensorR()->getRpm(), 2);
-				time += r->getSensorR()->getTime();
-				double boost = round_nplaces( r->getSensorR()->getBoost(), 2) ;
-				double lambda = round_nplaces( r->getSensorR()->getLambda(), 2);
-				data->increment(boost, lambda);
-//				qDebug() << boost << " " << lambda << " value=" << data->value(boost,lambda);
-                                samples++;
-			}
-                    }
+        foreach ( MdDataRecord* r , dl ) {
+            if ( r->getSensorR() != NULL ) {
+                if ( r->getSensorR()->getThrottle() >= 80 ) {
+    //				double rpm = round_nplaces( r->getSensorR()->getRpm(), 2);
+                    time += r->getSensorR()->getTime();
+                    double boost = round_nplaces( r->getSensorR()->getBoost(), 2) ;
+                    double lambda = round_nplaces( r->getSensorR()->getLambda(), 2);
+                    data->increment(boost, lambda);
+                    //qDebug() << boost << " " << lambda << " value=" << data->value(boost,lambda) << " maxVal="  << data->getMaxVal();
+                    samples++;
+                }
+            }
 		}
-                sampleIntervall = time / samples; //msecs
-                qDebug() << "EvalSpectrogramPlot::compute finished: sampleIntervall=" << sampleIntervall  << " msecs" << " samples=" << samples;
+        sampleIntervall = time / samples; //msecs
+        qDebug() << "EvalSpectrogramPlot::compute finished: sampleIntervall=" << sampleIntervall  << " msecs" << " samples=" << samples;
 
-//        qDebug()<<"bounding rect = " << es->data()->boundingRect();
 		replot();
 	}
 }

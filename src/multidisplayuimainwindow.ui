@@ -343,7 +343,7 @@ records:</string>
      <x>0</x>
      <y>0</y>
      <width>845</width>
-     <height>27</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -375,6 +375,7 @@ records:</string>
     </property>
     <addaction name="actionShow_Boost_Lambda"/>
     <addaction name="actionShow_RPM_Boost"/>
+    <addaction name="actionShow_Boost_Lambda_Spectrogram"/>
    </widget>
    <widget class="QMenu" name="menu_Visualization">
     <property name="title">
@@ -535,12 +536,12 @@ records:</string>
   </action>
   <action name="actionShow_Boost_Lambda">
    <property name="text">
-    <string>show Boost / &amp;Lambda</string>
+    <string>show Boost / &amp;Lambda (WOT)</string>
    </property>
   </action>
   <action name="actionShow_RPM_Boost">
    <property name="text">
-    <string>show RPM / &amp;Boost</string>
+    <string>show RPM / &amp;Boost (WOT)</string>
    </property>
   </action>
   <action name="action_Replay">
@@ -684,6 +685,11 @@ records:</string>
   <action name="actionConfigure_DataTable">
    <property name="text">
     <string>configure DataTable</string>
+   </property>
+  </action>
+  <action name="actionShow_Boost_Lambda_Spectrogram">
+   <property name="text">
+    <string>show Boost / Lambda (WOT) spectogram</string>
    </property>
   </action>
  </widget>

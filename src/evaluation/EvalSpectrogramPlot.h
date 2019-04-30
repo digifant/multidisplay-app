@@ -29,7 +29,7 @@ class QwtLinearColorMap;
 
 /**
 * @brief The EvalSpectrogramPlot class
-* BROKEN !!!
+* TODO: separate into class hierarchy!
 */
 class EvalSpectrogramPlot : public EvalPlot {
 public:
