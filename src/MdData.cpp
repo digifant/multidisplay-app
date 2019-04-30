@@ -41,6 +41,7 @@
 #include <math.h>
 #include <QSplashScreen>
 #include <QProgressBar>
+#include <QPair>
 
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
 #include "mobile/Accelerometer.h"
@@ -543,7 +544,9 @@ int MdData::getLastTime () {
 }
 
 void MdData::findWot () {
+    QPair <int,int> idxPair;
     QList <int> wotIdxL;
+    QList < QPair<int,int> > wotIdxPL;
     #define STATE_NO_WOT 1
     #define STATE_WOT_START 2
     #define STATE_WOT_FOUND 3
@@ -551,6 +554,7 @@ void MdData::findWot () {
     int wot_start_time = 0;
     int wot_end_time = 0;
     int wot_start_idx = 0;
+    int wot_end_idx = 0;
 
     for ( int i = 0 ; i < dataList.size() ; i++ ) {
         switch ( state ) {
@@ -564,6 +568,20 @@ void MdData::findWot () {
                     state = STATE_WOT_START;
                     wot_start_time = dataList[i]->getSensorR()->getTime();
                     wot_start_idx = i;
+                    //new Wot event -> append the old one
+                    //->append
+                    if ( idxPair.first > 0 && (idxPair.first != idxPair.second) ) {
+                        wotIdxPL.append (idxPair);
+                        idxPair.first = 0;
+                    }
+                }
+            } else {
+                //no new wot event after 5secs -> append the old one
+                if ( wot_end_time + 5000 > dataList[i]->getSensorR()->getTime() ) {
+                    if ( idxPair.first > 0 && (idxPair.first != idxPair.second) ) {
+                        wotIdxPL.append (idxPair);
+                        idxPair.first = 0;
+                    }
                 }
             }
             break;
@@ -574,6 +592,8 @@ void MdData::findWot () {
                 if ( wot_start_time + 2000 < dataList[i]->getSensorR()->getTime()  ) {
                     //2 secs wot
                     state = STATE_WOT_FOUND;
+                    idxPair.first = wot_start_idx;
+                    //alt
                     wotIdxL.append(wot_start_idx);
                 }
             }
@@ -582,15 +602,22 @@ void MdData::findWot () {
             if ( dataList[i]->getSensorR()->getThrottle() < 80 ) {
                 state = STATE_NO_WOT;
                 wot_end_time = dataList[i]->getSensorR()->getTime();
+                wot_end_idx = i;
+                idxPair.second = wot_end_idx;
             }
             break;
         }
     }
 
+    qDebug()<<"old boost search";
     foreach ( int i, wotIdxL ) {
-        qDebug() << "WOT event @ " << dataList[i]->getSensorR()->getTime() << " RPM=" << dataList[i]->getSensorR()->getRpm() << " bosot=" << dataList[i]->getSensorR()->getBoost();
+        qDebug() << "WOT event @ " << dataList[i]->getSensorR()->getTime() << " RPM=" << dataList[i]->getSensorR()->getRpm() << " boost=" << dataList[i]->getSensorR()->getBoost();
     }
-    wotEventsDialog->show( wotIdxL );
+    qDebug()<<"new boost search";
+    foreach ( auto p, wotIdxPL ) {
+        qDebug() << "WOT event @ " << dataList[p.first]->getSensorR()->getTime() << " - " << dataList[p.second]->getSensorR()->getTime() << " RPM=" << dataList[p.first]->getSensorR()->getRpm() << " boost=" << dataList[p.first]->getSensorR()->getBoost();
+    }
+    wotEventsDialog->show( wotIdxPL );
 }
 
 QList<int> MdData::findKnock(bool showWindow) {

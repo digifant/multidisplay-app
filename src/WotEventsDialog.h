@@ -35,7 +35,8 @@ public:
     explicit WotEventsDialog(QWidget *parent = 0);
     ~WotEventsDialog();
 
-    void show ( QList<int> idxL );
+    void show (QList<QPair<int, int>>  idxPL );
+    void show (QList<int> idxL );
     void showKnock ( QList<int> idxL );
     void showEGT ( QList<int> idxL );
     void show ( QMap<QString, QMap<QString, QVariant> > &d );

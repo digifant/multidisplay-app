@@ -64,9 +64,12 @@ void WotEventsDialog::show ( QList<int> idxL ) {
     tl << "time" << "RPM" << "boost";
     ui->tableWidget->setHorizontalHeaderLabels( tl );
 
+
     int row = 0;
-    foreach ( int i , idxL ) {
-        QTableWidgetItem *wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() ) );
+    foreach ( int i , idxL ) {       
+        QTime t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() );
+        QTableWidgetItem *wi = new QTableWidgetItem( t.toString("hh:mm:ss.zzz") );
         wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         ui->tableWidget->setItem (row,0,wi);
 
@@ -85,6 +88,97 @@ void WotEventsDialog::show ( QList<int> idxL ) {
     QDialog::show();
 }
 
+void WotEventsDialog::show ( QList<QPair<int,int>> idxPL ) {
+    QList<int> idxL;
+    foreach ( auto i , idxPL ) {
+        idxL.append ( i.first );
+    }
+
+    idxList = idxL;
+    ui->tableWidget->clear();
+    ui->tableWidget->setColumnCount(7);
+    ui->tableWidget->setRowCount( idxL.size() );
+
+    QList<QString> tl;
+    tl << "time" << "RPM min" << "RPM max" << "gear" << "min boost" << "max boost" << "mean boost";
+    ui->tableWidget->setHorizontalHeaderLabels( tl );
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    int row = 0;
+    QMap<int,int> gearM;
+    foreach ( int i , idxL ) {
+        double boost_max = 0;
+        double boost_min = 7;
+        double boost_mean = 0;
+        int rpm_min = 12000;
+        int rpm_max = 0;
+
+        QString gearS("no gear data");
+        uint p = 0;
+        for ( int i = idxPL.at(row).first ; i <= idxPL.at(row).second ; i++ ) {
+            double boost = AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getBoost();
+            int gear = AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getGear();
+            int rpm = AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getRpm();
+            gearM[gear] = 1;
+            boost_mean += boost;
+            if ( boost > boost_max )
+                boost_max = boost;
+            if ( boost > 0 && boost < boost_min)
+                boost_min = boost;
+            if ( rpm > rpm_max )
+                rpm_max = rpm;
+            if ( rpm < rpm_min )
+                rpm_min = rpm;
+            ++p;
+        }
+        boost_mean = boost_mean / p;
+        if ( ! gearM.empty()) {
+            gearS = "";
+            foreach ( int i, gearM.keys() ) {
+                gearS = gearS + QString::number(i) + " ";
+                qDebug() << i << " " << gearS;
+            }
+        }
+
+        QTime t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() );
+
+        QTableWidgetItem *wi = new QTableWidgetItem( t.toString("hh:mm:ss.zzz") );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,0,wi);
+
+
+        wi = new QTableWidgetItem( QString::number( rpm_min ) );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,1,wi);
+
+        wi = new QTableWidgetItem( QString::number( rpm_max ) );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,2,wi);
+
+        wi = new QTableWidgetItem( gearS );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,3,wi);
+
+        wi = new QTableWidgetItem( QString::number( boost_min ) );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,4,wi);
+
+        wi = new QTableWidgetItem( QString::number( boost_max ) );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,5,wi);
+
+        wi = new QTableWidgetItem( QString::number( boost_mean ) );
+        wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        ui->tableWidget->setItem (row,6,wi);
+
+        row++;
+    }
+
+    QDialog::show();
+}
+
+
 void WotEventsDialog::showKnock ( QList<int> idxL ) {
     idxList = idxL;
     ui->tableWidget->clear();
@@ -97,7 +191,10 @@ void WotEventsDialog::showKnock ( QList<int> idxL ) {
 
     int row = 0;
     foreach ( int i , idxL ) {
-        QTableWidgetItem *wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() ) );
+        QTime t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() );
+
+        QTableWidgetItem *wi = new QTableWidgetItem( t.toString("hh:mm:ss.zzz") );
         wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         ui->tableWidget->setItem (row,0,wi);
 
@@ -131,7 +228,9 @@ void WotEventsDialog::showEGT ( QList<int> idxL ) {
 
     int row = 0;
     foreach ( int i , idxL ) {
-        QTableWidgetItem *wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() ) );
+        QTime t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() );
+        QTableWidgetItem *wi = new QTableWidgetItem( t.toString("hh:mm:ss.zzz") );
         wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         ui->tableWidget->setItem (row,0,wi);
 
@@ -201,7 +300,9 @@ void WotEventsDialog::show ( QMap<QString,QMap<QString,QVariant > > &d ) {
                     wi->setIcon( QIcon::fromTheme("dialog-error") );
             }
 
-            wi = new QTableWidgetItem( QString::number( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() ) );
+            QTime t = QTime(0, 0, 0, 0);
+            t = t.addMSecs( AppEngine::getInstance()->getData()->getData()[i]->getSensorR()->getTime() );
+            wi = new QTableWidgetItem( t.toString("hh:mm:ss.zzz") );
             wi->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
             ui->tableWidget->setItem (row,1,wi);
 
