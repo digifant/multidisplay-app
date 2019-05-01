@@ -563,7 +563,14 @@ void MdData::findWot () {
                 if ( wot_end_time + 2000 > dataList[i]->getSensorR()->getTime() ) {
                     //delta between two WOT events too small -> discard the 2. wot event
                     //we have just a gear change here!
-                   state = STATE_WOT_FOUND;
+                    QTime t = QTime(0, 0, 0, 0);
+                    t = t.addMSecs( dataList[i]->getSensorR()->getTime() );
+                    QString t1 = t.toString("hh:mm:ss.zzz");
+                    //qDebug() << "gear change " << t1;
+                    wot_end_time = dataList[i]->getSensorR()->getTime();
+                    wot_end_idx = i;
+                    idxPair.second = wot_end_idx;
+                    state = STATE_WOT_FOUND;
                 } else {
                     state = STATE_WOT_START;
                     wot_start_time = dataList[i]->getSensorR()->getTime();
@@ -576,8 +583,8 @@ void MdData::findWot () {
                     }
                 }
             } else {
-                //no new wot event after 5secs -> append the old one
-                if ( wot_end_time + 5000 > dataList[i]->getSensorR()->getTime() ) {
+                //no new wot event after 3secs -> append the old one
+                if ( wot_end_time + 3000 < dataList[i]->getSensorR()->getTime() ) {
                     if ( idxPair.first > 0 && (idxPair.first != idxPair.second) ) {
                         wotIdxPL.append (idxPair);
                         idxPair.first = 0;
@@ -609,13 +616,21 @@ void MdData::findWot () {
         }
     }
 
+    /*
     qDebug()<<"old boost search";
     foreach ( int i, wotIdxL ) {
         qDebug() << "WOT event @ " << dataList[i]->getSensorR()->getTime() << " RPM=" << dataList[i]->getSensorR()->getRpm() << " boost=" << dataList[i]->getSensorR()->getBoost();
     }
+    */
     qDebug()<<"new boost search";
     foreach ( auto p, wotIdxPL ) {
-        qDebug() << "WOT event @ " << dataList[p.first]->getSensorR()->getTime() << " - " << dataList[p.second]->getSensorR()->getTime() << " RPM=" << dataList[p.first]->getSensorR()->getRpm() << " boost=" << dataList[p.first]->getSensorR()->getBoost();
+        QTime t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( dataList[p.first]->getSensorR()->getTime() );
+        QString t1 = t.toString("hh:mm:ss.zzz");
+        t = QTime(0, 0, 0, 0);
+        t = t.addMSecs( dataList[p.second]->getSensorR()->getTime() );
+        QString t2 = t.toString("hh:mm:ss.zzz");
+        qDebug() << "WOT event @ " << t1 << " - " << t2 << " RPM=" << dataList[p.first]->getSensorR()->getRpm() << " boost=" << dataList[p.first]->getSensorR()->getBoost();
     }
     wotEventsDialog->show( wotIdxPL );
 }

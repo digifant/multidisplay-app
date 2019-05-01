@@ -136,7 +136,6 @@ void WotEventsDialog::show ( QList<QPair<int,int>> idxPL ) {
             gearS = "";
             foreach ( int i, gearM.keys() ) {
                 gearS = gearS + QString::number(i) + " ";
-                qDebug() << i << " " << gearS;
             }
         }
 
