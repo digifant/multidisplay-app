@@ -179,6 +179,40 @@ AppEngine::AppEngine() {
 
 #if defined (Q_OS_ANDROID)
     qDebug() << "ANDROID mobile version";
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 10, 0)
+    auto  result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
+        if(resultHash["android.permission.READ_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "READ_EXTERNAL_STORAGE permission denied!";
+    }
+    result = QtAndroid::checkPermission(QString("android.permission.WRITE_EXTERNAL_STORAGE"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.WRITE_EXTERNAL_STORAGE"}));
+        if(resultHash["android.permission.WRITE_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "WRITE_EXTERNAL_STORAGE permission denied!";
+    }
+    result = QtAndroid::checkPermission(QString("android.permission.BLUETOOTH"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.BLUETOOTH"}));
+        if(resultHash["android.permission.BLUETOOTH"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "BLUETOOTH permission denied!";
+    }
+    result = QtAndroid::checkPermission(QString("android.permission.BLUETOOTH_ADMIN"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.BLUETOOTH_ADMIN"}));
+        if(resultHash["android.permission.BLUETOOTH_ADMIN"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "BLUETOOTH_ADMIN permission denied!";
+    }
+    result = QtAndroid::checkPermission(QString("android.permission.ACCESS_FINE_LOCATION"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.ACCESS_FINE_LOCATION"}));
+        if(resultHash["android.permission.ACCESS_FINE_LOCATION"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "ACCESS_FINE_LOCATION permission denied!";
+    }
+#endif
+
     amw = new AndroidMainWindow ();
 
     pcmw = NULL;
