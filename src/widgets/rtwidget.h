@@ -34,7 +34,7 @@ class BoostBarGraphWidget : public BarGraphWidget
 {
     Q_OBJECT
 public:
-    BoostBarGraphWidget ( QWidget * parent = 0, const QString & title = "Boost", const double & min = -1.5, const double & max = 2.0 , const double & alarm = 1.5   );
+    BoostBarGraphWidget ( QWidget * parent = 0, const QString & title = "Boost", const double & min = -1, const double & max = 2.2 , const double & alarm = 1.5   );
 };
 
 class RPMBarGraphWidget : public BarGraphWidget
@@ -135,7 +135,7 @@ protected:
 class MaxEgtWidget : public MeasurementWidget {
     Q_OBJECT
 public:
-    MaxEgtWidget ( QWidget *parent, QString caption, double lo=0, double mid=600, double hi=920,
+    MaxEgtWidget ( QWidget *parent, QString caption, double lo=0, double mid=800, double hi=920,
                     QColor loColor=Qt::cyan, QColor midColor=QColor(Qt::green), QColor hiColor=Qt::red );
 
     void setValue(double egt, quint8 idx);

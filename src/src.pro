@@ -212,12 +212,12 @@ FORMS += evaluation/evaluationwindow.ui \
 maemo5:FORMS += mobile/MobileEvaluationDialog.ui
 
 unix:INCLUDEPATH = ../libs/qextserialport/src \
-    ../libs/qwt-6.1.1/src
+    ../libs/qwt-6.1.4/src
 
 
 
 win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
-                    $$quote(..\libs\qwt-6.1.1\src)
+                    $$quote(..\libs\qwt-6.1.4\src)
 
 #win32 static
 #2011-06-29 broken
@@ -225,12 +225,12 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
 #    CONFIG(debug, debug|release) {
 #        win32:LIBS += $$quote(../libs\qextserialport/src/build/libqextserialportd1.a) \
 #                      $$quote(../libs\qextserialport/src/build/libqextserialportd.a) \
-#                      ..\libs\qwt-6.1.1\lib\libqwtd.a
+#                      ..\libs\qwt-6.1.4\lib\libqwtd.a
 
 #    } else {
 #        win32:LIBS += $$quote(../libs/qextserialport/src/build/libqextserialport1.a) \
 #                      $$quote(../libs\qextserialport/src/build/libqextserialport.a) \
-#                  ..\libs\qwt-6.1.1\lib\libqwt.a
+#                  ..\libs\qwt-6.1.4\lib\libqwt.a
 
 #    }
 #}
@@ -242,9 +242,9 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
         lessThan(QT_MAJOR_VERSION, 5) {
             LIBS += -L $$quote(..\libs\qextserialport\src\build) -lqextserialportd
         }
-        win32:LIBS += ..\libs\qwt-6.1.1\lib\libqwtd.a
+        win32:LIBS += ..\libs\qwt-6.1.4\lib\libqwtd.a
 #        unix:LIBS += -L ../libs/qextserialport/src/build -lqextserialportd \
-#                    ../libs/qwt-6.1.1/lib/libqwtd.a
+#                    ../libs/qwt-6.1.4/lib/libqwtd.a
 
         unix:{
             !android:!maemo5 {
@@ -252,18 +252,18 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                         lessThan(QT_MAJOR_VERSION, 5) {
                             unix:LIBS += -L ../libs/qextserialport/src/build -lqextserialportd
                         }
-                        unix:LIBS += -L../libs/qwt-6.1.1/lib -lqwt
+                        unix:LIBS += -L../libs/qwt-6.1.4/lib -lqwt
                       }
             android:  {
                         message("android: static linking!")
-                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a
+                        unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
                        }
             maemo5:    {
 #                        message ("Maemo5: static linking!")
 #                        unix:LIBS += ../libs/qextserialport/src/build/libqextserialportd.a \
-#                                     ../libs/qwt-6.1.1/lib/libqwtd.a
+#                                     ../libs/qwt-6.1.4/lib/libqwtd.a
                         message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
-                        unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
+                        unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
                         }
         }
 
@@ -272,21 +272,21 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
         !android:!maemo5 {
                         message ("UNIX pure")
                         unix:LIBS += ../libs/qextserialport/src/build/libqextserialport.a \
-                        -L ../libs/qwt-6.1.1/lib -lqwt
+                        -L ../libs/qwt-6.1.4/lib -lqwt
         }
         win32:{
                 lessThan(QT_MAJOR_VERSION, 5) {
                     LIBS += -L $$quote(..\libs\qextserialport\src\build) -lqextserialport1
                 }
-                    LIBS += -L $$quote(../libs/qwt-6.1.1/lib) -lqwt
+                    LIBS += -L $$quote(../libs/qwt-6.1.4/lib) -lqwt
         }
         android:  {
             message("android: static linking!")
-            unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a
+            unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
         }
         maemo5: {
             message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
-            unix:LIBS += ../libs/qwt-6.1.1/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
+            unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a -L../libs/qextserialport/src/build -lqextserialport
         }
     }
 }

@@ -18,8 +18,6 @@ BarGraphWidget::BarGraphWidget ( const QString & title, QWidget *parent )
     setLayout(v);
 
     thermo = new QwtThermo (this);
-    //qwt5
-//    thermo->setRange(-1.2, 2.0);
     thermo->setScale(-1.2, 2.0);
     thermo->setFillBrush(  QBrush(Qt::green) );
     thermo->setAlarmBrush ( QBrush(Qt::red) );
@@ -32,7 +30,15 @@ BarGraphWidget::BarGraphWidget ( const QString & title, QWidget *parent )
 
 void BarGraphWidget::resizeEvent ( QResizeEvent * event ) {
     if ( event ) {
-        thermo->setPipeWidth( event->size().width() - 100 );
+
+        //HiDPI fix: size for 4-digit scale isnt sufficient which causes a loop of resize events which made the Bargraph Widget occupy the whole screen size
+        if ( ((QGuiApplication*)QCoreApplication::instance())->primaryScreen()->physicalDotsPerInch() > 150 ) {
+            //thermo->setScalePosition ( QwtThermo::ScalePosition::NoScale );
+            thermo->setPipeWidth( event->size().width() - 150 );
+        } else {
+            thermo->setPipeWidth( event->size().width() - 100 );
+        }
+        //qDebug() << "DPI HI: " << ((QGuiApplication*)QCoreApplication::instance())->primaryScreen()->physicalDotsPerInch();
     }
 }
 

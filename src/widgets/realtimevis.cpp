@@ -28,7 +28,7 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     bg1 = new BoostBarGraphWidget (this);
 //    bg2 = new LambdaBarGraphWidget (this);
     bg2 = NULL;
-    bg3 = new RPMBarGraphWidget (this);
+    bg3 = new RPMBarGraphWidget (this, "RPM");
     h->addWidget(bg1, 1);
 //    h->addWidget(bg2, 1);
     h->addWidget(bg3, 1);
