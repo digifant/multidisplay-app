@@ -172,7 +172,7 @@ bool MdBluetoothCom::changePortSettings(QString sport, QString speed)
 {
     qDebug() << "MdBluetoothCom::changePortSettings " << sport << " " << speed;
     closePort();
-    setupPort(sport, speed);
+    return setupPort(sport, speed);
 }
 
 void MdBluetoothCom::transmitMsg(const QString &s) {

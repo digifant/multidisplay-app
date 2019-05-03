@@ -64,7 +64,8 @@ void MdBinaryProtocol::closePort()
 
 bool MdBinaryProtocol::changePortSettings (QString sport, QString speed) {
     if (ac)
-        ac->changePortSettings(sport,speed);
+        return ac->changePortSettings(sport,speed);
+    return false;
 }
 
 void MdBinaryProtocol::onPortOpened()
