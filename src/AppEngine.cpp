@@ -273,8 +273,8 @@ AppEngine::AppEngine() {
 #endif
 #if defined Q_OS_ANDROID
     QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
-    directory = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
-    qDebug() << "android save path 2019: " << directory;
+    directory = s.toString();
+    qDebug() << "android path 2019: " << directory;
 #endif
 
     //load TEST-DATA
@@ -713,7 +713,7 @@ void AppEngine::openData ( QString fn ) {
         fn = QFileDialog::getOpenFileName ( pcmw, QString("Select Filename"), directory, "mdv2 (*.mdv2)" );
     }
 
-    if ( fn != "") {
+    if ( !fn.isNull()) {
         directory = QFileInfo(fn).path(); // store path for next time
         qDebug() << "directory " << directory;
 
