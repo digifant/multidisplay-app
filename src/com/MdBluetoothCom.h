@@ -32,10 +32,34 @@ class MdBluetoothCom : public MdAbstractCom
 {
     Q_OBJECT
 public:
-    MdBluetoothCom( QObject* parent, QString mdServiceName="mdv2" );
+    /**
+     * @brief MdBluetoothCom starts service discovery and connects to spp service if service is found
+     * @param parent
+     */
+    MdBluetoothCom( QObject* parent = nullptr, const QString n="mdv2" );
     virtual ~MdBluetoothCom();
 
-//signals:
+    enum bluetoothState {
+           Idle = 0,
+           Scanning,
+           ScanFinished,
+           Connecting,
+           Connected,
+           ServiceFound,
+           AcquireData
+    };
+    Q_ENUM(bluetoothState)
+    enum ServiceDiscoveryNeeded { No = 0, Uuid = 1, Name = 2, Yes = 4 };
+
+    void setState(MdBluetoothCom::bluetoothState newState);
+    virtual void connectForWrapper();
+    void stopSearchForWrapper();
+
+signals:
+    /* Signals for user */
+    // FIXME needed??
+    void changedState(MdBluetoothCom::bluetoothState newState);
+    // FIXME needed??
 //    void showStatusMessage ( const QString& );
 //    void showStatusBarSampleCount ( const QString& );
 
@@ -45,21 +69,20 @@ public:
 //    //! new data received
 //    void bytesRead ( const QByteArray & );
 
-    enum ServiceDiscoveryNeeded { No = 0, Uuid = 1, Name = 2, Yes = 4 };
 
 public slots:
 
     /**
      * @brief searches a spp profile with name "mdv2*" and connect to it (no service discovery!)
      */
-    void sppConnect();
+    bool sppConnect();
 
     /**
      * @brief sppConnect: connects to a the service with the given uuid
      * @param uuid
      */
-    void sppConnect(const QString &uuid);
-    void sppConnect(const QBluetoothServiceInfo &serviceInfo);
+    bool sppConnect(const QString &uuid);
+    bool sppConnect(const QBluetoothServiceInfo &serviceInfo);
 
     void togglePort();
 
@@ -92,18 +115,22 @@ protected slots:
     void disconnected();
     void socketStateChanged (QBluetoothSocket::SocketState);
 
+    void emitBtNotAvailableDeferred();
+
 protected:
 
 private:
-    QBluetoothServiceDiscoveryAgent *sDiscoveryAgent;
-    QBluetoothSocket *socket;
+    QBluetoothServiceDiscoveryAgent *sDiscoveryAgent = nullptr;
+    QBluetoothSocket *socket = nullptr;
     QString localDeviceName;
     //connected devices
     QList<QBluetoothAddress> remotes;
     QMap<QListWidgetItem*, QBluetoothServiceInfo> m_discoveredServices;
-    ServiceDiscoveryNeeded sdNeeded;
+    ServiceDiscoveryNeeded sdNeeded = Yes;
     QString uuid;
-    QString mdServiceName;
+    //dont needed: remove or make a list
+    QString deviceName = QString("mdv2");
+    MdBluetoothCom::bluetoothState m_state = bluetoothState::Idle;
 };
 
 #endif // MDBLUETOOTHCOM_H

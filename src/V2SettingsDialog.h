@@ -19,7 +19,9 @@ signals:
     void cfgDialogAccepted();
 
 protected slots:
-    void accepted();
+    void save();
+    void signalFinished(int);
+    void signalRejected();
 
 protected:
     void showEvent ( QShowEvent * event );

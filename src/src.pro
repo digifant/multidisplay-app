@@ -7,28 +7,28 @@ QT += core \
     opengl
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += bluetooth sensors positioning
-    !android: QT += serialport
+    QT += bluetooth sensors positioning serialport
 }
 
 
-CONFIG += rtti exceptions mobility serialport
+CONFIG += rtti exceptions c++14
 
 #qDebug() to console
 win32: CONFIG += console
 
-#!android:QT += opengl
-
+#turn off debug messages in release build
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 android {
     QT += svg androidextras
+    ##FIX hack! fix for "java.lang.UnsatisfiedLinkError: dlopen failed: library libQt5Concurrent_x86.so libQt5PrintSupport_x86.so not found.
+    QT += printsupport concurrent
 }
 
 maemo5 {
     QT += maemo5 mobility svg
+    MOBILITY += location systeminfo sensors
 }
-
-MOBILITY += location systeminfo sensors
 
 android {
     #necessitas sets Q_OS_ANDROID
@@ -43,11 +43,10 @@ android {
 #    DEFINES+=QT_SIMULATOR
 #}
 
-
-MOC_DIR=./moc
-OBJECTS_DIR=./obj
-
 HEADERS += evaluation/EvalSpectrogramPlot.h \
+    com/MdBluetoothCom.h \
+    com/MdBluetoothLECom.h \
+    com/MdBluetoothWrapper.h \
     evaluation/MdSpectrogramData.h \
     evaluation/evaluationwindow.h \
     evaluation/EvalPlot.h \
@@ -99,13 +98,16 @@ HEADERS += evaluation/EvalSpectrogramPlot.h \
     mobile/AndroidMainWindow.h \
     mobile/SwipeGestureRecognizer.h \
     mobile/AndroidN75Dialog.h \
-    widgets/VR6Widget.h
+    widgets/VR6Widget.h \
+    com/BluetoothDeviceInfo.h \
+    com/MdQSerialPortCom.h
+
+
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:HEADERS+=com/MdQextSerialCom.h
 } else {
-    win32|unix:HEADERS+=com/MdQSerialPortCom.h \
-    mobile/MobileGPS.h
+    win32|unix:HEADERS+=mobile/MobileGPS.h
 }
 
 
@@ -115,10 +117,12 @@ maemo5:HEADERS+=mobile/MobileEvaluationDialog.h \
     com/MdQextSerialCom.h
 
 android:HEADERS+=mobile/Accelerometer.h \
-    com/MdBluetoothCom.h \
     mobile/AndroidDashboardDialog.h
 
 SOURCES += evaluation/EvalSpectrogramPlot.cpp \
+    com/MdBluetoothCom.cpp \
+    com/MdBluetoothLECom.cpp \
+    com/MdBluetoothWrapper.cpp \
     evaluation/MdSpectrogramData.cpp \
     evaluation/evaluationwindow.cpp \
     evaluation/EvalPlot.cpp \
@@ -171,14 +175,15 @@ SOURCES += evaluation/EvalSpectrogramPlot.cpp \
     mobile/AndroidMainWindow.cpp \
     mobile/SwipeGestureRecognizer.cpp \
     mobile/AndroidN75Dialog.cpp \
-    widgets/VR6Widget.cpp
+    widgets/VR6Widget.cpp \
+    com/BluetoothDeviceInfo.cpp \
+    com/MdQSerialPortCom.cpp
+
 
 lessThan(QT_MAJOR_VERSION, 5) {
     win32|unix:SOURCES+=com/MdQextSerialCom.cpp
 } else {
-    win32|unix:SOURCES+=com/MdQSerialPortCom.cpp \
-                        mobile/MobileGPS.cpp
-    android:SOURCES-=com/MdQSerialPortCom.cpp
+    win32|unix:SOURCES+=mobile/MobileGPS.cpp
 }
 
 maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
@@ -186,7 +191,6 @@ maemo5:SOURCES+=mobile/MobileEvaluationDialog.cpp \
     mobile/Accelerometer.cpp
 
 android:SOURCES+=mobile/Accelerometer.cpp \
-    com/MdBluetoothCom.cpp \
     mobile/AndroidDashboardDialog.cpp
 
 FORMS += evaluation/evaluationwindow.ui \
@@ -255,8 +259,10 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                         unix:LIBS += -L../libs/qwt-6.1.4/lib -lqwt
                       }
             android:  {
-                        message("android: static linking!")
-                        unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
+                        #message("android: static linking!")
+                        #unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
+                        message("android AAB: dynamic linking!")                        
+                        unix:LIBS += -L../libs/qwt-6.1.4/lib -lqwt_$${QT_ARCH}
                        }
             maemo5:    {
 #                        message ("Maemo5: static linking!")
@@ -271,8 +277,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
         message ("release")
         !android:!maemo5 {
                         message ("UNIX pure")
-                        unix:LIBS += ../libs/qextserialport/src/build/libqextserialport.a \
-                        -L ../libs/qwt-6.1.4/lib -lqwt
+                        unix:LIBS += -L ../libs/qwt-6.1.4/lib -lqwt
         }
         win32:{
                 lessThan(QT_MAJOR_VERSION, 5) {
@@ -281,8 +286,10 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                     LIBS += -L $$quote(../libs/qwt-6.1.4/lib) -lqwt
         }
         android:  {
-            message("android: static linking!")
-            unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
+            #message("android: static linking!")
+            #unix:LIBS += ../libs/qwt-6.1.4/lib/libqwt.a
+            message("android AAB: dynamic linking!")
+            unix:LIBS += -L../libs/qwt-6.1.4/lib -lqwt_$${QT_ARCH}
         }
         maemo5: {
             message ("Maemo5: static qwt6 linking, dynamic qextserialport!")
@@ -292,8 +299,6 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
 }
 
 
-
-RESOURCES += 
 
 #if build fails with "dpkg-shlibdeps: failure: couldn't find library libqwt.so.5 needed by debian/mui/usr/bin/mUI (its RPATH is '')."
 #uncomment line "dh_shlibdeps # Uncomment this line for use without Qt Creator"

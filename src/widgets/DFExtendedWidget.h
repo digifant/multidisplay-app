@@ -22,9 +22,9 @@ protected:
     bool tapAndHoldTriggered(QTapAndHoldGesture *pTapHold);
     bool swipeTriggered(QSwipeGesture *pSwipe);
     bool gestureEvent(QGestureEvent *event);
-    virtual void paintEvent(QPaintEvent *event);
-    virtual void paint();
-    virtual void resizeEvent ( QResizeEvent * event );
+    void paintEvent(QPaintEvent *event) override;
+    void paint() override;
+    void resizeEvent ( QResizeEvent * event ) override;
 
     bool setPositionForCol (uint lineSpacing, uint col=2 );
 
@@ -63,6 +63,8 @@ protected:
     uint h,w;
 
     int m_gestureId;
+
+    bool landscape_for_text = false;
 };
 
 

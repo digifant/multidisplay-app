@@ -13,6 +13,9 @@ class MdDataRecord;
 class DFExtendedWidget;
 class VR6Widget;
 
+/**
+ * @brief The RealTimeVis class implements the widget which visualizes all measurement values
+ */
 class RealTimeVis : public QWidget
 {
     Q_OBJECT

@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QTime>
 #include <QString>
+#include <QPixmap>
 #include "MdData.h"
 #include "widgets/rtwidget.h"
 #include "widgets/DFExtendedWidget.h"
@@ -29,9 +30,14 @@ public:
     void closeEvent(QCloseEvent *event);
     void resizeEvent ( QResizeEvent * event );
 
+    enum ToastDuration {
+        SHORT = 0,
+        LONG = 1
+    };
 
 public slots:
     void showStatusMessage ( const QString &msg );
+    void showToast ( const QString &msg, ToastDuration duration = ToastDuration::LONG );
     void btPortClosed ();
     void btPortOpened ();
 
@@ -49,6 +55,7 @@ private:
     DFExtendedWidget *dfexw;
     MeasurementWidget *lw;
     MaxEgtWidget *egtw;
+    QPixmap _pixmapBg;
 };
 
 #endif // ANDROIDMAINWINDOW_H

@@ -16,8 +16,15 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     QHBoxLayout *pl = new QHBoxLayout();
     pl->setContentsMargins(0,0,0,0);
     pl->setSpacing(0);
-    parent->setLayout(pl);
-    pl->addWidget(this);
+    //dashboard realtimevis on androidmainwindow
+    QMainWindow *amw = qobject_cast<QMainWindow*>(parent);
+    if ( amw != nullptr )
+        //amw->centralWidget()->setLayout(pl);
+        amw->setCentralWidget(this);
+    else {
+        parent->setLayout(pl);
+        pl->addWidget(this);
+    }
 
     QHBoxLayout *h = new QHBoxLayout();
     h->setContentsMargins(0,0,0,0);
@@ -74,8 +81,11 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     v->setContentsMargins(0,0,0,0);
     v->setSpacing(0);
     fWidgets1->setLayout(v);
+#if defined (DIGIFANTAPP)
+    h->addWidget(fWidgets1, 1);
+#else
     h->addWidget(fWidgets1, 2);
-
+#endif
     boostW = new MeasurementWidget ( this, QString("Boost [bar]"), -1, 0, 2.0, Qt::darkGreen, Qt::green, Qt::red);
     boostW->setDigits(4);
     boostW->setGeometry( QRect(100,100,100,100) );

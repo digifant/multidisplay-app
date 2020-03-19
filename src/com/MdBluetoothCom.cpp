@@ -21,9 +21,10 @@
 
 #include <QListWidgetItem>
 #include <QBluetoothLocalDevice>
+#include <QTimer>
 
-MdBluetoothCom::MdBluetoothCom(QObject *parent, QString mdServiceName)
-    : MdAbstractCom(parent), sDiscoveryAgent (0), socket (0), sdNeeded(Yes), mdServiceName(mdServiceName)
+MdBluetoothCom::MdBluetoothCom(QObject *parent, const QString n)
+    : MdAbstractCom(parent), deviceName(n)
 {
 
     QBluetoothLocalDevice localDevice;
@@ -47,33 +48,59 @@ MdBluetoothCom::MdBluetoothCom(QObject *parent, QString mdServiceName)
 
     } else {
         qDebug() << "bluetooth not available!";
-        emit showStatusMessage( "Bluetooth: not available!" );
+        QTimer::singleShot(500, this, SLOT(emitBtNotAvailableDeferred()));
     }
 }
 
 MdBluetoothCom::~MdBluetoothCom() {
-
+    if ( socket != nullptr ) delete socket;
+    if ( sDiscoveryAgent != nullptr ) delete sDiscoveryAgent;
+    //qDeleteAll(m_discoveredServices);
 }
 
-void MdBluetoothCom::sppConnect() {
+void MdBluetoothCom::connectForWrapper(){
+    setState(Idle);
+    startServiceDiscovery();
+}
+void MdBluetoothCom::stopSearchForWrapper() {
+    if ( sDiscoveryAgent != nullptr )
+        sDiscoveryAgent->stop();
+}
+
+void MdBluetoothCom::setState(MdBluetoothCom::bluetoothState newState)
+{
+    if (m_state == newState)
+        return;
+
+    qDebug() << "new state " << newState;
+    m_state = newState;
+    emit changedState(newState);
+}
+
+bool MdBluetoothCom::sppConnect() {
     foreach ( QBluetoothServiceInfo si, m_discoveredServices.values() ) {
-        if ( ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
+        if ( ( ( si.device().name().startsWith(deviceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
              && ( si.serviceName() == "Serial Port Profile") ) {
+            //FIX one HC has Service name: "Dev B"
             // we found our md bluetooth service!
             qDebug() << "found mdv2 service on " << si.device().name() << " " << si.device().address().toString();
             qDebug() << "Service name:" << si.serviceName() << " UUID=" << si.serviceUuid().toString();
-            sppConnect(si);
+            if ( sppConnect(si) )
+                return true;
         }
     }
+    return false;
 }
 
-void MdBluetoothCom::sppConnect(const QString &uuid) {
+bool MdBluetoothCom::sppConnect(const QString &uuid) {
+    Q_UNUSED(uuid)
     QBluetoothServiceInfo s;
     s.setServiceUuid( QBluetoothUuid(QString("{00001101-0000-1000-8000-00805f9b34fb}")) );
-    sppConnect(s);
+    return sppConnect(s);
 }
 
-void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
+bool MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
+    setState(bluetoothState::Connecting);
     if (!socket) {
         socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol, this);
         connect (socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)), this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)) );
@@ -81,11 +108,14 @@ void MdBluetoothCom::sppConnect(const QBluetoothServiceInfo &serviceInfo) {
     }
 
     socket->connectToService(serviceInfo);
+    setState(bluetoothState::Connected);
     qDebug() << "ConnectToService done";
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
     connect(socket, SIGNAL( disconnected() ), this, SLOT( disconnected() ) );
+
+    return true;
 }
 
 void MdBluetoothCom::togglePort()
@@ -116,6 +146,7 @@ void MdBluetoothCom::closePort()
 //        socket->close();
         qDebug("is open: %d", socket->isOpen());
     }
+    setState(MdBluetoothCom::bluetoothState::Idle);
     emit showStatusMessage ("Bluetooth: SPP closed");
     emit portClosed();
 }
@@ -136,20 +167,39 @@ void MdBluetoothCom::openPort()
     }
 }
 
-bool MdBluetoothCom::setupPort(QString sport, QString speed)
-{
+bool MdBluetoothCom::setupPort(QString sport, QString speed) {
+    Q_UNUSED(speed)
     sdNeeded = No;
     if ( sport == "" ) {
         sdNeeded = Name;
         //mdv2
+        /*
+         * D/digifantview(19481): Discovered service on  "df1ecu"   "98:D3:31:30:27:22"
+           D/digifantview(19481): 	Service name: "Serial Port Profile"
+           D/digifantview(19481): 	Description: ""
+           D/digifantview(19481): 	Provider: ""
+           D/digifantview(19481): 	L2CAP protocol service multiplexer: 0
+           D/digifantview(19481): 	RFCOMM server channel: 0
+           D/digifantview(19481): Discovered service on  "df1ecu"   "98:D3:31:30:27:22"
+           D/digifantview(19481): 	Service name: ""
+           D/digifantview(19481): 	Description: ""
+           D/digifantview(19481): 	Provider: ""
+           D/digifantview(19481): 	L2CAP protocol service multiplexer: 0
+           D/digifantview(19481): 	RFCOMM server channel: -1
+           D/digifantview(19481): service discovery finished
+           D/digifantview(19481):
+           D/digifantview(19481): found mdv2 service on  "df1ecu"   "98:D3:31:30:27:22"
+           D/digifantview(19481): Service name: "Serial Port Profile"  UUID= "{00001101-0000-1000-8000-00805f9b34fb}"
+        */
         foreach ( QBluetoothServiceInfo si, m_discoveredServices.values() ) {
-            if ( ( ( si.device().name().startsWith(mdServiceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
+            if ( ( ( si.device().name().startsWith(deviceName,Qt::CaseInsensitive) ) || ( si.device().name().startsWith("df1ecu",Qt::CaseInsensitive) ) )
                  && ( si.serviceName() == "Serial Port Profile") ) {
                 // we found our md bluetooth service!
                 qDebug() << "found mdv2 service on " << si.device().name() << " " << si.device().address().toString();
                 qDebug() << "Service name:" << si.serviceName() << " UUID=" << si.serviceUuid().toString();
                 emit showStatusMessage( "Bluetooth: found mdv2 service on " + si.device().name() + " " + si.device().address().toString() +
                                         "Service name:" + si.serviceName() + " UUID=" + si.serviceUuid().toString() );
+                setState(MdBluetoothCom::bluetoothState::Connecting);
                 sppConnect(si);
                 openPort();
                 sdNeeded = No;
@@ -192,6 +242,7 @@ void MdBluetoothCom::startServiceDiscovery(bool force)
 //    te->insertHtml("<span style=\"color:black; font-weight:normal\">start service discovery</span><br>");
     if (!sDiscoveryAgent) {
         sDiscoveryAgent = new QBluetoothServiceDiscoveryAgent(this);
+
         connect( sDiscoveryAgent, SIGNAL(serviceDiscovered(QBluetoothServiceInfo) ),
             this, SLOT(serviceDiscovered(QBluetoothServiceInfo)) );
         connect(sDiscoveryAgent, SIGNAL(finished()), this, SLOT(serviceDiscoveryFinished()) );
@@ -201,17 +252,17 @@ void MdBluetoothCom::startServiceDiscovery(bool force)
     }
 
     if ( (force) || !( sdNeeded==No ) ) {
-    // Start a discovery
-    //        discoveryAgent->setUuidFilter(uuid);
-    //        discoveryAgent->start(QBluetoothServiceDiscoveryAgent::FullDiscovery);
+        qDebug() << "start service discovery";
         sDiscoveryAgent->start();
         m_discoveredServices.clear();
+        setState(MdBluetoothCom::bluetoothState::Scanning);
     }
 }
 
 void MdBluetoothCom::serviceDiscoveryCanceled()
 {
     qDebug() << "service discovery canceld! ";
+    emit couldNotConnect2BtDevice();
 }
 
 void MdBluetoothCom::serviceDiscovered(const QBluetoothServiceInfo &serviceInfo)
@@ -261,10 +312,16 @@ void MdBluetoothCom::serviceDiscoveryFinished()
     qDebug() << "service discovery finished\n";
     switch (sdNeeded) {
         case Uuid:
-            sppConnect(uuid);
+            if ( ! sppConnect(uuid) )
+                emit couldNotConnect2BtDevice();
             break;
         case Name:
-            sppConnect();
+        case Yes:
+            if ( ! sppConnect() )
+                emit couldNotConnect2BtDevice();
+            break;
+        default:
+            emit couldNotConnect2BtDevice();
             break;
     }
 }
@@ -282,6 +339,7 @@ void MdBluetoothCom::connected()
 {
     emit portOpened();
     emit showStatusMessage ("Bluetooth connected!");
+    setState(bluetoothState::AcquireData);
     qDebug() << "MdBluetoothCom::connected()";
 }
 
@@ -289,26 +347,41 @@ void MdBluetoothCom::disconnected()
 {
     emit portClosed();
     emit showStatusMessage ("Bluetooth disconnected!");
+    setState(bluetoothState::Idle);
     qDebug() << "MdBluetoothCom::disconnected()";
+
+    if ( getAutoReconnect() ) {
+        //TODO auto reconnect ?
+        //TODO TESTME!
+        setupPort();
+    }
 }
 
 void MdBluetoothCom::socketStateChanged(QBluetoothSocket::SocketState s)
 {
     switch (s) {
     case QBluetoothSocket::ConnectedState:
+        setState(bluetoothState::Connected);
         emit showStatusMessage( "Bluetooth: socket connected!");
         openPort();
         qDebug() << "socket connected";
         break;
     case QBluetoothSocket::UnconnectedState:
+        setState(bluetoothState::Idle);
         emit showStatusMessage( "Bluetooth: socket unconnected!");
         closePort();
         qDebug() << "socket unconnected";
         break;
     case QBluetoothSocket::ConnectingState:
+        setState(bluetoothState::Connecting);
         emit showStatusMessage( "Bluetooth: socket is attempting to connect to a device.!");
         qDebug() << "Socket is attempting to connect to a device";
         break;
     }
 }
 
+void MdBluetoothCom::emitBtNotAvailableDeferred()
+{
+    emit showStatusMessage( "Bluetooth: not available!" );
+    emit bluetoothNotAvailable();
+}

@@ -29,7 +29,7 @@ MdBinaryProtocol::MdBinaryProtocol(QObject *parent, MdData *data, MdAbstractCom 
     freqMeasure = QTime::currentTime();
     freqMeasure.start();
 
-    QSettings settings("MultiDisplay", "UI");
+    QSettings settings;
     if ( settings.value("debug/generate_data", QVariant(false)).toBool() ) {
         debugDataGenTimer = new QTimer(this);
         connect ( debugDataGenTimer, SIGNAL(timeout()), this, SLOT(debugDataGenUpdate()) );
@@ -54,6 +54,16 @@ MdBinaryProtocol::~MdBinaryProtocol() {
         delete dfVoltageMap;
     if ( sdata )
         delete sdata;
+}
+
+void MdBinaryProtocol::changeComInstance (MdAbstractCom* c) {
+    if ( ac != nullptr) {
+        delete ac;
+        ac = c;
+        connect ( ac, SIGNAL(bytesRead(QByteArray)), this, SLOT(incomingData(QByteArray)) );
+        connect ( ac, SIGNAL(portClosed()), this, SLOT(onPortClosed()) );
+        connect ( ac, SIGNAL(portOpened()), this, SLOT(onPortOpened()) );
+    }
 }
 
 void MdBinaryProtocol::closePort()
@@ -296,7 +306,8 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
     double  lambda = fixed_b100_2double( quint16 ( rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8) ) );
     base +=2;
 
-    double  lmm = fixed_b100_2double( quint16 ( rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8) ) );
+    //double  lmm = fixed_b100_2double( quint16 ( rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8) ) );
+    double  lmm = ( quint16 ( rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8) ) );
     base +=2;
 
     double  casetemp = fixed_b100_2double( quint16 ( rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8) ) );
@@ -363,7 +374,7 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
 
 //    qDebug() << "efr_speed raw=" << efr_speed_tmp << " usec rise2fall=" << efr_speed_tmp/2 << " usec rise2rise "
 //             << efr_speed_tmp << " freq=" << 1000000/efr_speed_tmp << "Hz speed=" << efr_speed << " RPM"
-//             << " DataOut " << ((millisElapsed > 0) ? 1000/millisElapsed : -1) << " Hz";
+//             << " DataOut " << ((millisElapsed > 0) ? 10000/millisElapsed : -1) << " Hz";
 
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
     ;

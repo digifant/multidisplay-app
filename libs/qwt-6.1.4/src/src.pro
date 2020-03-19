@@ -27,7 +27,7 @@ contains(QWT_CONFIG, QwtDll) {
     win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
 }
 else {
-    CONFIG += staticlib
+    !android: { CONFIG += staticlib }
 } 
 
 contains(QWT_CONFIG, QwtFramework) {
