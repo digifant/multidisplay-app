@@ -77,10 +77,13 @@ QWT_INSTALL_FEATURES  = $${QWT_INSTALL_PREFIX}/features
 } else {
         message ("maemo5: static lib (hack)")
 }
-android: {
-        QWT_CONFIG -= QwtDll
-        message ("android: static lib (hack)")
-}
+#2020: android app bundle (AAB)
+android: { CONFIG -= staticlib }
+android: DEFINES += LIBS_SUFFIX='\\"_$${QT_ARCH}.so\\"'
+#android: {
+#        QWT_CONFIG -= QwtDll
+#        message ("android: static lib (hack)")
+#}
 
 ######################################################################
 # QwtPlot enables all classes, that are needed to use the QwtPlot
@@ -126,11 +129,12 @@ QWT_CONFIG     += QwtOpenGL
 # Otherwise you have to build it from the designer directory.
 ######################################################################
 
-!maemo5: {
-        !android: {
-                QWT_CONFIG     += QwtDesigner
-        }
-}
+#!maemo5: {
+#        !android: {
+#                QWT_CONFIG     += QwtDesigner
+#        }
+#}
+QWT_CONFIG -= QwtDesigner
 
 ######################################################################
 # Compile all Qwt classes into the designer plugin instead
@@ -173,7 +177,7 @@ win32 {
 
 macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
 
-    QWT_CONFIG += QwtFramework
+    #QWT_CONFIG += QwtFramework
 }
 
 ######################################################################

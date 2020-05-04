@@ -113,7 +113,7 @@ void MultidisplayUIMainWindow::newDfBoostTransferFunction (int name) {
         ui.action250kpa->setChecked(true);
         break;
     case 100 :
-        ui.action200kpa->setChecked(true);
+        ui.action100kpa->setChecked(true);
         break;
     case 300 :
         ui.action300kpa->setChecked(true);
