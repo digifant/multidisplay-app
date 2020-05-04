@@ -11,7 +11,19 @@ V2SettingsDialog::V2SettingsDialog(QWidget *parent) :
     ui(new Ui::V2SettingsDialog)
 {
     ui->setupUi(this);
-    connect (ui->buttonBox, SIGNAL(accepted()), this, SLOT(accepted()));
+#ifdef Q_OS_ANDROID
+    //we want no ok / cancel button on android. data is saved on close by back button
+    //back button triggers 1. rejected and 2. finished
+    connect (this, SIGNAL(rejected()), this, SLOT(accept() ));
+    //connect (this, SIGNAL(finished(int)), this, SLOT(signalFinished(int) ));
+    connect (this, SIGNAL(accepted()), this, SLOT(save()));
+    ui->buttonBox->hide();
+    //delete on close! AndroidMainWindows eventhandler will initiate the re-creation
+    //fixes broken dialog on 2. show
+    setAttribute( Qt::WA_DeleteOnClose, true );
+#else
+    connect (ui->buttonBox, SIGNAL(accepted()), this, SLOT(save()));
+#endif
 }
 
 V2SettingsDialog::~V2SettingsDialog()
@@ -19,7 +31,7 @@ V2SettingsDialog::~V2SettingsDialog()
     delete ui;
 }
 
-void V2SettingsDialog::accepted() {
+void V2SettingsDialog::save() {
     AppEngine::getInstance()->setActualizeVis1( ui->actualizeVis1CheckBox->isChecked() );
     AppEngine::getInstance()->setActualizeDashboard( ui->actualizeDashboardCheckBox->isChecked() );
 
@@ -60,6 +72,18 @@ void V2SettingsDialog::accepted() {
     emit cfgDialogAccepted();
 }
 
+void V2SettingsDialog::signalFinished(int result)
+{
+    //android: back button triggers 2. signal finished
+}
+
+void V2SettingsDialog::signalRejected()
+{
+    //android: back button triggers 1. signal rejected
+    //qt: cancel triggers signal rejected
+
+}
+
 void V2SettingsDialog::showEvent ( QShowEvent * event ) {
     Q_UNUSED(event);
     ui->actualizeVis1CheckBox->setChecked( AppEngine::getInstance()->getActualizeVis1() );
@@ -88,6 +112,16 @@ void V2SettingsDialog::showEvent ( QShowEvent * event ) {
     {
         ui->groupBoxFrequency->hide();
         ui->groupBoxEnergy->hide();
+        //FIX android dark holo theme default has light background and text color! -> set background to black!
+        QColor fr = ui->comboBoxEcu->palette().color(QWidget::foregroundRole());
+        //light 0 dark 243
+        //qDebug() << fr.lightness();
+        if ( fr.lightness() >= 243 ) {
+            ui->comboBoxEcu->setStyleSheet("QComboBox { background-color: black }" "QListView { color: blue; }");
+            //ui->comboBoxWbLambda->setStyleSheet("QComboBox { background-color: black }" "QListView { color: blue; }");
+            ui->comboBoxMapSensor->setStyleSheet("QComboBox { background-color: black }" "QListView { color: blue; }");
+            //ui->buttonBox->setStyleSheet("QPushButton { background-color: black }");
+        }
     }
 #endif
 }

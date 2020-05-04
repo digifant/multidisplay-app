@@ -41,5 +41,21 @@ void VR6Widget::paint() {
     h = fm.height() + fm.leading();
     painter.drawText( QPoint(0,h), caption );
 
+    textFont.setItalic(false);
+    textFont.setBold(false);
+
+#if defined (DIGIFANTAPP)
+    w = fm.width(caption) + fm.maxWidth();
+
+    int ps = textFont.pointSize();
+    textFont.setPointSize(ps * 0.75);
+    painter.setFont(textFont);
+    painter.drawText( QPoint(w,h), "programmed by digifant-onlineabstimmung.de" );
+#endif
+    w=0;
+
+    h += 2 * fm.lineSpacing();
+    painter.drawText( QPoint(w,h), "...VR6 support is comming soon!" );
+
     painter.end();
 }

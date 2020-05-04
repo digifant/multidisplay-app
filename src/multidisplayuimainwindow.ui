@@ -28,11 +28,11 @@
         <string>SerialData</string>
        </property>
        <attribute name="title">
-        <string>SerialInput</string>
+        <string>Log</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QPlainTextEdit" name="DataTextEdit"/>
+         <widget class="QPlainTextEdit" name="LogTextEdit"/>
         </item>
        </layout>
       </widget>
@@ -124,6 +124,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="PlayButton">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Play</string>
            </property>
@@ -343,7 +346,7 @@ records:</string>
      <x>0</x>
      <y>0</y>
      <width>845</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -454,7 +457,7 @@ records:</string>
   </action>
   <action name="action_SerialOptions">
    <property name="text">
-    <string>&amp;Options</string>
+    <string>&amp;Serial Options</string>
    </property>
   </action>
   <action name="action_Save">

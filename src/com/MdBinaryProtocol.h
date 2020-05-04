@@ -43,6 +43,9 @@ public:
     MdBinaryProtocol(QObject *parent, MdData *data, MdAbstractCom* ac);
     ~MdBinaryProtocol();
 
+    //! change the com instance (ie. usb -> bluetooth). old instance will get deleted!
+    void changeComInstance (MdAbstractCom* c);
+
 signals:
     void portOpened();
     void portClosed();

@@ -84,6 +84,7 @@ MultidisplayUIMainWindow::~MultidisplayUIMainWindow() {
 
 void MultidisplayUIMainWindow::showStatusMessage (QString msg) {
     ui.StatusBar->showMessage(msg);
+    ui.LogTextEdit->appendPlainText(msg);
 }
 
 void MultidisplayUIMainWindow::showStatusBarSampleCount (QString msg) {

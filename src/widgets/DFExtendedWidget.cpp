@@ -215,6 +215,19 @@ void DFExtendedWidget::paint() {
     textFont.setItalic(false);
     textFont.setBold(false);
 
+#if defined (DIGIFANTAPP)
+    w = fm.width(caption) + fm.maxWidth();
+
+    int ps = textFont.pointSize();
+    textFont.setPointSize(ps * 0.75);
+    painter.setFont(textFont);
+    if ( landscape_for_text )
+        painter.drawText( QPoint(w,h), "programmed by digifant-onlineabstimmung.de" );
+    w=0;
+    textFont.setPointSize(ps);
+    painter.setFont(textFont);
+#endif
+
 //    textFont.setBold(true);
     QString ign = "Ign " + QString::number(df_ignition, 'f', 2);
     QString retard = "Retard " + QString::number(df_ignition_retard, 'f', 2);
@@ -233,7 +246,7 @@ void DFExtendedWidget::paint() {
 
     //make 0-250kpa
     QString boost = "Boost " + QString::number(df_boost_raw) + " (raw) "  +
-            QString::number( AppEngine::getInstance()->getDfBoostTransferFunction()->map( df_boost_raw ) ) + " kpa";
+            QString::number( AppEngine::getInstance()->getDfBoostTransferFunction()->map( df_boost_raw ), 'f', 2 ) + " kpa";
 
     QString lambda = "Lambda " + QString::number(df_lambda_raw) + "(raw)";
 
@@ -245,7 +258,7 @@ void DFExtendedWidget::paint() {
 
     quint16 isv_conv = ( 0x1a93 - ( (( isvMap->mapValue(df_isv) * 0xC7 ) / 16 ) + 0xA60 ) ) / 2;
     QString isv = "ISV " + QString::number(isv_conv) + " us";
-    QString voltage = "Volt " + QString::number(voltageMap->mapValue(df_voltage)) + " V";
+    QString voltage = "Volt " + QString::number(voltageMap->mapValue(df_voltage), 'f', 2) + " V";
     QString lc = "LC ";
     if ( df_lc_flags & 8)
         lc += "ON";
@@ -315,11 +328,15 @@ void DFExtendedWidget::paint() {
     painter.drawText( QPoint(0, h), lc );
 
     QString racemode = "knock detection ON";
+    if (!landscape_for_text)
+        racemode = "knock det. ON";
 
     if ( setPositionForCol(fm.lineSpacing(),2) )
-        w = fm.width(lc+2);
+        w = fm.width(lc) + fm.maxWidth();
     if ( df_lc_flags & 16) {
         racemode = "knock detection OFF";
+        if (!landscape_for_text)
+            racemode = "knock det. OFF";
         painter.fillRect( QRect(w, h - fm.lineSpacing(),
                                 fm.width (racemode), fm.height() ), Qt::red);
     }
@@ -327,6 +344,17 @@ void DFExtendedWidget::paint() {
 
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), lc_state);
+
+    if ( !landscape_for_text ) {
+        h += 2 * fm.lineSpacing();
+        QFont backupFont = textFont;
+        int ps = textFont.pointSize();
+        textFont.setPointSize(ps * 0.75);
+        painter.setFont(textFont);
+        painter.drawText( QPoint(0, h), "by digifant-onlineabstimmung.de" );
+        textFont = backupFont;
+        painter.setFont(textFont);
+    }
 
 
     //KNOCK Bar Test
@@ -350,6 +378,13 @@ void DFExtendedWidget::paint() {
 
 void DFExtendedWidget::resizeEvent ( QResizeEvent * event ) {
     MeasurementWidget::resizeEvent( event );
+    if ( event ) {
+
+        if ( event->size().height() > event->size().width()  )
+            landscape_for_text = false;
+        else
+            landscape_for_text = true;
+    }
 }
 
 bool DFExtendedWidget::setPositionForCol(uint lineSpacing, uint col)

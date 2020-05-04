@@ -9,6 +9,10 @@
 #if defined(Q_OS_ANDROID)
     #include <QAndroidJniObject>
     #include <QAndroidJniEnvironment>
+    #include <QtAndroid>
+    //FIX hack! fix for "java.lang.UnsatisfiedLinkError: dlopen failed: library libQt5Concurrent_x86.so libQt5PrintSupport_x86.so not found.
+    #include <QtPrintSupport>
+    #include <QtConcurrent>
 #endif
 
 
@@ -28,8 +32,11 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
      grabGesture(Qt::PinchGesture);
      grabGesture(Qt::SwipeGesture);
 
+     //test: moved to AndroidDashboardDialog
+     /*
      connect (ui->actionMdSupportForum, SIGNAL(triggered()), this, SLOT(fireSupportForumIntent()) );
-
+     connect (ui->fbPushButton, SIGNAL(clicked()), this, SLOT(fireFbPageIntent()) );
+    */
      QSettings settings;
      if ( settings.value("md/md", QVariant ( MDMODE ).toBool() )  == false ) {
          ui->actionV2_N75_Settings->setVisible(false);
@@ -47,8 +54,14 @@ AndroidMainWindow::~AndroidMainWindow()
 
 bool AndroidMainWindow::event(QEvent *event)
 {
+    //qDebug() << "AndroidMainWindow::event event type=" << event->type();
     if (event->type() == QEvent::Gesture)
         return gestureEvent(static_cast<QGestureEvent*>(event));
+    if (event->type() == QEvent::ChildRemoved) {
+        QChildEvent* ce = dynamic_cast<QChildEvent*>(event);
+        if ( ce->child()->isWidgetType() )
+            AppEngine::getInstance()->reCreateDialogsAndroidFix();
+    }
     return QWidget::event(event);
 }
 
@@ -75,6 +88,7 @@ bool AndroidMainWindow::gestureEvent(QGestureEvent *event)
 
 void AndroidMainWindow::closeEvent(QCloseEvent *event) {
     //segfaults :(
+    AppEngine::getInstance()->getMdCom()->closePort();
     emit writeSettings();
     event->accept();
     QMainWindow::closeEvent ( event );
@@ -83,24 +97,51 @@ void AndroidMainWindow::closeEvent(QCloseEvent *event) {
 void AndroidMainWindow::resizeEvent(QResizeEvent *event)
 {
     qDebug() << "AndroidMainWindow::resizeEvent size=" << event->size() << " old=" << event->oldSize();
+    //ui->fbPushButton->setMinimumHeight( ui->dashboardPushButton->height() );
     QMainWindow::resizeEvent(event);
 }
 
 void AndroidMainWindow::showStatusMessage(const QString &msg)
 {
-    qDebug() << "showStatusMessage";
+    qDebug() << "showStatusMessage" << msg;
+    //test: moved to AndroidDashboardDialog
+    /*
     if ( ui->textEdit )
         ui->textEdit->insertPlainText( msg + "\n" );
+    */
+#if defined(Q_OS_ANDROID)
+    showToast(msg);
+#endif
+}
+
+void AndroidMainWindow::showToast(const QString &message, ToastDuration duration)
+{
+#if defined(Q_OS_ANDROID)
+    // all the magic must happen on Android UI thread
+    QtAndroid::runOnAndroidThread([message, duration] {
+        QAndroidJniObject javaString = QAndroidJniObject::fromString(message);
+        QAndroidJniObject toast = QAndroidJniObject::callStaticObjectMethod("android/widget/Toast", "makeText",
+                                                                            "(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;",
+                                                                            QtAndroid::androidActivity().object(),
+                                                                            javaString.object(),
+                                                                            jint(duration));
+        toast.callMethod<void>("show");
+    });
+#else
+    qDebug() << "toasts are availabe in androiy only!";
+#endif
 }
 
 void AndroidMainWindow::btPortClosed()
 {
     ui->actionBluetoothToggleState->setText("Bluetooth connect");
+    qDebug() << "BT port closed";
 }
 
 void AndroidMainWindow::btPortOpened()
 {
     ui->actionBluetoothToggleState->setText("Bluetooth disconnect");
+    qDebug() << "BT port opened";
 }
 
 void AndroidMainWindow::fireSupportForumIntent()

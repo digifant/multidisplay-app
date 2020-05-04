@@ -111,6 +111,16 @@
           </item>
           <item>
            <property name="text">
+            <string>bluetooth</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>/dev/tty.usbserial-*</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>/dev/rfcomm0</string>
            </property>
           </item>

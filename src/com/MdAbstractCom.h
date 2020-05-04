@@ -26,8 +26,11 @@ class MdAbstractCom : public QObject
 {
     Q_OBJECT
 public:
-    explicit MdAbstractCom(QObject *parent = 0);
+    explicit MdAbstractCom(QObject *parent = nullptr);
     virtual ~MdAbstractCom ();
+
+    void setAutoReconnect ( bool r) { autoReconnect = r; }
+    bool getAutoReconnect ()  { return autoReconnect; }
 
 signals:
     void showStatusMessage ( const QString& );
@@ -35,6 +38,10 @@ signals:
 
     void portOpened();
     void portClosed();
+
+    //! BT wrapper class needs this to get info that BT classic or LE can not find any device
+    void couldNotConnect2BtDevice();
+    void bluetoothNotAvailable();
 
     //! new data received
     void bytesRead ( const QByteArray & );
@@ -53,6 +60,9 @@ public slots:
 
 protected slots:
     virtual void onReadyRead() = 0;
+
+protected:
+    bool autoReconnect = true;
 
 };
 

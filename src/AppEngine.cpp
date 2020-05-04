@@ -64,9 +64,13 @@
 #include "widgets/MyTableWidget.h"
 #include "widgets/N75PidSettingsWidget.h"
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) && not defined(Q_OS_ANDROID)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     #include "com/MdQSerialPortCom.h"
 #endif
+
+#include "com/MdBluetoothCom.h"
+#include "com/MdBluetoothLECom.h"
+#include "com/MdBluetoothWrapper.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     #include "com/MdQextSerialCom.h"
@@ -74,6 +78,7 @@
 
 #if defined (Q_OS_ANDROID)
     #include "com/MdBluetoothCom.h"
+    #include "com/MdBluetoothLECom.h"
     #include <QtAndroid>
 #endif
 
@@ -93,11 +98,13 @@ AppEngine::AppEngine() {
 #if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
     qDebug() << "desktop version";
     pcmw = new MultidisplayUIMainWindow ();
-    mmw = NULL;
-    mbw = NULL;
-    mvis1w = NULL;
-    mcw = NULL;
-    amw = NULL;
+    mmw = nullptr;
+    mbw = nullptr;
+    mvis1w = nullptr;
+    mcw = nullptr;
+    amw = nullptr;
+
+    wbLambdaTransferFunction = nullptr;
 
     DataViewSlider = pcmw->ui.DataViewSlider;
     DataViewSpinBox = pcmw->ui.DataViewWinSizeSpinBox;
@@ -106,6 +113,8 @@ AppEngine::AppEngine() {
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     mdcom = new MdQSerialPortCom(this);
+    //mdcom = new MdBluetoothLECom(this);
+    //mdcom = new MdBluetoothWrapper(this);
 #else
     mdcom = new MdQextSerialCom(this);
 #endif
@@ -223,7 +232,8 @@ AppEngine::AppEngine() {
 
     data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
 
-    mdcom = new MdBluetoothCom(this);
+    //mdcom = new MdBluetoothCom(this);
+    mdcom = new MdBluetoothWrapper(this);
     mds = new MdBinaryProtocol(this, data, mdcom);
 
     mySerialOptionsDialog = new SerialOptionsDialog ();
@@ -335,6 +345,8 @@ void AppEngine::setupPC() {
     connect (pcmw->ui.StopButton, SIGNAL(clicked()), replay, SLOT(stop()) );
     connect (pcmw->ui.ReplayFactorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setReplaySpeedUpFactor(double)));
 
+    connect (mdcom, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)) );
+    connect (mds, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)) );
     connect (data, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)));
     connect (mds, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)));
     connect (mds, SIGNAL(showStatusBarSampleCount(QString)), pcmw, SLOT(showStatusBarSampleCount(QString)));
@@ -515,14 +527,14 @@ void AppEngine::setupMaemo() {
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
         mGps = new MobileGPS (this);
     else
-        mGps = NULL;
+        mGps = nullptr;
     if ( settings.value("mobile/use_accel", QVariant(true)).toBool() )
         accelMeter = new Accelerometer(this);
     else
-        accelMeter = false;
+        accelMeter = nullptr;
 #else
-    mGps = NULL;
-    accelMeter = NULL;
+    mGps = nullptr;
+    accelMeter = nullptr;
 #endif
 
     //load TEST-DATA
@@ -551,7 +563,19 @@ void AppEngine::setupAndroid () {
     AndroidN75Dialog* an75 = new AndroidN75Dialog (amw, mds);
     connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), an75, SLOT(showMaximized()));
 
+    //TODO FIXME: refactor menu!
+    /*
+    delete (amw->ui->menuConfig);
+    amw->ui->menuConfig = nullptr;
+    delete ( amw->ui->actionSettings );
+    amw->ui->actionSettings = nullptr;
+    */
     connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
+
+    //TODO dont works! :(
+    QAction *a = new QAction("aha", amw->ui->menubar);
+    amw->ui->menubar->addAction(a);
+    connect(a, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
 
     //    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
 //    connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
@@ -579,16 +603,21 @@ void AppEngine::setupAndroid () {
 
 
     //Dashboard
-    amw->ui->mainFrame->setContentsMargins(0,0,0,0);
+    //test: moved to AndroidDashboardDialog
+    //amw->ui->mainFrame->setContentsMargins(0,0,0,0);
 
     add = new AndroidDashboardDialog( );
-    rtvis = new RealTimeVis ( add );
+    //rtvis = new RealTimeVis ( add );
+    rtvis = new RealTimeVis ( amw );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
 
-    if ( QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper", "hasPermanentMenuKey" ))
+    //test: moved to AndroidDashboardDialog
+    /*
+    if ( QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/digifant/MuiIntentHelper", "hasPermanentMenuKey" ))
         connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showFullScreen()) );
     else
         connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
+    */
 
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
@@ -613,12 +642,40 @@ void AppEngine::setupAndroid () {
 
     connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
 
+    amw->showStatusMessage("Bluetooth autoconnect is ON");
+
     //http://qt-project.org/doc/qt-5/qandroidjniobject.html#details
 //    QAndroidJniObject activity = QtAndroid::androidActivity();
 //    Q_ASSERT ( activity.isValid() );
 //    activity.callMethod<void>("setKeepScreenOn", "(B)V", true);
 #endif
 }
+
+void AppEngine::reCreateDialogsAndroidFix()
+{
+#ifdef Q_OS_ANDROID
+    if ( v2SettingsDialog == nullptr ) {
+        v2SettingsDialog = new V2SettingsDialog(amw);
+        connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
+        connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
+    }
+    if ( aboutDialog == nullptr ) {
+        aboutDialog = new AboutDialog(amw);
+        connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(showMaximized()));
+    }
+    if ( gearSettingsDialog == nullptr ) {
+        gearSettingsDialog = new GearSettingsDialog(amw);
+        connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(showMaximized()));
+    } else {
+        connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(showMaximized()));
+    }
+    if ( v2N75SetupDialog == nullptr ) {
+        v2N75SetupDialog = new V2N75SetupDialog(amw);
+        connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
+    }
+#endif
+}
+
 
 void AppEngine::show() {
 #if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)
@@ -630,25 +687,36 @@ void AppEngine::show() {
     mmw->showMaximized();
     mmw->statusBar()->hide();
 #endif
+
 #if defined (Q_OS_ANDROID)
     jboolean permanentMenuKey = QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper", "hasPermanentMenuKey" );
     qDebug() << "hasPermanentMenuKey result: " << ( permanentMenuKey==true ? "true" : "false" );
     if ( permanentMenuKey ) {
         amw->showFullScreen();
-        add->showFullScreen();
+        //add->showFullScreen();
     } else {
         amw->showMaximized();
-        add->showMaximized();
+        //add->showMaximized();
     }
  #endif
 }
 
 void AppEngine::saveData () {
+    QString path;
 #if QT_VERSION >= 0x050000
-    QString path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
+#if not defined (ANDROID)
+    path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+#endif
+#if defined (ANDROID)
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+    qDebug() << "android save path 2019: " << path;
+#endif
+
 #else
-    QString path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
+    //Qt 4.x
+    path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 
@@ -662,13 +730,29 @@ void AppEngine::saveData () {
 }
 
 void AppEngine::saveDataAsCSV() {
+    QString path;
 #if QT_VERSION >= 0x050000
-    QString path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
-            + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".csv";
-#else
-    QString path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
+#if not defined (ANDROID)
+    path =  QStandardPaths::standardLocations (QStandardPaths::DocumentsLocation)[0]
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".csv";
 #endif
+#if defined (ANDROID)
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+    qDebug() << "android save path 2019: " << path;
+#endif
+#else
+    //Qt 4.x
+    path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation)
+            + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".csv";
+#endif
+
+    /*
+#if defined (ANDROID)
+    //Hack for sdcard
+    path = QString("/scard") + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+#endif
+*/
     QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
                                                 "CSV (*.csv)");
     if ( fn != "")
@@ -694,6 +778,13 @@ void AppEngine::saveDataAs () {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 
+/*
+#if defined (ANDROID)
+    //Hack for sdcard
+    path = QString("/scard") + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
+#endif
+*/
+
     QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
                                                 "mdv2 (*.mdv2)");
     if ( fn != "") {
@@ -713,9 +804,15 @@ void AppEngine::openData ( QString fn ) {
         fn = QFileDialog::getOpenFileName ( pcmw, QString("Select Filename"), directory, "mdv2 (*.mdv2)" );
     }
 
-    if ( !fn.isNull()) {
+//#if defined (ANDROID)
+//    //Hack for sdcard
+//    fn = QString("/scard");
+//#endif
+
+
+    if ( ! fn.isNull() ) {
         directory = QFileInfo(fn).path(); // store path for next time
-        qDebug() << "directory " << directory;
+        qDebug() << "set new directory " << directory;
 
 #ifdef Q_WS_MAEMO5
         mmw->setAttribute(Qt::WA_Maemo5ShowProgressIndicator);
@@ -765,7 +862,20 @@ void AppEngine::clearData () {
 }
 
 void AppEngine::changeSerialOptions() {
-    mds->changePortSettings ( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
+    bool isBt = false;
+    if ( mySerialOptionsDialog->getUi()->portComboBox->currentText() == "bluetooth" ) {
+        isBt = true;
+        if ( qobject_cast<MdBluetoothWrapper*>(mds) == nullptr ) {
+            mds->changeComInstance( new MdBluetoothWrapper(this) );
+        }
+    } else {
+        if ( qobject_cast<MdQSerialPortCom*>(mds) == nullptr ) {
+            mds->changeComInstance( new MdQSerialPortCom(this) );
+        }
+    }
+    //TODO mac osx dynamic names like /dev/tty.usbserial-A900JFA
+    if ( !isBt )
+        mds->changePortSettings ( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
 }
 
 void AppEngine::changeDataWinMarkMicroLeft () {
@@ -888,7 +998,8 @@ void AppEngine::readSettings () {
     mySerialOptionsDialog->getUi()->portComboBox->setCurrentIndex( settings.value ("mdserial/port", 0).toInt() );
     mySerialOptionsDialog->getUi()->speedComboBox->setCurrentIndex( settings.value ("mdserial/speed", 0).toInt() );
 #if not defined ( Q_OS_ANDROID )
-    mds->changePortSettings( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
+    changeSerialOptions();
+    //mds->changePortSettings( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
 #else
     //HACK FIXME to open the spp profile with starting name mdv2
     mds->changePortSettings ("", 0);

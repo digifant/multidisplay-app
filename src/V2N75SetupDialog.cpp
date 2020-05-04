@@ -60,6 +60,12 @@ V2N75SetupDialog::V2N75SetupDialog(QWidget *parent) :
 
     n75Settings = new N75PidSettingsWidget (this);
     ui->n75TableGroupBox->layout()->addWidget (n75Settings);
+
+#ifdef Q_OS_ANDROID
+    //delete on close! AndroidMainWindows eventhandler will initiate the re-creation
+    //fixes broken dialog on 2. show
+    setAttribute( Qt::WA_DeleteOnClose, true );
+#endif
 }
 
 

@@ -23,6 +23,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QDebug>
+#include <QWidget>
 
 #include <cxxabi.h>
 #include <iostream>
@@ -34,10 +35,41 @@ int main(int argc, char *argv[]) {
         QApplication::setStyle(QString("Plastique"));
 #endif
 
+#ifdef DIGIFANTAPP
+        QApplication::setOrganizationName("gummel-informatics");
+        QCoreApplication::setApplicationName("digifantview");
+        QSettings settings;
+        settings.setValue ("md/md", QVariant(false));
+#else
         QApplication::setOrganizationName("MultiDisplay");
         QCoreApplication::setApplicationName("UI");
-
+        QSettings settings;
+        settings.setValue ("md/md", QVariant(true));
+#endif
         QApplication a(argc, argv);
+        //dont works
+        //a.setStyleSheet( "GLGauge {color:black}");
+
+#if defined ( Q_OS_ANDROID)
+        {
+        //FIX android dark holo theme default has light background and text color! -> set background to black!
+        QColor fr = a.palette().color(QPalette::Window);
+        //light 243 dark 0
+        //QPushButton { color: yellow; }
+        auto teststyle = R"(
+                QWidget { background-color: black; }
+                QComboBox { background-color: black }
+
+                QPushButton { background-color: black }
+                       )";
+        //qDebug() << fr.lightness();
+        if ( fr.lightness() == 0 ) {
+            a.setStyleSheet(teststyle);
+        }
+    }
+#endif
+
+
 
         AppEngine *e = AppEngine::getInstance();
         e->show();
