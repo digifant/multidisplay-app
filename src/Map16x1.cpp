@@ -205,22 +205,22 @@ Map16x1_ISV::Map16x1_ISV() {
 Map16x1_Voltage::Map16x1_Voltage() {
     mapData.resize(17);
     mapData[0]=0;
-    mapData[1]=1.6;
-    mapData[2]=3.2;
-    mapData[3]=4.8;
-    mapData[4]=6.4;
-    mapData[5]=8;
-    mapData[6]=9.6;
-    mapData[7]=11.2;
-    mapData[8]=12.8;
-    mapData[9]=14.3;
-    mapData[10]=15.9;
-    mapData[11]=17.5;
-    mapData[12]=19.1;
-    mapData[13]=20.7;
-    mapData[14]=22.3;
-    mapData[15]=23.9;
-    mapData[16]=25.5;
+    mapData[1]=1.49;
+    mapData[2]=2.98;
+    mapData[3]=4.48;
+    mapData[4]=5.97;
+    mapData[5]=7.46;
+    mapData[6]=8.95;
+    mapData[7]=10.44;
+    mapData[8]=11.93;
+    mapData[9]=13.43;
+    mapData[10]=14.92;
+    mapData[11]=16.41;
+    mapData[12]=17.90;
+    mapData[13]=19.39;
+    mapData[14]=20.89;
+    mapData[15]=22.38;
+    mapData[16]=23.78;
 }
 
 
