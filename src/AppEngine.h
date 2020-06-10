@@ -34,6 +34,7 @@
 #include "com/MdAbstractCom.h"
 #include "com/MdBinaryProtocol.h"
 #include "TransferFunction.h"
+#include "Map16x1.h"
 #include "serialoptions.h"
 
 #define MDMODE true
@@ -62,7 +63,6 @@ class N75OptionsDialog;
 class V2N75SetupDialog;
 class N75PidSettingsWidget;
 class V2SettingsDialog;
-class Map16x1;
 class MobileEvaluationDialog;
 class GearSettingsDialog;
 class AboutDialog;
@@ -109,6 +109,10 @@ public:
 
     TransferFunction* getWbLamdaTransferFunction() { return wbLambdaTransferFunction; }
     void setWbLambdaTransferFunction( TransferFunction* t ) { delete (wbLambdaTransferFunction); wbLambdaTransferFunction=t; }
+
+    Map16x1* getVdo1Map() { return mapVdo1; };
+    Map16x1* getVdo2Map() { return mapVdo2; };
+    Map16x1* getVdo3Map() { return mapVdo3; };
 
     quint8 numConnectedTypeK;
 
@@ -158,6 +162,7 @@ private:
     void setupMobile();
     void setupMaemo();
     void setupAndroid();
+    void setupIos();
 
     void readSettings ();
 
@@ -215,6 +220,9 @@ private:
     bool vis1ActualizeSave;
     TransferFunction* dfBoostTransferFunction;
     TransferFunction* wbLambdaTransferFunction;
+    QPointer<Map16x1> mapVdo1 = nullptr;
+    QPointer<Map16x1> mapVdo2 = nullptr;
+    QPointer<Map16x1> mapVdo3 = nullptr;
     DigifantApplicationWindow* dfAppWin;
 
     QString directory;

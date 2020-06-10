@@ -21,14 +21,20 @@
 #define MAP16X1_H
 
 #include <QVector>
+#include <QObject>
+#include <QString>
 
-class Map16x1
+class Map16x1 : public QObject
 {
 public:
     Map16x1();
     virtual ~Map16x1();
-    double mapValue ( int dval );
+    virtual double mapValue ( int dval );
+    virtual double mapValue8Bit ( int dval );
+    virtual double mapValue10Bit ( int dval );
+    virtual double mapValue12Bit ( int dval );
     virtual void testIt ();
+    virtual QString name () = 0;
 
 protected:
     QVector<double> mapData;
@@ -40,6 +46,7 @@ public:
     Map16x1_NTC_ECT();
 
     virtual void testIt ();
+    QString name () { return "DF_ECT"; };
 };
 
 class Map16x1_NTC_IAT : public Map16x1 {
@@ -47,25 +54,52 @@ public:
     Map16x1_NTC_IAT();
 
     virtual void testIt ();
+    QString name () { return "DF_IAT"; };
 };
 
 class Map16x1_ISV : public Map16x1 {
 public:
     Map16x1_ISV();
+    QString name () { return "DF_ISV"; };
 };
 
 class Map16x1_Voltage : public Map16x1 {
 public:
     Map16x1_Voltage();
+    QString name () { return "DF_Voltage"; };
 };
 
 class Map16x1_RPM6500 : public Map16x1 {
 public:
     Map16x1_RPM6500();
+    QString name () { return "DF_RPM_6500"; };
 };
 class Map16x1_RPM7350 : public Map16x1 {
 public:
     Map16x1_RPM7350();
+    QString name () { return "DF_RPM_7350"; };
+};
+
+/**
+ * @brief The Map16x1_10Bit_VDO5 class maps 10 Bit AD values to millibars of a vdo 5 bar sensor
+ */
+class Map16x1_10Bit_VDO5 : public Map16x1 {
+public:
+    Map16x1_10Bit_VDO5();
+    virtual double mapValue ( int dval );
+    virtual void testIt ();
+    QString name () { return "VDO5"; };
+};
+
+/**
+ * @brief The Map16x1_10Bit_VDO5 class maps 10 Bit AD values to millibars of a vdo 10 bar sensor
+ */
+class Map16x1_10Bit_VDO10 : public Map16x1 {
+public:
+    Map16x1_10Bit_VDO10();
+    virtual double mapValue ( int dval );
+    virtual void testIt ();
+    QString name () { return "VDO10"; };
 };
 
 

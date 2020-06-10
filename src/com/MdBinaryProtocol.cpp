@@ -334,11 +334,11 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
     base +=2;
 
     //FIXME pressure / temp ints???
-    quint16 vdo_pres1 = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
+    quint16 vdo_pres1_i = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
     base +=2;
-    quint16 vdo_pres2 = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
+    quint16 vdo_pres2_i = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
     base +=2;
-    quint16 vdo_pres3 = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
+    quint16 vdo_pres3_i = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
     base +=2;
     quint16 vdo_temp1 = rcvData.asBytes[base+0] + (rcvData.asBytes[base+1] << 8);
     base +=2;
@@ -472,6 +472,24 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
     if ( (df_lc_flags & 3)==1 )
         df_ignition = (2*df_ign_raw *-0.351563)+73.9;
     double df_voltage = dfVoltageMap->mapValue(df_voltage_raw);
+
+#if defined (DIGIFANTAPP)
+    //Ladedruck in Bar aus DF Druck berechnen
+    boost = (AppEngine::getInstance()->getDfBoostTransferFunction()->map(df_boost_raw) / 100) - 1;
+    //wideband lambda transfer function!
+    //df interface überträgt lambda raw voltage in lmm daten!
+    if ( AppEngine::getInstance()->getWbLamdaTransferFunction()->name() != -99 )
+        lambda = AppEngine::getInstance()->getWbLamdaTransferFunction()->map (lmm);
+    // qDebug() << "vdo: " << vdo_pres1_i << " " << vdo_pres2_i << " " << vdo_pres3_i;
+
+    double vdo_pres1 = AppEngine::getInstance()->getVdo1Map()->mapValue10Bit(vdo_pres1_i);
+    double vdo_pres2 = AppEngine::getInstance()->getVdo2Map()->mapValue10Bit(vdo_pres2_i);
+    double vdo_pres3 = AppEngine::getInstance()->getVdo3Map()->mapValue10Bit(vdo_pres3_i);
+#else
+    double vdo_pres1 = vdo_pres1_i;
+    double vdo_pres2 = vdo_pres2_i;
+    double vdo_pres3 = vdo_pres3_i;
+#endif
 
 
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)

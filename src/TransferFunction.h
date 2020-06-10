@@ -66,5 +66,31 @@ class TransferFunction300kpa : public TransferFunction
     int name () { return 300; }
 };
 
+/** wideband lambda */
+class TransferFunctionWbLambdaPlx : public TransferFunction {
+    double map ( double input ) { double l = ( (5.0*( ( input) /1023)) * 2 + 10 ) / 14.7; return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
+    int name () { return -1; }
+};
+
+class TransferFunctionWbLambdaInnovateLC1 : public TransferFunction {
+    double map ( double input ) { double l =  ( (5.0*( (input) /1023)) * 3 + 7.35 ) / 14.7;  return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
+    int name () { return -1; }
+};
+class TransferFunctionWbLambdaInnovateLM1 : public TransferFunction {
+    double map ( double input ) { double l =  ( (5.0*( (input) /1023)) * 2 + 10.0 ) / 14.7;  return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
+    int name () { return -1; }
+};
+class TransferFunctionWbLambdaZeitronix : public TransferFunction {
+    double map ( double input ) { double l = ( (5.0*( (input) /1023)) * 2 + 9.6 ) / 14.7;  return static_cast<double>(static_cast<int>(l*100+0.5))/100.0;}
+    int name () { return -1; }
+};
+class TransferFunctionWbLambdaDummy : public TransferFunction {
+    double map ( double input ) { return input; }
+    int name () { return -99; }
+};
+class TransferFunctionWbLambdaRawDebug : public TransferFunction {
+    double map ( double input ) { return input; }
+    int name () { return -98; }
+};
 
 #endif // TRANSFERFUNCTION_H

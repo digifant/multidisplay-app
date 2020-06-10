@@ -29,9 +29,23 @@ Map16x1::~Map16x1() {
 }
 
 double Map16x1::mapValue ( int dval ) {
+    return mapValue8Bit ( dval );
+}
+
+double Map16x1::mapValue8Bit ( int dval ) {
     int idx = dval >> 4;
     int w = dval & 0xF;
     return idx < 0xF ? (( ( w * mapData[idx+1] ) + ( -1 * (w-16) * mapData[idx]) ) / 16) : mapData[idx];
+}
+double Map16x1::mapValue10Bit ( int dval ) {
+    int idx = dval >> 6;
+    int w = dval - 64*idx;
+    return idx < 0xF ? (( ( w * mapData[idx+1] ) + ( -1 * (w-64) * mapData[idx]) ) / 64) : mapData[idx];
+}
+double Map16x1::mapValue12Bit ( int dval ) {
+    int idx = dval >> 8;
+    int w = dval - 256*idx;
+    return idx < 0xF ? (( ( w * mapData[idx+1] ) + ( -1 * (w-256) * mapData[idx]) ) / 256) : mapData[idx];
 }
 
 void Map16x1::testIt () {
@@ -264,4 +278,80 @@ Map16x1_RPM7350::Map16x1_RPM7350() {
     mapData[14]=1000;
     mapData[15]=700;
     mapData[16]=500;
+}
+
+
+Map16x1_10Bit_VDO5::Map16x1_10Bit_VDO5() {
+    mapData.resize(17);
+    mapData[0]=0;
+    mapData[1]=110;
+    mapData[2]=573;
+    mapData[3]=1113;
+    mapData[4]=1751;
+    mapData[5]=2515;
+    mapData[6]=2958;
+    mapData[7]=3999;
+    mapData[8]=5319;
+    mapData[9]=5319;
+    mapData[10]=5319;
+    mapData[11]=5319;
+    mapData[12]=5319;
+    mapData[13]=5319;
+    mapData[14]=5319;
+    mapData[15]=5319;
+    mapData[16]=5319;
+}
+double Map16x1_10Bit_VDO5::mapValue ( int dval ) {
+    return mapValue10Bit( dval );
+}
+void Map16x1_10Bit_VDO5::testIt () {
+    QList<int> v;
+    v.append(0);
+    v.append(64);
+    v.append(96);
+    v.append(928);
+    v.append(960);
+    v.append(1024);
+
+    foreach ( int i,  v ) {
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
+    }
+}
+
+
+Map16x1_10Bit_VDO10::Map16x1_10Bit_VDO10() {
+    mapData.resize(17);
+    mapData[0]=0;
+    mapData[1]=207;
+    mapData[2]=1006;
+    mapData[3]=1962;
+    mapData[4]=3126;
+    mapData[5]=4583;
+    mapData[6]=6474;
+    mapData[7]=9067;
+    mapData[8]=10796;
+    mapData[9]=10796;
+    mapData[10]=10796;
+    mapData[11]=10796;
+    mapData[12]=10796;
+    mapData[13]=10796;
+    mapData[14]=10796;
+    mapData[15]=10796;
+    mapData[16]=10796;
+}
+double Map16x1_10Bit_VDO10::mapValue ( int dval ) {
+    return mapValue10Bit( dval );
+}
+void Map16x1_10Bit_VDO10::testIt () {
+    QList<int> v;
+    v.append(0);
+    v.append(64);
+    v.append(96);
+    v.append(448);
+    v.append(480);
+    v.append(512);
+
+    foreach ( int i,  v ) {
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
+    }
 }

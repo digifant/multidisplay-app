@@ -119,5 +119,19 @@ public class MuiIntentHelper extends QtActivity
         }
         return "";
     }
+
+    public static String getPublicDownloadsPath() 
+    {
+        /* Checks if external storage is available for read and write */
+        //isExternalStorageWritable()
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            // oder getExternalStorageDirectory
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            return path.getAbsolutePath() ;
+        }
+        return "";
+    }
+
 }
 

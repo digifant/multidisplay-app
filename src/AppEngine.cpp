@@ -282,9 +282,10 @@ AppEngine::AppEngine() {
     directory = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation);
 #endif
 #if defined Q_OS_ANDROID
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
     directory = s.toString();
-    qDebug() << "android path 2019: " << directory;
+    qDebug() << "android path 2020: " << directory;
 #endif
 
     //load TEST-DATA
@@ -433,6 +434,9 @@ void AppEngine::setupMobile() {
 #endif
 #ifdef Q_OS_ANDROID
     setupAndroid();
+#endif
+#if defined(Q_OS_IOS)
+    setupIos();
 #endif
 }
 
@@ -613,7 +617,7 @@ void AppEngine::setupAndroid () {
 
     //test: moved to AndroidDashboardDialog
     /*
-    if ( QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/digifant/MuiIntentHelper", "hasPermanentMenuKey" ))
+    if ( QAndroidJniObject::callStaticMethod<jboolean>( "de/gummelinformatics/mui/MuiIntentHelper", "hasPermanentMenuKey" ))
         connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showFullScreen()) );
     else
         connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
@@ -621,6 +625,7 @@ void AppEngine::setupAndroid () {
 
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (this, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mdcom, SIGNAL(portClosed()), amw, SLOT(btPortClosed()) );
     connect (mdcom, SIGNAL(portOpened()), amw, SLOT(btPortOpened()) );
 
@@ -649,6 +654,9 @@ void AppEngine::setupAndroid () {
 //    Q_ASSERT ( activity.isValid() );
 //    activity.callMethod<void>("setKeepScreenOn", "(B)V", true);
 #endif
+}
+
+void AppEngine::setupIos() {
 }
 
 void AppEngine::reCreateDialogsAndroidFix()
@@ -709,9 +717,10 @@ void AppEngine::saveData () {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 #if defined (ANDROID)
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
-    qDebug() << "android save path 2019: " << path;
+    qDebug() << "android save path 2020: " << path;
 #endif
 
 #else
@@ -737,7 +746,7 @@ void AppEngine::saveDataAsCSV() {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".csv";
 #endif
 #if defined (ANDROID)
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
     qDebug() << "android save path 2019: " << path;
 #endif
@@ -767,7 +776,8 @@ void AppEngine::saveDataAs () {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 #if defined (ANDROID)
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
     qDebug() << "android save path 2019: " << path;
 #endif
@@ -778,17 +788,41 @@ void AppEngine::saveDataAs () {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 
-/*
 #if defined (ANDROID)
-    //Hack for sdcard
-    path = QString("/scard") + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
-#endif
-*/
-
+    QString fn = path;
+    //QString fn = QFileDialog::getSaveFileName( amw, QString("Select File"), path, "mdv2 (*.mdv2)" );
+    //dont show select window because there is no native android dialog -> qt desktop dialog sucks on mobile
+    qDebug() << "android: save file instantly to " + path;
+    //TODO FIXME Android: use native save dialog !
+    //https://codereview.qt-project.org/c/qt/qtbase/+/251238
+    emit showStatusMessage( "save to " + fn );
+#else
     QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
                                                 "mdv2 (*.mdv2)");
+#endif
     if ( fn != "") {
-        data->saveData(fn);
+        if ( ! data->saveData(fn) ) {
+            qDebug() << "save failed!";
+            emit showStatusMessage( "save failed!" );
+        } else {
+#if defined (ANDROID)
+            QAndroidJniObject jsPath = QAndroidJniObject::fromString(path);
+            QAndroidJniObject jsTitle = QAndroidJniObject::fromString("digifant log");
+            QAndroidJniObject jsMimeType = QAndroidJniObject::fromString("application/digifant-ecu");
+            int requestId = 0;
+            /*
+                        QAndroidJniObject::callStaticObjectMethod("de/gummelinformatics/mui/MuiIntentHelper",
+                                                                  "sendFile",
+                                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I;Landroid/content/Context;)V",
+                                                                  jsPath.object<jstring>(), jsTitle.object<jstring>(), jsMimeType.object<jstring>(), requestId, QtAndroid::androidContext().object() );
+                                                                  */
+            // JNI DETECTED ERROR IN APPLICATION: use of invalid jobject 0xc131ba50
+            //QAndroidJniObject::callStaticMethod<void>("de/gummelinformatics/mui/MuiIntentHelper",
+            //                                          "sendFileSimple",
+            //                                          "(Ljava/lang/String;Landroid/content/Context;)V", path.toLocal8Bit().data(), QtAndroid::androidContext().object() );
+
+#endif
+        }
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
         if ( mGps ) {
             mGps->saveTrack (fn + ".track");
