@@ -31,7 +31,7 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     h->setSpacing(0);
     this->setLayout(h);
 
-#if !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)  && !defined (Q_OS_IOS)
     bg1 = new BoostBarGraphWidget (this);
 //    bg2 = new LambdaBarGraphWidget (this);
     bg2 = NULL;
@@ -70,10 +70,6 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     vr6W = new VR6Widget (this, "VR6 M3.8.1");
     v4->addWidget(vr6W);
 
-
-    switchEcu();
-
-
     QFrame *fWidgets1 = new QFrame (this);
     fWidgets1->setContentsMargins(0,0,0,0);
     QVBoxLayout *v = new QVBoxLayout();
@@ -86,12 +82,29 @@ RealTimeVis::RealTimeVis(QWidget *parent):
 #else
     h->addWidget(fWidgets1, 2);
 #endif
+#if defined (DIGIFANTVANAPP)
+    boostW = new MeasurementWidget ( this, QString("AFM (Volts)"), 0.01, 2.5, 4.5, Qt::green, Qt::green, Qt::red);
+    boostW->setDigits(4);
+    boostW->setGeometry( QRect(100,100,100,100) );
+    v->addWidget(boostW);
+
+    lambdaW = new MeasurementWidget ( this, QString("WbLambda"), 0.90, 1.0, 1.10, Qt::red, Qt::green, Qt::red);
+    lambdaW->setDigits(4);
+    lambdaW->setGeometry( QRect(100,100,100,100) );
+    v->addWidget(lambdaW);
+
+    egtW = new MaxEgtWidget ( this, QString("RPM") );
+    egtW->setDigits(4);
+    egtW->setGeometry( QRect(100,100,100,100) );
+    v->addWidget(egtW);
+#else
+
     boostW = new MeasurementWidget ( this, QString("Boost [bar]"), -1, 0, 2.0, Qt::darkGreen, Qt::green, Qt::red);
     boostW->setDigits(4);
     boostW->setGeometry( QRect(100,100,100,100) );
     v->addWidget(boostW);
 
-    lambdaW = new MeasurementWidget ( this, QString("Lambda"), 0.85, 1.1, 1.36, Qt::green, Qt::yellow, Qt::red);
+    lambdaW = new MeasurementWidget ( this, QString("WB Lambda"), 0.85, 1.1, 1.36, Qt::green, Qt::yellow, Qt::red);
     lambdaW->setDigits(3.8);
     lambdaW->setGeometry( QRect(100,100,100,100) );
     v->addWidget(lambdaW);
@@ -100,7 +113,7 @@ RealTimeVis::RealTimeVis(QWidget *parent):
     egtW->setDigits(4);
     egtW->setGeometry( QRect(100,100,100,100) );
     v->addWidget(egtW);
-
+#endif
     bexW = new BoostExtendedWidget ( this, QString("N75 debug") );
     bexW->setDigits(12);
     bexW->setGeometry( QRect(100,100,100,100) );
@@ -129,19 +142,57 @@ RealTimeVis::RealTimeVis(QWidget *parent):
         fWidgets2->hide();
     }
 
-    t = QTime::currentTime();
-    t.start();
+    switchEcu();
+
+    timer.start();
+
+    //testOverlay = new Overlay (this);
+
+    topOverlay = new MessageOverlay (this, Qt::AlignJustify);
+    //topOverlay->showMessage (QString("Test-Overlay Message"), 10);
+    middleOverlay = new MessageOverlay (this, Qt::AlignVCenter | Qt::AlignHCenter);
+    //middleOverlay->showMessage (QString("Test-Overlay Message"), 10);
+    bottomOverlay = new MessageOverlay (this, Qt::AlignBottom | Qt::AlignHCenter);
+    //bottomOverlay->showMessage (QString("Test-Overlay Message"), 10);
 }
 
 void RealTimeVis::possibleCfgChange () {
     switchEcu();
 }
 
+void RealTimeVis::showMessage(const QString &msg, const int forSeconds)
+{
+    if ( topOverlay )
+        topOverlay->showMessage(msg,forSeconds);
+}
+
+void RealTimeVis::showStatusMessage(const QString &msg)
+{
+    if ( topOverlay )
+        topOverlay->showMessage(msg,5);
+}
+
+void RealTimeVis::showMessage3(const QString &msg)
+{
+    if ( topOverlay )
+        topOverlay->showMessage(msg,3);
+}
+
+void RealTimeVis::hideMessage()
+{
+    if (topOverlay)
+        topOverlay->hideMessage();
+}
+
 void RealTimeVis::visualize (MdDataRecord *d) {
     if ( AppEngine::getInstance()->getActualizeDashboard() && d->getSensorR() != NULL ) {
-
-        if ( t.elapsed() > 100 ) {
-            t.restart();
+#if defined (Q_OS_IOS)
+        //100ms causes 100% cpu load on IOS
+        if ( timer.elapsed() > 500 ) {
+#else
+        if ( timer.elapsed() > 100 ) {
+#endif
+            timer.restart();
 
             //TODO encapsulate in objects
 
@@ -160,8 +211,15 @@ void RealTimeVis::visualize (MdDataRecord *d) {
             if ( bg3 != NULL ) {
                 bg3->setValue( d->getSensorR()->getRpm() );
             }
-
+#if defined (DIGIFANTVANAPP)
+            // only works for afm if boost sensor set to 100kpa
+            // casted to 2 decimal places in transfer function
+            // had it like below until I figured out issue with missing code in MdBinaryProtocol line 489
+            //boostW->setValue(AppEngine::getInstance()->getDfBoostTransferFunction()->map( d->getSensorR()->df_boost_raw ));
+            boostW->setValue(qFloor( d->getSensorR()->getBoost()*100)/100.0 );  // us qfloor to set to 2 digits must use 100.0 for divide
+#else
             boostW->setValue(  d->getSensorR()->getBoost() );
+#endif
             lambdaW->setValue(  d->getSensorR()->getLambda() );
             QMap<QString, double> e = d->getSensorR()->getHighestEgt();
             egtW->setValue( e["temp"], (quint8) e["idx"]  );
@@ -215,12 +273,20 @@ void RealTimeVis::switchEcu()
     if ( ecuStr == "Digifant 1" ) {
         fDfWidget->setVisible(true);
         fVr6Widget->setVisible(false);
-    } else if ( ecuStr == "VR6 M3.8.1" ) {
+        boostW->setVisible(true);
+        rpmW->setVisible(true);
+    }
+    if ( ecuStr == "VR6" ) {
         fDfWidget->setVisible(false);
         fVr6Widget->setVisible(true);
-    } else {
+        boostW->setVisible(true);
+        rpmW->setVisible(true);
+    }
+    if ( ecuStr == "generic (WB Lambda only)" ) {
         fDfWidget->setVisible(false);
         fVr6Widget->setVisible(false);
+        boostW->setVisible(false);
+        rpmW->setVisible(false);
     }
 
 }
@@ -229,6 +295,10 @@ bool RealTimeVis::mdMode()
 {
     QSettings settings;
     bool mdMode = settings.value("md/md", QVariant (MDMODE)).toBool();
+#if defined (DIGIFANTVANAPP)
+    //fix: was true for digifantvanapp ?!
+    mdMode = false;
+#endif
     if ( mdMode ) {
         egtW->show();
         bexW->show();

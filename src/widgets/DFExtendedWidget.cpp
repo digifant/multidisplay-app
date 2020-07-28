@@ -18,6 +18,7 @@ DFExtendedWidget::DFExtendedWidget ( QWidget *parent, QString caption, double lo
 //#endif
     isvMap = new Map16x1_ISV();
     voltageMap = new Map16x1_Voltage();
+    nbLambdaMap = new Map16x1_NbLambda();
 
 
     df_wot_flag = 0;
@@ -179,8 +180,11 @@ void DFExtendedWidget::setValue( MdDataRecord *d )
         maxRetard = df_ignition_retard;
     df_O2_AD_Volts = (df_lambda_raw*5.0/255);
     df_O2_Volts = (df_lambda_raw * (-7.0626000))+1661.300;  // info from Vanagon O2 analysis
+    if( df_O2_Volts < 0)
+        df_O2_Volts = 0;
     if( df_O2_Volts > O2_Volts_max)
         O2_Volts_max = df_O2_Volts;
+    df_lambda_nb = nbLambdaMap->mapValue(df_O2_Volts);
 #if defined (DIGIFANTVANAPP)
     this->lambda_raw = d->getSensorR()->getLmm(); // wideband input from small interface - 10 bit
     lambda_volts = ((lambda_raw * 5.0/1023));
@@ -197,6 +201,18 @@ void DFExtendedWidget::setValue( MdDataRecord *d )
 #endif
     this->rpm = d->getSensorR()->getRpm();
 
+    n75_duty = d->getSensorR()->getN75();
+    speed = d->getSensorR()->getSpeed();
+    if ( speed == 0 ) {
+        if ( d->getMobileR() != nullptr ) {
+            speed = d->getMobileR()->gpsGroundSpeed;
+            speedGps = true;
+        } else {
+            speedGps = false;
+        }
+    }
+    gear = d->getSensorR()->getGear();
+    
     update();
 }
 
@@ -277,6 +293,19 @@ void DFExtendedWidget::paint() {
     //we should better use QTranslator http://qt-project.org/doc/qt-5/qtranslator.html#details
 #if defined (DIGIFANTVANAPP)
     // this is my set-up for Vanagon
+    QString ect = "";
+    if (df_flg3 & 0x2)
+        ect = "ECT OPEN on PWR UP";
+    else if (df_ect>-50)
+        ect = "ECT " + QString::number(df_ect, 'f', 1) + " " + QChar(0x00B0) + "C"; // 1 decimal
+    else
+        ect = "ECT is OPEN!"; // added for diagnostics
+    QString iat = "";
+
+    if (df_iat > -50)
+        iat = "IAT " + QString::number(df_iat, 'f', 1) + " " + QChar(0x00B0) + "C"; // 1 decimal
+   else
+        iat = "IAT is OPEN!"; // added for diagnostics
     qreal df_inj_time_ms = df_inj_time / 1000.0;
     qreal injduty = df_inj_duty;
     if (injduty > injduty_max)
@@ -309,7 +338,7 @@ void DFExtendedWidget::paint() {
     else if ( df_wot_flag | 0x10 )
         dk += "- WOT Enrich pending";
     else
-            dk+="";
+        dk+="";
     }
 
 #else
@@ -333,10 +362,25 @@ void DFExtendedWidget::paint() {
     QString injection = "Inj " + QString::number(df_inj_time_ms, 'f', 1) + "ms " + QString::number(injduty, 'f', 1) + " % (" + QString::number(injduty_max, 'f', 0) + "%)";
 
     //make 0-250kpa
+#if defined ( DIGIFANTAPP )
+    QString boost = "Boost " +
+            QString::number( AppEngine::getInstance()->getDfBoostTransferFunction()->map( df_boost_raw ), 'f', 2 ) + " kpa";
+#else
     QString boost = "Boost " + QString::number(df_boost_raw) + " (raw) "  +
             QString::number( AppEngine::getInstance()->getDfBoostTransferFunction()->map( df_boost_raw ), 'f', 2 ) + " kpa";
-
-    QString lambda = "NB O2 " + QString::number(df_O2_Volts, 'f', 0) + " mV";
+#endif
+    QString lambda = "NB O2";
+    lambda += " " + QString::number(df_lambda_nb, 'f', 2);
+    QString nbLambda = "1";
+    if ( df_O2_Volts > 800 )
+        nbLambda = "rich";
+    if ( df_O2_Volts <= 800 && df_O2_Volts > 450 )
+        nbLambda = "0.99";
+    if ( df_O2_Volts < 500 && df_O2_Volts > 150 )
+        nbLambda = "1.01";
+    if ( df_O2_Volts <= 150  )
+        nbLambda = "lean";
+    lambda += " " + nbLambda;
 
     QString ect_enrich = "ECT enrich " + QString::number(df_ect_enrich);
     QString iat_enrich = "IAT enrich " + QString::number(df_iat_enrich);
@@ -348,7 +392,7 @@ void DFExtendedWidget::paint() {
     double isv_percent = (1 - (isv_conv / 2073.0)) * 100;
     //QString isv = "ISV " + QString::number(isv_conv) + " us " + QString::number(isv_percent) + "%";
     QString isv = "ISV open " + QString::number(isv_percent, 'f', 0) + "%";
-    QString voltage = "Volt " + QString::number(voltageMap->mapValue(df_voltage), 'f', 2) + " V";
+    QString voltage = "Bat " + QString::number(voltageMap->mapValue(df_voltage), 'f', 2) + " V";
     QString lc = "LC ";
     if ( df_lc_flags & 8)
         lc += "ON";
@@ -370,6 +414,14 @@ void DFExtendedWidget::paint() {
         dk = "WOT";
     else if ( df_wot_flag & 0x10 )
         dk = "idle";
+    
+    QString speedStr = QString::number(speed) + " km/h ";
+    if ( speedGps )
+        speedStr += "(GPS) ";
+    if ( gear > 0 )
+        speedStr += " @ " + QString::number(gear) + " g";
+    
+    QString n75Str = "N75 " + QString::number(n75_duty/255) + " %";
 #endif
 
     painter.setFont(textFont);
@@ -377,8 +429,14 @@ void DFExtendedWidget::paint() {
 
     h += fm.lineSpacing();
     painter.drawText( QPoint (0, h), ign );
+
+#if defined (DIGIFANTVANAPP)
+    setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(w, h), voltage );
+#else
     setPositionForCol(fm.lineSpacing(),2);
     painter.drawText( QPoint (w, h), retard + " (" + QString::number(maxRetard, 'g',2) + ")" );
+#endif
 
 
     h += fm.lineSpacing();
@@ -389,48 +447,50 @@ void DFExtendedWidget::paint() {
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), injection );
 
-    //Good to here
+
+
+//Good to here
 #if defined (DIGIFANTVANAPP)
-        h += fm.lineSpacing();
-        painter.drawText( QPoint(0, h), boost,'f', 2 ); // AFM volts
+    h += fm.lineSpacing();
+    painter.drawText( QPoint(0, h), boost,'f', 2 ); // AFM volts
 
-        setPositionForCol(fm.lineSpacing(),2);
+    setPositionForCol(fm.lineSpacing(),2);
 
-        painter.drawText( QPoint(w, h), lambda1,'f', 2 ); //Added WB lambda to second column
-        h += fm.lineSpacing();
+    painter.drawText( QPoint(w, h), lambda1,'f', 2 ); //Added WB lambda to second column
+    h += fm.lineSpacing();
 
-        painter.drawText( QPoint(0, h), lambda ); //narrow band O2
-        setPositionForCol(fm.lineSpacing(),2);
+    painter.drawText( QPoint(0, h), lambda ); //narrow band O2
+    setPositionForCol(fm.lineSpacing(),2);
 
-        painter.drawText(QPoint(w, h), lambda2  ); //WB lambda volts
+    painter.drawText(QPoint(w, h), lambda2  ); //WB lambda volts
 
-    //add OXS PID and OXS Int here
-        h += fm.lineSpacing();  //add space
-        painter.drawText( QPoint(0, h), OXS_PID );
-        setPositionForCol(fm.lineSpacing(),2); // 2nd column
-        painter.drawText( QPoint(w, h), OXS_INT );
+//add OXS PID and OXS Int here
+    h += fm.lineSpacing();  //add space
+    painter.drawText( QPoint(0, h), OXS_PID );
+    setPositionForCol(fm.lineSpacing(),2); // 2nd column
+    painter.drawText( QPoint(w, h), OXS_INT );
 
-        h += fm.lineSpacing();  //add space
-        painter.drawText( QPoint(0, h), trans_enrich ); //transient enrichment
-        setPositionForCol(fm.lineSpacing(),2); // 2nd column
-        painter.drawText( QPoint(w, h), trans_enrich_tmr ); //transient enrichment timer
-        h += fm.lineSpacing();
-        painter.drawText( QPoint(0, h), ect_enrich );
-        setPositionForCol(fm.lineSpacing(),2); // 2nd column
-        painter.drawText( QPoint(w, h), WOTtimer );
-        h += fm.lineSpacing();
-        painter.drawText( QPoint(0, h), dk ); // Throttle switch and Idle/Mid/WOT conditions
+    h += fm.lineSpacing();  //add space
+    painter.drawText( QPoint(0, h), trans_enrich ); //transient enrichment
+    setPositionForCol(fm.lineSpacing(),2); // 2nd column
+    painter.drawText( QPoint(w, h), trans_enrich_tmr ); //transient enrichment timer
+    h += fm.lineSpacing();
+    painter.drawText( QPoint(0, h), ect_enrich );
+    setPositionForCol(fm.lineSpacing(),2); // 2nd column
+    painter.drawText( QPoint(w, h), WOTtimer );
+    h += fm.lineSpacing();
+    painter.drawText( QPoint(0, h), dk ); // Throttle switch and Idle/Mid/WOT conditions
 
-        if ( !landscape_for_text ) {
-            h += 2 * fm.lineSpacing();
-            QFont backupFont = textFont;
-            int ps = textFont.pointSize();
-            textFont.setPointSize(ps * 0.75);
-            painter.setFont(textFont);
-            painter.drawText( QPoint(0, h), "by digifant-onlineabstimmung.de" );
-            textFont = backupFont;
-            painter.setFont(textFont);
-        }
+    if ( !landscape_for_text ) {
+        h += 2 * fm.lineSpacing();
+        QFont backupFont = textFont;
+        int ps = textFont.pointSize();
+        textFont.setPointSize(ps * 0.75);
+        painter.setFont(textFont);
+        painter.drawText( QPoint(0, h), "by digifant-onlineabstimmung.de" );
+        textFont = backupFont;
+        painter.setFont(textFont);
+    }
 #else
 
     h += fm.lineSpacing();
@@ -481,6 +541,22 @@ void DFExtendedWidget::paint() {
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), lc_state);
 
+#if defined (DIGIFANTAPP)
+    h += fm.lineSpacing();
+    painter.drawText( QPoint(0, h), speedStr);
+    if ( landscape_for_text ) {
+        setPositionForCol(fm.lineSpacing(),2); // 2. column
+        if ( n75_duty > 0 ) {
+            painter.drawText( QPoint(w, h), n75Str);
+        }
+    } else {
+        if ( n75_duty > 0 ) {
+            h += fm.lineSpacing();
+            painter.drawText( QPoint(0, h), n75Str);
+        }
+    }
+#endif
+    
     if ( !landscape_for_text ) {
         h += 2 * fm.lineSpacing();
         QFont backupFont = textFont;
@@ -499,6 +575,12 @@ void DFExtendedWidget::paint() {
 #else
     const int knockBarHeigth = 40;
 #endif
+#if defined (DIGIFANTVANAPP)
+    int barW = size().width() * (df_O2_Volts/1286); //1286
+    painter.fillRect( QRect(0,size().height()-knockBarHeigth, barW, size().height()), rawKnockBlend->overblend3(df_O2_Volts) );
+    painter.drawText( QRect(0, size().height()-knockBarHeigth + QFontMetrics(textFont).leading(), this->size().width(), this->size().height() ),
+                      Qt::AlignLeft, "Nb O2 " + QString::number  ((df_O2_Volts),'f',0)+ " mV (Max " + QString::number(O2_Volts_max, 'f', 0)+ " mV)");
+#else
     painter.fillRect( QRect(0,size().height()-knockBarHeigth, size().width(),size().height()), Qt::white );
     int barW = size().width() * (df_knock_raw/255.0);
     painter.fillRect( QRect(0,size().height()-knockBarHeigth, barW, size().height()), rawKnockBlend->overblend3(df_knock_raw) );
@@ -508,7 +590,7 @@ void DFExtendedWidget::paint() {
         painter.drawText( QRect(0, size().height()-knockBarHeigth + QFontMetrics(textFont).leading(), this->size().width(), this->size().height() ),
                           Qt::AlignLeft, "knock " + QString::number (df_knock_raw));
 //    }
-
+#endif
     painter.end();
 }
 

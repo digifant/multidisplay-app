@@ -26,6 +26,9 @@ protected:
     DFExtendedWidget *dfexw;
     MeasurementWidget *lw;
     MaxEgtWidget *egtw;
+#if defined (DIGIFANTVANAPP)
+    MeasurementWidget* rpmw;
+#endif
 };
 
 #endif // DIGIFANTAPPLICATIONWINDOW_H

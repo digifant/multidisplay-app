@@ -268,6 +268,12 @@ public:
             QTableView* dataView=NULL);
     virtual ~MdData();
 
+    enum accTimingState {
+           NoMeasure = 0,
+           Measuring
+    };
+    Q_ENUM(accTimingState)
+
     void addDataRecord (MdDataRecord* nr, bool doReplot=true);
     void checkMaxValues (MdDataRecord* nr);
 
@@ -338,6 +344,8 @@ public slots:
 
     void clearPlots();
     void visualizeDataRecord (MdDataRecord* nr, bool doReplot=true);
+    //! evaluate a new data record
+    void evaluateDataRecord (MdDataRecord* nr);
 
     //! helper for operations on selected cells; list is not sorted!
     QList<int> helperGetUniqueRows (QItemSelectionModel *select );
@@ -365,7 +373,7 @@ private:
     V2PowerDialog* powerDialog;
     WotEventsDialog* wotEventsDialog;
 
-    QLinkedList<MdPlot*> plotList;
+    std::list<MdPlot*> plotList;
 
     QTableView* dataView;
 
@@ -405,6 +413,15 @@ private:
     Map16x1_ISV *isvMap;
 
     MaxDataSet* maxValues[MAXVALUES];
+
+    int accTimingStartSpeed = 100;
+    int accTimingEndSpeed = 200;
+    accTimingState accTimingState = NoMeasure;
+    double accTiming_last_speed = 0;
+    bool accTiming_gps=false;
+    int accTiming_li = 0;
+    int accTiming_ui = 0;
+    QList<int> accTiming_rowList = QList<int>();
 };
 
 

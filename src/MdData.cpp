@@ -43,7 +43,7 @@
 #include <QProgressBar>
 #include <QPair>
 
-#if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
+#if  defined (Q_WS_MAEMO_5)  || defined (ANDROID) || defined (Q_OS_IOS)
 #include "mobile/Accelerometer.h"
 #include "mobile/MobileGPS.h"
 #endif
@@ -54,7 +54,7 @@
 #include <QFileDialog>
 #endif
 
-MaxDataSet::MaxDataSet () : p(NULL) {
+MaxDataSet::MaxDataSet () : p(nullptr) {
 
 }
 
@@ -230,7 +230,7 @@ MdData::~MdData() {
 }
 
 void MdData::writeSettings () {
-#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID) && !defined (Q_OS_IOS)
     QSettings settings("MultiDisplay", "UI");
     settings.beginGroup("DataTableView");
     for (int i=0 ; i<headerColNames.size() ; i++) {
@@ -240,7 +240,7 @@ void MdData::writeSettings () {
 #endif
 }
 void MdData::readSettings () {
-#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID) && !defined (Q_OS_IOS)
     QSettings settings("MultiDisplay", "UI");
     settings.beginGroup("DataTableView");
     for (int i=0 ; i<headerColNames.size() ; i++) {
@@ -306,8 +306,23 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
         QList<int> dr = helperGetUniqueRows ( select );
         foreach (int i, dr) {
             MdSensorRecord *record = dataList.at( size - i - 1)->getSensorR();
+#if defined (DIGIFANTVANAPP)
+            record->setBoost( tf->map(record->df_boost_raw));
+#else
             //HACK set ambient pressure to 100kpa!
             record->setBoost( qFloor ( ((tf->map(record->df_boost_raw) - 100) / 100) *100) / 100.0 );
+#endif
+#if defined (DIGIFANTAPP)
+            if ( record->df_flags & 8 && record->getThrottle() == 0)
+                record->setThrottle(100);
+            else {
+                if ( record->df_flags & 0x10 && record->getThrottle() == 0)
+                    ;
+                else
+                    if ( record->getThrottle() == 0 )
+                        record->setThrottle (50);
+            }
+#endif
         }
     }
 
@@ -315,7 +330,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
         //first selected element
         Q_ASSERT (select != NULL);
         QList<int> rows;
-        if ( select != NULL ) {
+        if ( select != nullptr ) {
             //complete row is selected
             QModelIndexList sr = select->selectedRows();
             if ( ! sr.isEmpty() ) {
@@ -344,7 +359,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
     if ( a == dataViewContextMenuPowerPlot || a == dataViewContextMenuPowerPlotGPS ) {
         QList<int> rows;
         Q_ASSERT (select != NULL);
-        if ( select != NULL ) {
+        if ( select != nullptr ) {
             //complete row is selected
             QModelIndexList sr = select->selectedRows();
             if ( ! sr.isEmpty() ) {
@@ -373,7 +388,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
     if ( a == dataViewContextMenuCalc100to200 ) {
         QList<int> rows;
         Q_ASSERT (select != NULL);
-        if ( select != NULL ) {
+        if ( select != nullptr ) {
             //complete row is selected
             QModelIndexList sr = select->selectedRows();
             if ( ! sr.isEmpty() ) {
@@ -406,7 +421,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
                         }
                     }
 
-                    QMessageBox::information (NULL, "time 100-200 km/h",s);
+                    QMessageBox::information (nullptr, "time 100-200 km/h",s);
                 }
             }
         }
@@ -414,7 +429,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
     if ( a == dataViewContextMenuCalc100to200GPS ) {
         QList<int> rows;
         Q_ASSERT (select != NULL);
-        if ( select != NULL ) {
+        if ( select != nullptr ) {
             //complete row is selected
             QModelIndexList sr = select->selectedRows();
             if ( ! sr.isEmpty() ) {
@@ -438,6 +453,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
 
                     QString s = "100-200 km/h in " + QString::number(time[-1].time_s, 'f', 2) + " secs (GPS)";
                     s += "\nkm/h\ttime[s]\tt delta\talt delta\talt(GPS)";
+                    bool valid = true;
                     foreach ( qreal sp , time.keys() ) {
                         if ( sp != -1 )
                             s += "\n" + QString::number(sp)
@@ -445,8 +461,15 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
                                     + "\t" + QString::number(time[sp].time_delta, 'f', 2)
                                     + "\t" + QString::number(time[sp].alt_delta, 'f', 2)
                                     + "\t" + QString::number(time[sp].alt, 'f', 2);
+                        else {
+                            valid = time[sp].valid;
+                            if ( valid )
+                                s += "\nVALID\n";
+                            else
+                                s += "\nNOT VALID\n";
+                        }
                     }
-                    QMessageBox::information (NULL, "time 100-200 km/h",s);
+                    QMessageBox::information (nullptr, "time 100-200 km/h",s);
                 }
             }
         }
@@ -466,7 +489,7 @@ void MdData::tableDataView_customContextMenu( const QPoint& pos) {
                 + QDir::separator() + "selection.mdv2";
 #endif
 
-        QString fn = QFileDialog::getSaveFileName ( NULL, QString("Select Filename"), path,
+        QString fn = QFileDialog::getSaveFileName ( nullptr, QString("Select Filename"), path,
                                                     "mdv2 (*.mdv2)");
         saveData (fn, dataList.size() - dr.back() - 1, dataList.size() - dr.front() - 1);
     }
@@ -1026,8 +1049,8 @@ bool MdData::loadData ( const QString& filename ) {
 	ds >> magic;
 	ds >> version;
 
-    int l = 0;
-	MdDataRecord* r = NULL;
+        int l = 0;
+	MdDataRecord* r = nullptr;
         Map16x1_Voltage vmap;
 
         switch ( version ) {
@@ -1067,7 +1090,7 @@ bool MdData::loadData ( const QString& filename ) {
             }
             break;
         default:
-            QMessageBox::critical  ( NULL, QString("wrong file version"),
+            QMessageBox::critical  ( nullptr, QString("wrong file version"),
                                      QString("load of incompatible file version ")  + QString::number(version) + QString(" attempted!") );
             return false;
         }
@@ -1095,7 +1118,7 @@ bool MdData::loadData ( const QString& filename ) {
 
     emit showStatusMessage ("Data loaded from File " + filename + " (" + QString::number(l) + " rows)");
 
-#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
+#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID) || defined (Q_OS_IOS)
     //disabled on mobile
     ;
 #else
@@ -1111,14 +1134,26 @@ void MdData::clearData () {
 		p->clear();
 	}
 
-    beginRemoveRows( QModelIndex(), 0, dataList.size()-1 );
-	foreach ( MdDataRecord* r , dataList )
+    if ( dataList.size() > 1 ) {
+        beginRemoveRows( QModelIndex(), 0, dataList.size()-1 );
+        foreach ( MdDataRecord* r , dataList )
 			delete (r);
-	dataList.clear();
-    endRemoveRows();
+        dataList.clear();
+        endRemoveRows();
+    }
+    accTimingState = NoMeasure;
+    accTiming_last_speed = 0;
+    accTiming_gps=false;
+    accTiming_li = 0;
+    accTiming_ui = 0;
+    accTiming_rowList.clear();
+    powerDialog->powerPlot()->accTimingList.clear();
 }
 
 void MdData::addDataRecord (MdDataRecord *nr, bool doReplot) {
+    //fix lambda df / md
+    //nr->getSensorR()->setBatcur( nr->getSensorR()->df_voltage );
+
 	insertRows(dataList.size(), 1, QModelIndex());
 	dataList.push_back(nr);
     if ( dataView ) {
@@ -1127,6 +1162,7 @@ void MdData::addDataRecord (MdDataRecord *nr, bool doReplot) {
         ;
     }
 	visualizeDataRecord(nr, doReplot);
+    evaluateDataRecord(nr);
 }
 
 void MdData::checkMaxValues (MdDataRecord* nr) {
@@ -1493,10 +1529,10 @@ bool MdData::removeRows ( int row, int count, const QModelIndex & parent ) {
 }
 
 void MdData::visualizeDataRecord (MdDataRecord* nr, bool doReplot) {
-    if ( nr->getSensorR() != NULL ) {
+    if ( nr->getSensorR() != nullptr ) {
         boostPidPlot->addRecord(nr->getSensorR(), doReplot );
     }
-    if ( nr->getSensorR() != NULL ) {
+    if ( nr->getSensorR() != nullptr ) {
         visPlot->addRecord(nr->getSensorR(), doReplot );
     }
     emit rtNewDataRecord(nr);
@@ -1506,7 +1542,89 @@ void MdData::visualizeDataRecord (MdDataRecord* nr, bool doReplot) {
 //	if ( doReplot ) {
 //		visPlot->replot();
 //		boostPidPlot->replot();
-//	}
+    //	}
+}
+
+void MdData::evaluateDataRecord(MdDataRecord *nr)
+{
+    double speed = nr->getSensorR()->getSpeed();
+
+    switch (accTimingState) {
+    case NoMeasure:
+        if ( speed == 0 ) {
+            if ( nr->getMobileR() != nullptr ) {
+                speed = nr->getMobileR()->gpsGroundSpeed;
+                accTiming_gps = true;
+            }
+        } else
+                accTiming_gps = false;
+        if ( accTiming_last_speed < accTimingStartSpeed && speed > accTimingStartSpeed ) {
+            //start
+            accTiming_li = dataList.size()-2;
+            accTiming_rowList.push_back(accTiming_li);
+            accTiming_rowList.push_back(accTiming_li+1);
+            accTimingState = Measuring;
+            emit showStatusMessage(QString::number(accTimingStartSpeed) + "-" + QString::number(accTimingEndSpeed) + " km/h Start!");
+        } else
+            accTiming_li = 0;
+        accTiming_last_speed = speed;
+        break;
+    case Measuring:
+        if ( accTiming_gps )
+            speed = nr->getMobileR()->gpsGroundSpeed;
+        if ( accTiming_last_speed < accTimingEndSpeed && speed > accTimingEndSpeed ) {
+            //finish!
+            accTiming_ui = dataList.size()-1;
+            accTiming_rowList.push_back(accTiming_ui);
+            accTimingState = NoMeasure;
+            //now calculate it
+            std::sort (accTiming_rowList.begin(), accTiming_rowList.end());
+            QMap<qreal,SpeedData> time;
+            if ( accTiming_gps )
+                time = powerDialog->powerPlot()->calculateTimeBetweenSpeedsGPS (dataList, accTiming_rowList, accTimingStartSpeed, accTimingEndSpeed);
+            else
+                time = powerDialog->powerPlot()->calculateTimeBetweenSpeeds (dataList, accTiming_rowList, accTimingStartSpeed, accTimingEndSpeed);
+            accTiming_rowList = QList<int>();
+            qDebug() << accTimingStartSpeed << "-" << accTimingEndSpeed << " km/h in " << time[-1].time_s << " msecs";
+            if ( time[-1].time_s > 0 ) {
+                QString s = QString::number(accTimingStartSpeed) + "-" + QString::number(accTimingEndSpeed) + " km/h in " + QString::number(time[-1].time_s, 'f', 2) + " secs";
+                if ( accTiming_gps )
+                    s += " GPS";
+                if ( time[-1].valid )
+                    s += " VALID";
+                else
+                    s += " INVALID!";
+                qDebug() << "acceleration timing : " << s;
+                //TODO overlay!
+                //TODO store performance data / ui!
+                emit showStatusMessage(s);
+                QString s2 = "km/h\ttime[s]\tt delta\talt delta\talt(GPS)";
+                foreach ( qreal sp , time.keys() ) {
+                    if ( sp != -1 ) {
+                        s2 += "\n" + QString::number(sp)
+                                + "\t" + QString::number(time[sp].time_s, 'f', 2)
+                                + "\t" + QString::number(time[sp].time_delta, 'f', 2)
+                                + "\t" + QString::number(time[sp].alt_delta, 'f', 2)
+                                + "\t" + QString::number(time[sp].alt, 'f', 2);
+                    }
+                }
+                emit showStatusMessage(s2);
+                powerDialog->powerPlot()->accTimingList.push_back(time);
+            }
+        } else {
+            if ( speed > accTimingStartSpeed ) {
+                if ( dataList.at(accTiming_li)->getSensorR()->getTime() + 30000 < nr->getSensorR()->getTime() ) {
+                    //abort
+                    accTimingState = NoMeasure;
+                    accTiming_rowList = QList<int>();
+                } else {
+                    accTiming_rowList.append( dataList.size()-1 );
+                }
+            }
+        }
+        accTiming_last_speed = speed;
+        break;
+    }
 }
 
 QList<MdDataRecord*> & MdData::getData() {

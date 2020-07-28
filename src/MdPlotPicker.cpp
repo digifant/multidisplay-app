@@ -67,13 +67,39 @@ QwtText MdPlotPicker::trackerTextF (const QPointF &pos ) const {
 //                t.append ( myPlot->getCurveColor(curvenum).name() );
                 t.append ( i->curve->pen().color().name() );
                 t.append ("\">");
-                // show the real values (new apply a factor to some curves!)
-                if ( i->curve->title().text() == "Speed")
-                    t.append( QString::number(i->y / 10 ) );
-                else if ( i->curve->title().text() == "N75")
-                    t.append( QString::number(i->y * 25) );
-                else
-                    t.append( QString::number(i->y) );
+                // show the real values (new apply a factor to some curves!
+                bool gotit = false;
+                if ( i->curve->title().text() == "Speed") {
+                    t.append( QString::number(i->y / 10, 'f',1 ) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "N75") {
+                    t.append( QString::number(i->y * 25, 'f', 0) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "Knock") {
+                    t.append( QString::number(i->y * 25, 'f', 0) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "Ignition Retard") {
+                    t.append( QString::number(i->y * 4, 'f', 1) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "Ignition") {
+                    t.append( QString::number(i->y * 6, 'f', 1) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "rpm") {
+                    t.append( QString::number(i->y, 'f', 0) );
+                    gotit = true;
+                }
+                if ( i->curve->title().text() == "lambda") {
+                    t.append( QString::number(i->y, 'f', 2) );
+                    gotit = true;
+                }
+                if ( ! gotit )
+                    t.append( QString::number(i->y, 'f',1) );
+
                 t.append( "</span>");
                 curvenum++;
         	}

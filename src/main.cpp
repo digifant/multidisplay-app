@@ -68,6 +68,11 @@ int main(int argc, char *argv[]) {
         }
     }
 #endif
+        
+#if defined (Q_OS_IOS)
+    //https://doc.qt.io/qt-5/qtbluetooth-index.html
+    //QLoggingCategory::setFilterRules(QStringLiteral("qt.bluetooth.ios = true"));
+#endif
 
 
 

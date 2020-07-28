@@ -29,7 +29,21 @@ protected:
     QwtThermo *thermo;
 };
 
+#if defined (DIGIFANTVANAPP)
+    class BoostBarGraphWidget : public BarGraphWidget
+    {
+        Q_OBJECT
+    public:
+        BoostBarGraphWidget ( QWidget * parent = nullptr, const QString & title = "AFM-Volts", const double & min = 0.1, const double & max = 5.0 , const double & alarm = 4.5   );
+    };
+    class RPMBarGraphWidget : public BarGraphWidget
+    {
+        Q_OBJECT
+    public:
+        RPMBarGraphWidget ( QWidget * parent = nullptr, const QString & title = "RPM", const double & min = 0, const double & max = 6000 , const double & alarm = 4500   );
+    };
 
+#else
 class BoostBarGraphWidget : public BarGraphWidget
 {
     Q_OBJECT
@@ -43,6 +57,7 @@ class RPMBarGraphWidget : public BarGraphWidget
 public:
     RPMBarGraphWidget ( QWidget * parent = 0, const QString & title = "RPM", const double & min = 0, const double & max = 8000 , const double & alarm = 7000   );
 };
+#endif
 
 class LambdaBarGraphWidget : public BarGraphWidget
 {
@@ -60,7 +75,7 @@ protected:
 };
 
 
-#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID)
+#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 class GLGauge : public QGLWidget {
 //class GLGauge : public QFrame {
 #else

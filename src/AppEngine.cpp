@@ -82,6 +82,13 @@
     #include <QtAndroid>
 #endif
 
+#if defined (Q_OS_IOS)
+    #include "com/MdBluetoothCom.h"
+    #include "com/MdBluetoothLECom.h"
+    #include "mobile/MobileGPS.h"
+    #include "mobile/Accelerometer.h"
+#endif
+
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
 #include "mobile/MobileGPS.h"
 #include "mobile/Accelerometer.h"
@@ -95,7 +102,7 @@ AppEngine* AppEngine::getInstance() {
 
 AppEngine::AppEngine() {
 
-#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (ANDROID) && !defined (Q_OS_IOS)
     qDebug() << "desktop version";
     pcmw = new MultidisplayUIMainWindow ();
     mmw = nullptr;
@@ -255,6 +262,42 @@ AppEngine::AppEngine() {
     actualizeDashboard = false;
 #endif
 
+#if defined (Q_OS_IOS)
+    amw = new AndroidMainWindow ();
+
+    pcmw = NULL;
+    mmw = NULL;
+    //FIXME
+    mbw = new MobileBoostPidWindow (amw);
+    mvis1w = new MobileVis1MainWindow (mbw);
+
+    data = new MdData(mbw, mbw->ui->BoostGraphGroupBox, mvis1w, mvis1w->ui->Vis1PlotBox );
+
+    //mdcom = new MdBluetoothCom(this);
+    mdcom = new MdBluetoothLECom(this);
+    //mdcom = new MdBluetoothWrapper(this);
+    mds = new MdBinaryProtocol(this, data, mdcom);
+
+    mySerialOptionsDialog = new SerialOptionsDialog ();
+    //mySerialOptionsDialog->setGeometry( QRect(0,0,700,350) );
+    mcw = new MobileCommandWindow(amw);
+    aboutDialog = new AboutDialog(amw);
+
+    evalWinBoostLambda = new EvaluationWindow (amw, data, EvaluationWindow::BoostLambda );
+    Q_ASSERT(evalWinBoostLambda != NULL);
+    evalWinRPMBoost = new EvaluationWindow (amw, data, EvaluationWindow::RPMBoost );
+    Q_ASSERT(evalWinRPMBoost != NULL);
+    //	evalWinBoostLambdaSpectro = new EvaluationWindow (NULL, data, EvaluationWindow::SpectroBoostLambda );
+
+    v2N75SetupDialog = new V2N75SetupDialog(amw);
+    v2SettingsDialog = new V2SettingsDialog(amw);
+    gearSettingsDialog = new GearSettingsDialog(amw);
+
+    actualizeVis1 = false;
+    actualizeDashboard = false;
+
+    //TODO do we have to request rights on IOS???
+#endif
 
     //Replay
     replaySpeedUpFactor = 1;
@@ -263,13 +306,13 @@ AppEngine::AppEngine() {
 
     connect (replay, SIGNAL(clearPlots()), data, SLOT(clearPlots()) );
 
-#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)  && !defined (Q_OS_IOS)
     connect (replay, SIGNAL(showStatusMessage(QString)), pcmw, SLOT(showStatusMessage(QString)), Qt::QueuedConnection );
 #endif
     connect (replay, SIGNAL(visualizeDataRecord(MdDataRecord*,bool)), data, SLOT(visualizeDataRecord(MdDataRecord*,bool)), Qt::QueuedConnection );
 
 
-#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
+#if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID) || defined (Q_OS_IOS)
     setupMobile();
 #else
     setupPC();
@@ -408,6 +451,7 @@ void AppEngine::setupPC() {
     //Dashboard
     rtvis = new RealTimeVis ( dynamic_cast<QWidget*>(pcmw->ui.DashboardTab) );
     connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
+    connect (data, SIGNAL(showStatusMessage(QString)), rtvis, SLOT(showStatusMessage(QString)) );
 
     //Digifant-1 stuff
     connect (this, SIGNAL(newDfBoostTransferFunction(int)), pcmw, SLOT(newDfBoostTransferFunction(int)));
@@ -577,9 +621,9 @@ void AppEngine::setupAndroid () {
     connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
 
     //TODO dont works! :(
-    QAction *a = new QAction("aha", amw->ui->menubar);
-    amw->ui->menubar->addAction(a);
-    connect(a, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
+    //QAction *a = new QAction("aha", amw->ui->menubar);
+    //amw->ui->menubar->addAction(a);
+    //connect(a, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
 
     //    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), v2N75SetupDialog, SLOT(showMaximized()));
 //    connect (v2N75SetupDialog, SIGNAL(n75reqDutyMap(quint8,quint8,quint8)), mds, SLOT(mdCmdReqN75DutyMap(quint8,quint8,quint8)));
@@ -626,6 +670,7 @@ void AppEngine::setupAndroid () {
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (this, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (data, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mdcom, SIGNAL(portClosed()), amw, SLOT(btPortClosed()) );
     connect (mdcom, SIGNAL(portOpened()), amw, SLOT(btPortOpened()) );
 
@@ -657,6 +702,74 @@ void AppEngine::setupAndroid () {
 }
 
 void AppEngine::setupIos() {
+#if defined (Q_OS_IOS)
+    QSettings s;
+    qDebug() << "settings are stored in " << s.fileName();
+
+    connect (amw, SIGNAL(writeSettings()), this, SLOT(writeSettings()));
+
+    //Evaluations
+
+    //Vis1 (Graph)
+
+    //replay
+
+    //Bluetooth
+    connect (mds, SIGNAL(portOpened()), mvis1w, SLOT(disableReplay()));
+    connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
+
+    //V2 settings
+    /*
+    AndroidN75Dialog* an75 = new AndroidN75Dialog (amw, mds);
+    connect (amw->ui->actionV2_N75_Settings, SIGNAL(triggered()), an75, SLOT(showMaximized()));
+*/
+    //TODO FIXME: refactor menu!
+    /*
+    delete (amw->ui->menuConfig);
+    amw->ui->menuConfig = nullptr;
+    delete ( amw->ui->actionSettings );
+    amw->ui->actionSettings = nullptr;
+    */
+    connect (amw->ui->actionSettings, SIGNAL(triggered()), v2SettingsDialog, SLOT(showMaximized()));
+
+    connect (amw->ui->actionGearbox_settings, SIGNAL(triggered()), gearSettingsDialog, SLOT(showMaximized()) );
+    connect (amw->ui->actionAbout, SIGNAL(triggered()), aboutDialog, SLOT(showMaximized()));
+
+    add = new AndroidDashboardDialog( );
+    //rtvis = new RealTimeVis ( add );
+    rtvis = new RealTimeVis ( amw );
+    connect (data, SIGNAL(rtNewDataRecord(MdDataRecord*)), rtvis, SLOT(visualize(MdDataRecord*)));
+
+    connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (this, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
+    connect (mdcom, SIGNAL(showStatusMessage(QString)), rtvis, SLOT(showStatusMessage(QString)) );
+    connect (mds, SIGNAL(showStatusMessage(QString)), rtvis, SLOT(showStatusMessage(QString)) );
+    connect (this, SIGNAL(showStatusMessage(QString)), rtvis, SLOT(showStatusMessage(QString)) );
+    connect (data, SIGNAL(showStatusMessage(QString)), rtvis, SLOT(showStatusMessage(QString)) );
+    connect (mdcom, SIGNAL(portClosed()), amw, SLOT(btPortClosed()) );
+    connect (mdcom, SIGNAL(portOpened()), amw, SLOT(btPortOpened()) );
+
+    connect (amw->ui->actionBluetoothToggleState, SIGNAL(triggered()), mdcom, SLOT(togglePort()) );
+    connect (amw->ui->actionSave, SIGNAL(triggered()) , this, SLOT(saveDataAs()) );
+    connect (amw->ui->actionOpen_Replay, SIGNAL(triggered()) , this, SLOT(openData()) );
+    connect (amw->ui->actionClear, SIGNAL(triggered()) , this, SLOT(clearData()) );
+
+
+    QSettings settings;
+    if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
+        mGps = new MobileGPS (this);
+    else
+        mGps = nullptr;
+    if ( settings.value("mobile/use_accel", QVariant(true)).toBool() )
+        accelMeter = new Accelerometer(this);
+    else
+        accelMeter = nullptr;
+
+    connect ( v2SettingsDialog, SIGNAL(cfgDialogAccepted()), rtvis, SLOT(possibleCfgChange()) );
+
+    rtvis->showStatusMessage("Bluetooth autoconnect");
+#endif
 }
 
 void AppEngine::reCreateDialogsAndroidFix()
@@ -686,7 +799,7 @@ void AppEngine::reCreateDialogsAndroidFix()
 
 
 void AppEngine::show() {
-#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID)
+#if  !defined (Q_WS_MAEMO_5)  && !defined (Q_OS_ANDROID) && !defined (Q_OS_IOS)
     //Windows / Linux Desktop GUI
     pcmw->show();
 #endif
@@ -707,6 +820,11 @@ void AppEngine::show() {
         //add->showMaximized();
     }
  #endif
+
+#if defined (Q_OS_IOS)
+    amw->showMaximized();
+    //amw->showFullScreen();
+#endif
 }
 
 void AppEngine::saveData () {
@@ -730,12 +848,15 @@ void AppEngine::saveData () {
 #endif
 
     data->saveData(path);
+/*
+* disabled 2020-06: we already store gps and accel reading in MdDataRecord!
 #if  defined (Q_WS_MAEMO_5)  || defined (Q_OS_ANDROID)
     if ( mGps ) {
         mGps->saveTrack (path + ".track");
         mGps->saveTrackBinary (path + ".trackB");
     }
 #endif
+*/
 }
 
 void AppEngine::saveDataAsCSV() {
@@ -762,8 +883,13 @@ void AppEngine::saveDataAsCSV() {
     path = QString("/scard") + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 */
+#if defined (Q_OS_LINUX)
+    QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
+                                                "CSV (*.csv)", nullptr, QFileDialog::DontUseNativeDialog);
+#else
     QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
                                                 "CSV (*.csv)");
+#endif
     if ( fn != "")
         data->saveDataCSV(fn);
 }
@@ -797,8 +923,13 @@ void AppEngine::saveDataAs () {
     //https://codereview.qt-project.org/c/qt/qtbase/+/251238
     emit showStatusMessage( "save to " + fn );
 #else
+#if defined (Q_OS_LINUX)
+    QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
+                                                "mdv2 (*.mdv2)", nullptr, QFileDialog::DontUseNativeDialog);
+#else
     QString fn = QFileDialog::getSaveFileName ( pcmw, QString("Select Filename"), path,
                                                 "mdv2 (*.mdv2)");
+#endif
 #endif
     if ( fn != "") {
         if ( ! data->saveData(fn) ) {
@@ -823,19 +954,26 @@ void AppEngine::saveDataAs () {
 
 #endif
         }
+/*
+ * disabled 2020-06: we already store gps and accel reading in MdDataRecord!
 #if  defined (Q_WS_MAEMO_5)  || defined (ANDROID)
         if ( mGps ) {
             mGps->saveTrack (fn + ".track");
             mGps->saveTrackBinary (fn + ".trackB");
         }
 #endif
+*/
     }
 }
 void AppEngine::openData ( QString fn ) {
     if ( fn == "" ) {
         //, QString("~"), QString("*.mdd")
 //        QString path = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation);
-        fn = QFileDialog::getOpenFileName ( pcmw, QString("Select Filename"), directory, "mdv2 (*.mdv2)" );
+#if defined (Q_OS_LINUX)
+        fn = QFileDialog::getOpenFileName ( pcmw, tr("Select Filename"), directory, tr("mdv2 (*.mdv2)"), nullptr, QFileDialog::DontUseNativeDialog);
+#else
+        fn = QFileDialog::getOpenFileName ( pcmw, tr("Select Filename"), directory, tr("mdv2 (*.mdv2)"), nullptr);
+#endif
     }
 
 //#if defined (ANDROID)
@@ -867,11 +1005,11 @@ void AppEngine::openData ( QString fn ) {
         mmw->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
 #endif
 
-#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
         emit showStatusBarSampleCount( QString::number(data->size()) );
 #endif
 
-#if defined Q_OS_ANDROID
+#if defined Q_OS_ANDROID or defined Q_OS_IOS
         //start replay on android
         replayData();
 #else
@@ -886,11 +1024,11 @@ void AppEngine::clearData () {
     mds->closePort();
     data->clearData();
 
-#if defined Q_OS_ANDROID
+#if defined Q_OS_ANDROID or defined Q_OS_IOS
     if ( replay && ( replayThread->isRunning() || replayThread->isFinished() ) )
         replay->stop();
 #endif
-#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
     emit showStatusMessage( QString::number(data->size()) );
 #endif
 }
@@ -903,9 +1041,11 @@ void AppEngine::changeSerialOptions() {
             mds->changeComInstance( new MdBluetoothWrapper(this) );
         }
     } else {
+#if not defined (Q_OS_IOS)
         if ( qobject_cast<MdQSerialPortCom*>(mds) == nullptr ) {
             mds->changeComInstance( new MdQSerialPortCom(this) );
         }
+#endif
     }
     //TODO mac osx dynamic names like /dev/tty.usbserial-A900JFA
     if ( !isBt )
@@ -961,7 +1101,7 @@ void AppEngine::changeDataWinSize (int ns) {
 void AppEngine::writeSettings () {
     QSettings settings;
 
-#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
     settings.beginGroup("MainWindow");
     settings.setValue("size", pcmw->size());
     settings.setValue("pos", pcmw->pos());
@@ -993,7 +1133,7 @@ void AppEngine::writeSettings () {
     settings.setValue ("MapSensor", dfBoostTransferFunction->name() );
     settings.endGroup();
 
-#if  defined (Q_WS_MAEMO_5) || defined (Q_OS_ANDROID)
+#if  defined (Q_WS_MAEMO_5) || defined (Q_OS_ANDROID) || defined (Q_OS_IOS)
     if ( mGps )
         settings.setValue("mobile/use_gps", QVariant(true) );
     else
@@ -1018,7 +1158,7 @@ void AppEngine::writeSettings () {
 void AppEngine::readSettings () {
     QSettings settings("MultiDisplay", "UI");
 
-#if !defined(Q_WS_MAEMO_5) && !defined(ANDROID)
+#if !defined(Q_WS_MAEMO_5) && !defined(ANDROID) && !defined(Q_OS_IOS)
     settings.beginGroup("MainWindow");
     pcmw->resize(settings.value("size", QSize(800, 480)).toSize());
     pcmw->move(settings.value("pos", QPoint(200, 200)).toPoint());
@@ -1031,7 +1171,7 @@ void AppEngine::readSettings () {
 
     mySerialOptionsDialog->getUi()->portComboBox->setCurrentIndex( settings.value ("mdserial/port", 0).toInt() );
     mySerialOptionsDialog->getUi()->speedComboBox->setCurrentIndex( settings.value ("mdserial/speed", 0).toInt() );
-#if not defined ( Q_OS_ANDROID )
+#if not defined ( Q_OS_ANDROID ) && not defined (Q_OS_IOS)
     changeSerialOptions();
     //mds->changePortSettings( mySerialOptionsDialog->getUi()->portComboBox->currentText(), mySerialOptionsDialog->getUi()->speedComboBox->currentText() );
 #else
@@ -1080,11 +1220,11 @@ void AppEngine::closeEvent(QCloseEvent *event) {
 
 
 void AppEngine::replayData() {
-#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
     replaySpeedUpFactor = mvis1w->ui->ReplaySpinBox->value();
     replayStartAtPos = data->getVisPlot()->windowBegin();
 #endif
-#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if not defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
     if ( !pcmw->ui.ReplayCurPos->isChecked() )
         replayStartAtPos = 0;
     else
@@ -1094,7 +1234,7 @@ void AppEngine::replayData() {
 
     replayThread->start();
 
-#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID
+#if defined Q_WS_MAEMO_5 and not defined Q_OS_ANDROID and not defined Q_OS_IOS
     DataViewSlider->setValue( DataViewSlider->minimum() );
 #endif
 }

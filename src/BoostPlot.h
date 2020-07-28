@@ -40,7 +40,7 @@ public:
     BoostPidPlot( QMainWindow* mw, QWidget *parent );
     virtual ~BoostPidPlot();
 
-    void addRecord ( MdSensorRecord* r, bool doReplot=true );
+    virtual void addRecord ( MdSensorRecord* r, bool doReplot=true );
     void clear ();
 
 private:

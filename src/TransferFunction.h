@@ -47,7 +47,16 @@ class TransferFunction250kpa : public TransferFunction
     int name () { return 250; }
 };
 
-
+#if defined (DIGIFANTVANAPP)
+//! use 100kpa selection for AFM: input 0-255, output to volts
+class TransferFunction100kpa : public TransferFunction
+{
+    /** input 0-255, out kpa
+      **/
+    double map ( double input ) { return (5.0 * (input/255)); }
+    int name () { return 100; }
+};
+#else
 //! Freescale MPXA6115A 100kpa
 class TransferFunction100kpa : public TransferFunction
 {
@@ -56,6 +65,7 @@ class TransferFunction100kpa : public TransferFunction
     double map ( double input ) { return ((5.0 * (input/255.0)) + 0.475) / 0.045; }
     int name () { return 100; }
 };
+#endif
 
 //! Freescale 300kpa
 class TransferFunction300kpa : public TransferFunction
@@ -67,6 +77,11 @@ class TransferFunction300kpa : public TransferFunction
 };
 
 /** wideband lambda */
+class TransferFunctionWbLambdaTechEdge : public TransferFunction {
+    double map ( double input ) { double l = ( (5.0*( ( input) /1023)) * 2 + 9 ) / 14.7; return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
+    int name () { return -1; }
+};
+
 class TransferFunctionWbLambdaPlx : public TransferFunction {
     double map ( double input ) { double l = ( (5.0*( ( input) /1023)) * 2 + 10 ) / 14.7; return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
     int name () { return -1; }
@@ -91,6 +106,10 @@ class TransferFunctionWbLambdaDummy : public TransferFunction {
 class TransferFunctionWbLambdaRawDebug : public TransferFunction {
     double map ( double input ) { return input; }
     int name () { return -98; }
+};
+class TransferFunctionWbLambdaBreitbandLambdaDe40 : public TransferFunction {
+    double map ( double input ) { double l = (5.0*( ( input) /1023)) * 0.12 + 0.7; return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
+    int name () { return -1; }
 };
 
 #endif // TRANSFERFUNCTION_H

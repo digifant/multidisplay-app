@@ -27,7 +27,6 @@
 #include <qwt_plot_marker.h>
 
 
-
 VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableView *tableView )
     : MdPlot(mw, parent, tableView) {
 
@@ -54,6 +53,10 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     speedData = new MdPlotData (0, 100);
     gearData = new MdPlotData (0, 100);
     n75Data = new MdPlotData (0, 100);
+
+    dfRetardData = new MdPlotData (0, 100);
+    dfKnockData = new MdPlotData (0, 100);
+    dfIgnData = new MdPlotData (0, 100);
 
     //	setTitle (QString("Boost / RPM / Lambda / Throttle / EGT"));
 
@@ -147,6 +150,18 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     n75Curve->attach(this);
     n75Curve->setYAxis(QwtPlot::yLeft);
 
+    dfRetardCurve = new QwtPlotCurve ("Ignition Retard");
+    dfRetardCurve->attach(this);
+    dfRetardCurve->setYAxis(QwtPlot::yLeft);
+
+    dfKnockCurve = new QwtPlotCurve ("Knock");
+    dfKnockCurve->attach(this);
+    dfKnockCurve->setYAxis(QwtPlot::yLeft);
+
+    dfIgnCurve = new QwtPlotCurve ("Ignition");
+    dfIgnCurve->attach(this);
+    dfIgnCurve->setYAxis(QwtPlot::yLeft);
+
     boostCurve->setPen(QPen(Qt::red));
     rpmCurve->setPen(QPen(Qt::yellow));
     lambdaCurve->setPen(QPen(Qt::blue));
@@ -167,6 +182,9 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     speedCurve->setPen(QPen(Qt::darkYellow));
     gearCurve->setPen(QPen(Qt::gray));
     n75Curve->setPen(QPen(Qt::darkGray));
+    dfRetardCurve->setPen(QPen(Qt::darkRed));
+    dfKnockCurve->setPen(QPen(Qt::darkGreen));
+    dfIgnCurve->setPen(QPen(QColor(0xff,0x7a,0)));
 
     curveMap["boost"] = boostCurve;
     curveMap["rpm"] = rpmCurve;
@@ -188,6 +206,9 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     curveMap["Speed"] = speedCurve;
     curveMap["gear"] = gearCurve;
     curveMap["N75"] = n75Curve;
+    curveMap["Ignition Retard"] = dfRetardCurve;
+    curveMap["Knock"] = dfKnockCurve;
+    curveMap["Ignition"] = dfIgnCurve;
 
     boostCurve->setStyle( QwtPlotCurve::Lines );
 
@@ -227,6 +248,9 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     speedCurve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (speedData) );
     gearCurve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (gearData) );
     n75Curve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (n75Data) );
+    dfRetardCurve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (dfRetardData) );
+    dfKnockCurve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (dfKnockData) );
+    dfIgnCurve->setSamples ( dynamic_cast<QwtSeriesData<QPointF>* > (dfIgnData) );
 
 #ifndef Q_WS_MAEMO_5
     QwtLegend *legend = new QwtLegend();
@@ -238,6 +262,7 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     connect(legend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(showCurve(QVariant,bool,int)) );
     connect(legend, SIGNAL(clicked(QVariant,int)), this, SLOT(showCurve(QVariant,int)) );
 #endif
+
 }
 
 VisualizationPlot::~VisualizationPlot() {
@@ -277,6 +302,12 @@ void VisualizationPlot::addRecord(MdSensorRecord *r, bool doReplot) {
         //255 is 10 on left axis
         n75Data->append ( r->getTime()/60000.0, r->getN75() * 0.04 );
 
+        //48 is 12 on left axis
+        dfRetardData->append ( r->getTime()/60000.0, r->df_ignition_total_retard / 4 );
+        //255 is 10 on left axis
+        dfKnockData->append ( r->getTime()/60000.0, r->df_knock_raw * 0.04 );
+        //72 is 12 on left axis
+        dfIgnData->append ( r->getTime()/60000.0, r->df_ignition / 6 );
         if ( doReplot && this->isVisible() ) {
             //              updateAxes();
             replot();
@@ -346,10 +377,15 @@ void VisualizationPlot::clear () {
     egt1Data->clear();
     egt2Data->clear();
     egt3Data->clear();
+    egt4Data->clear();
+    egt5Data->clear();
     lmmData->clear();
     speedData->clear();
     gearData->clear();
     n75Data->clear();
+    dfRetardData->clear();
+    dfKnockData->clear();
+    dfIgnData->clear();
     foreach (QwtPlotMarker* m, markerList) {
         m->detach();
         delete (m);

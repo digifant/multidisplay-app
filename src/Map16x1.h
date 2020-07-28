@@ -66,7 +66,15 @@ public:
 class Map16x1_Voltage : public Map16x1 {
 public:
     Map16x1_Voltage();
+    double mapValue(int dval);
     QString name () { return "DF_Voltage"; };
+};
+
+class Map16x1_NbLambda : public Map16x1 {
+public:
+    Map16x1_NbLambda();
+    QString name () { return "DF_NbLambda"; };
+    double mapValue ( int dval );
 };
 
 class Map16x1_RPM6500 : public Map16x1 {

@@ -9,13 +9,16 @@ MdBluetoothLECom::MdBluetoothLECom(QObject *parent) : MdAbstractCom(parent)
 {
     QBluetoothLocalDevice localDevice;
 
+#if not defined Q_OS_IOS
     // Check if Bluetooth is available on this device
+    // useless on IOS. always false https://bugreports.qt.io/browse/QTBUG-65547
     if (! localDevice.isValid()) {
         qWarning() << "bluetooth not available!";
         QTimer::singleShot(500, this, SLOT(emitBtNotAvailableDeferred()));
         return;
     }
-
+#endif
+    
     /* 1. Step: Bluetooth LE Device Discovery */
     m_deviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
     m_deviceDiscoveryAgent->setLowEnergyDiscoveryTimeout(5000);
@@ -56,8 +59,14 @@ void MdBluetoothLECom::togglePort()
 {
     switch (m_state) {
         case Idle:
+#if defined (Q_OS_IOS)
+            setAutoReconnect(true);
+#endif
             openPort(); break;
         case AcquireData:
+#if defined (Q_OS_IOS)
+            setAutoReconnect(false);
+#endif
             closePort(); break;
         default:
             //sth between

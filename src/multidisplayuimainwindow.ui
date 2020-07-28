@@ -529,7 +529,7 @@ records:</string>
   </action>
   <action name="action_config_Vis1">
    <property name="text">
-    <string>&amp;configure Visualization 1</string>
+    <string>Visualization 1 options</string>
    </property>
   </action>
   <action name="actionTest123">
@@ -687,7 +687,7 @@ records:</string>
   </action>
   <action name="actionConfigure_DataTable">
    <property name="text">
-    <string>configure DataTable</string>
+    <string>Data Table options</string>
    </property>
   </action>
   <action name="actionShow_Boost_Lambda_Spectrogram">

@@ -238,7 +238,6 @@ void MdBluetoothCom::transmitMsg(const QByteArray &ba)
 
 void MdBluetoothCom::startServiceDiscovery(bool force)
 {
-    qDebug() << "start service discovery";
 //    te->insertHtml("<span style=\"color:black; font-weight:normal\">start service discovery</span><br>");
     if (!sDiscoveryAgent) {
         sDiscoveryAgent = new QBluetoothServiceDiscoveryAgent(this);

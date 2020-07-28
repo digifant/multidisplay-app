@@ -23,8 +23,7 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
-     t = QTime::currentTime();
-     t.start();
+     timer.start();
 
      grabGesture(Qt::TapGesture);
      grabGesture(Qt::TapAndHoldGesture);
@@ -100,6 +99,29 @@ void AndroidMainWindow::resizeEvent(QResizeEvent *event)
     //ui->fbPushButton->setMinimumHeight( ui->dashboardPushButton->height() );
     QMainWindow::resizeEvent(event);
 }
+
+//void AndroidMainWindow::paintEvent(QPaintEvent *pe)
+//{
+//    QPainter painter(this);
+//    int widWidth = this->ui->centralwidget ->width();
+//    int widHeight = this->ui->centralwidget->height();
+//    _pixmapBg = _pixmapBg.scaled(widWidth, widHeight, Qt::KeepAspectRatioByExpanding);
+//    painter.drawPixmap(0, 0, _pixmapBg);
+
+////    auto winSize = size();
+////    auto pixmapRatio = (float)_pixmapBg.width() / _pixmapBg.height();
+////    auto windowRatio = (float)winSize.width() / winSize.height();
+
+////    if(pixmapRatio > windowRatio) {
+////        auto newWidth = (int)(winSize.height() * pixmapRatio);
+////        auto offset = (newWidth - winSize.width()) / -2;
+////        painter.drawPixmap(offset, 0, newWidth, winSize.height(), _pixmapBg);
+////    } else {
+////        auto newHeight = (int)(winSize.width() / pixmapRatio);
+////        auto offset = (newHeight - winSize.height()) / -2;
+////        painter.drawPixmap(0, offset, winSize.width(), newHeight, _pixmapBg);
+////    }
+//}
 
 void AndroidMainWindow::showStatusMessage(const QString &msg)
 {

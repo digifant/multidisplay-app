@@ -28,6 +28,11 @@ public slots:
     void visualize (MdDataRecord *d);
     void possibleCfgChange ();
 
+    void showMessage (const QString &msg, const int forSeconds=0);
+    void showStatusMessage ( const QString &msg );
+    void showMessage3 (const QString &msg);
+    void hideMessage ();
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual bool event(QEvent * e);
@@ -54,12 +59,15 @@ private:
     FuelPressureWidget *fuelW;
     MeasurementWidget *rpmW;
 
-    Overlay* overlay;
+    QPointer<Overlay> testOverlay = nullptr;
+    QPointer<MessageOverlay> topOverlay = nullptr;
+    QPointer<MessageOverlay> middleOverlay = nullptr;
+    QPointer<MessageOverlay> bottomOverlay = nullptr;
 
     QFrame *fDfWidget;
     QFrame *fVr6Widget;
 
-    QTime t;
+    QElapsedTimer timer;
 };
 
 #endif // REALTIMEVIS_H

@@ -29,6 +29,7 @@ public:
     bool gestureEvent(QGestureEvent *event);
     void closeEvent(QCloseEvent *event);
     void resizeEvent ( QResizeEvent * event );
+    //void paintEvent(QPaintEvent *pe);
 
     enum ToastDuration {
         SHORT = 0,
@@ -50,7 +51,7 @@ private:
     Ui::AndroidMainWindow *ui;
 
     QGridLayout* l;
-    QTime t;
+    QElapsedTimer timer;
     MeasurementWidget* boostw;
     DFExtendedWidget *dfexw;
     MeasurementWidget *lw;

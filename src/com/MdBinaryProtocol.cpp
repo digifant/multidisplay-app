@@ -464,14 +464,25 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
     base += 1;
     if ( df_active_frame < 255 )
         df_connected = true;
+    double df_ignition = (df_ign_raw *-0.3515625)+78;
+#if defined (DIGIFANTVANAPP)
+    double df_ignition_total_retard = 0.0 ; //no retard because no knock sensor
+    double df_ect = dfEctMap->mapValue( df_ect_raw );
+    // Note: in Vanagon ECU voltage divder resistor = 8200 ohms so same transfer function as ECT
+    double df_iat = dfEctMap->mapValue( df_iat_raw );
+    // Note: no launch control in Vanagon ECU so we are not changing the timing
 
+    double df_voltage = dfVoltageMap->mapValue(df_voltage_raw);
+    //or
+    //double df_voltage = df_voltage_raw*(17800+4740)/(51.0*4740);
+#else
     double df_ignition_total_retard = ( df_cyl1_knock_retard + df_cyl2_knock_retard + df_cyl3_knock_retard + df_cyl4_knock_retard ) * 0.351563 ;
     double df_ect = dfEctMap->mapValue( df_ect_raw );
     double df_iat = dfIatMap->mapValue( df_iat_raw );
-    double df_ignition = (df_ign_raw *-0.351563)+73.9;
     if ( (df_lc_flags & 3)==1 )
-        df_ignition = (2*df_ign_raw *-0.351563)+73.9;
+        df_ignition = (2*df_ign_raw *-0.3515625)+78;
     double df_voltage = dfVoltageMap->mapValue(df_voltage_raw);
+#endif
 
 #if defined (DIGIFANTAPP)
     //Ladedruck in Bar aus DF Druck berechnen
@@ -482,9 +493,21 @@ void MdBinaryProtocol::convertReceivedMd2Frame() {
         lambda = AppEngine::getInstance()->getWbLamdaTransferFunction()->map (lmm);
     // qDebug() << "vdo: " << vdo_pres1_i << " " << vdo_pres2_i << " " << vdo_pres3_i;
 
+    //qDebug() << "vdo: " << vdo_pres1_i << " " << vdo_pres2_i << " " << vdo_pres3_i;
+    // TODO: solution for digifant app on mdv2
     double vdo_pres1 = AppEngine::getInstance()->getVdo1Map()->mapValue10Bit(vdo_pres1_i);
     double vdo_pres2 = AppEngine::getInstance()->getVdo2Map()->mapValue10Bit(vdo_pres2_i);
     double vdo_pres3 = AppEngine::getInstance()->getVdo3Map()->mapValue10Bit(vdo_pres3_i);
+
+    if ( df_flags & 8 && throttle == 0)
+        throttle = 100;
+    else {
+        if ( df_flags & 0x10 && throttle == 0)
+            throttle = 0;
+        else
+            if ( throttle == 0 )
+                throttle = 50;
+    }
 #else
     double vdo_pres1 = vdo_pres1_i;
     double vdo_pres2 = vdo_pres2_i;

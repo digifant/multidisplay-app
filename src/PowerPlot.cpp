@@ -510,10 +510,13 @@ void PowerPlot::reCalculate( bool useGpsSpeed ) {
        }
     }
 
-    QString maxValuesString = "DIN engine max Torque " + QString::number(dinMaxTorque, 'f', 2) + "Nm @ " + QString::number(dinMaxTorqueRPM,'f',0)
-            + " max power " + QString::number(dinMaxPower,'f',2) + "KW @ " + QString::number(dinMaxPowerRPM,'f',0) + " | wheel "
-            + "max Torque " + QString::number(wheelMaxTorque,'f',2) + "Nm @ " + QString::number(wheelMaxTorqueRPM,'f',0)
-            + " max power " + QString::number(wheelMaxPower,'f',2) + "KW @ " + QString::number(wheelMaxPowerRPM,'f',0);
+    double dinMaxPowerHp = dinMaxPower * 1.36;
+    double wheelMaxPowerHp = wheelMaxPower * 1.36;
+
+    QString maxValuesString = "DIN engine max Torque " + QString::number(dinMaxTorque, 'f', 0) + "Nm @ " + QString::number(dinMaxTorqueRPM,'f',0)
+            + " max power " + QString::number(dinMaxPowerHp,'f',0) + "PS " + QString::number(dinMaxPower,'f',0) + "KW @ " + QString::number(dinMaxPowerRPM,'f',0) + " | wheel "
+            + "max Torque " + QString::number(wheelMaxTorque,'f',0) + "Nm @ " + QString::number(wheelMaxTorqueRPM,'f',0)
+            + " max power " + QString::number(wheelMaxPowerHp,'f',0) + "PS " + QString::number(wheelMaxPower,'f',0) + "KW @ " + QString::number(wheelMaxPowerRPM,'f',0);
     qDebug() << maxValuesString;
     emit resultString(maxValuesString);
 
@@ -585,6 +588,12 @@ void PowerPlot::computePower (MdDataRecord* curR, MdDataRecord* lastR, ComputedP
     A=Stirnfläche, Cw=Cw Wert, D=Dichte der Luft (abhängig von Temperatur)
     cw-Wert bei 195er 0,32 bei 205er und Plusachse 0,34 (ist aber nicht sicher!!)
     Stirnflächen: normaler Corrado 1,81m² US und 2.0L (kleine Frontlippe) 1,80m²
+
+    golf 1: 0,42/1,83/0,77
+    golf 2: 0,35/1,89/0,67
+    golf 3: 0,34/1,98/0,67
+    golf 4: 0,33/2,11/0,69
+    golf 5: 0,32/2,22/0,72
     */
     qreal f_air = 1.81*0.5 * 0.34 * 1.29 * qPow(end_velocity*0.27778, 2);
     qreal w_air = f_air * distance;
@@ -649,6 +658,8 @@ qreal PowerPlot::findX (qreal x1, qreal y1, qreal x2, qreal y2, qreal ys) {
 QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeeds ( QList<MdDataRecord*>&dl, QList<int> &rn, qreal startspeed, qreal endspeed ) {
     QMap<qreal,SpeedData> timeTable;
     timeTable[-1] = SpeedData();
+    timeTable[-1].startSpeed = startspeed;
+    timeTable[-1].endSpeed = endspeed;
 
     if ( rn.size() < 2 )
         return timeTable;
@@ -659,7 +670,7 @@ QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeeds ( QList<MdDataRecord
     int idx_endh = 0;
 
     //sort ascending
-    qSort (rn.begin(), rn.end());
+    std::sort (rn.begin(), rn.end());
 
     bool upperFound = false;
     foreach ( int i, rn ) {
@@ -705,7 +716,7 @@ QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeeds ( QList<MdDataRecord
     qreal time = endMillis - startMillis;
     qDebug() << "calculateTimeBetweenSpeeds startspeed=" << startspeed << " endspeed=" << endspeed << " " << time << " msecs"
              << " startRPM=" << startRPM << " endRPM=" << endRPM;
-    timeTable = calculateAdditionalDataTimeBetweenSpeeds(dl, rn, 100, 200, false);
+    timeTable = calculateAdditionalDataTimeBetweenSpeeds(dl, rn, startspeed, endspeed, false);
     SpeedData ts;
     ts.time_s=time/1000.0;
     timeTable[-1]=ts;
@@ -715,7 +726,7 @@ QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeeds ( QList<MdDataRecord
 QMap<qreal, SpeedData> PowerPlot::calculateAdditionalDataTimeBetweenSpeeds( QList<MdDataRecord*>&dl, QList<int> &rn, qreal speedL, qreal speedH, bool useGps ) {
     QMap<qreal,SpeedData> timeTable;
     //sort ascending
-    qSort (rn.begin(), rn.end());
+    std::sort (rn.begin(), rn.end());
 
     qreal first_time = 0;
     qreal alt_old = 0;
@@ -769,6 +780,8 @@ QMap<qreal, SpeedData> PowerPlot::calculateAdditionalDataTimeBetweenSpeeds( QLis
 QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeedsGPS ( QList<MdDataRecord*>&dl, QList<int> &rn, qreal startspeed, qreal endspeed ) {
     QMap<qreal,SpeedData> timeTable;
     timeTable[-1]=SpeedData();
+    timeTable[-1].startSpeed = startspeed;
+    timeTable[-1].endSpeed = endspeed;
 
     if ( rn.size() < 2 )
         return timeTable;
@@ -779,7 +792,7 @@ QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeedsGPS ( QList<MdDataRec
     int idx_endh = 0;
 
     //sort ascending
-    qSort (rn.begin(), rn.end());
+    std::sort (rn.begin(), rn.end());
 
     bool upperFound = false;
     foreach ( int i, rn ) {
@@ -825,9 +838,22 @@ QMap<qreal,SpeedData> PowerPlot::calculateTimeBetweenSpeedsGPS ( QList<MdDataRec
     qreal time = endMillis - startMillis;
     qDebug() << "calculateTimeBetweenSpeeds startspeed=" << startspeed << " endspeed=" << endspeed << " " << time << " msecs"
              << " startRPM=" << startRPM << " endRPM=" << endRPM;
-    timeTable = calculateAdditionalDataTimeBetweenSpeeds(dl, rn, 100, 200, true);
+    timeTable = calculateAdditionalDataTimeBetweenSpeeds(dl, rn, startspeed, endspeed, true);
     SpeedData ts;
     ts.time_s=time/1000.0;
+    //valid speed data?
+    qreal avg_speed_pitch = ( endspeed - startspeed ) / (timeTable.size());
+    bool valid = true;
+    foreach( qreal s , timeTable.keys() ) {
+        // TODO facor right sized?
+        if ( timeTable.value(s).time_s < 2*avg_speed_pitch )
+            valid = false;
+    }
+    if ( !valid ) {
+        qDebug() << "GPS speed data possibly not valid!";
+        ts.valid = false;
+    } else
+        ts.valid = true;
     timeTable[-1]=ts;
     return timeTable;
 }

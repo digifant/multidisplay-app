@@ -40,6 +40,9 @@ MultidisplayUIMainWindow::MultidisplayUIMainWindow(QWidget *parent)
     setAttribute(Qt::WA_Maemo5StackedWindow);
 #endif
 
+#if defined ( DIGIFANTAPP )
+    setWindowTitle("Digifant 1 ECU by digifant-onlineabstimmung.de");
+#endif
     statusBarRecordSizeLabel = new QLabel ("0");
     ui.StatusBar->addPermanentWidget(statusBarRecordSizeLabel);
 
@@ -71,7 +74,7 @@ MultidisplayUIMainWindow::MultidisplayUIMainWindow(QWidget *parent)
     connect (ui.action300kpa, SIGNAL(triggered(bool)), this, SLOT(dfMapSelected300(bool)));
     connect (ui.action400kpa, SIGNAL(triggered(bool)), this, SLOT(dfMapSelected400(bool)));
 
-    overlay = NULL;
+    overlay = nullptr;
 //    overlay = new Overlay (this);
 
     //ui.DataTab->setStyleSheet ("background: url(/home/bofh/1280x720dfo_yt_landscape.png)");

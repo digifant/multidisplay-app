@@ -38,6 +38,7 @@ protected:
     double df_O2_Volts; //D Starr added for O2 volts from NB lambda sensor
     double O2_Volts_max; // D Starr added for O2 volts max from NB Lambda sensor
     double df_O2_AD_Volts; //D Starr added for O2 volts at a/d
+    double df_lambda_nb = 0;
 
 #if defined (DIGIFANTVANAPP)
     double lambda_raw;  //D Starr added for wideband
@@ -70,9 +71,15 @@ protected:
 
     double df_inj_duty;
     double injduty_max;
+    
+    double speed = 0;
+    bool speedGps = false;
+    int gear = 0;
+    quint8 n75_duty = 0;
 
     Map16x1_ISV *isvMap;
     Map16x1_Voltage *voltageMap;
+    QPointer<Map16x1_NbLambda> nbLambdaMap = nullptr;
 
     QFont captionFont;
 

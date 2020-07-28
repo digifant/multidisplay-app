@@ -89,7 +89,7 @@ void LambdaBarGraphWidget::wotOn() {
 
 /* ************************************ */
 
-#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID)
+#if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 GLGauge::GLGauge ( QWidget *parent )
     : QGLWidget (parent) {
 //    : QFrame (parent) {
@@ -163,7 +163,7 @@ MeasurementWidget::MeasurementWidget ( QWidget *parent, QString caption, double 
     recalcDataFontSize = true;
 
     textPen = QPen ( Qt::black );
-#if defined ( Q_OS_ANDROID )
+#if defined ( Q_OS_ANDROID ) or defined ( Q_OS_IOS )
     textFont.setPointSize(16);
 #else
     textFont.setPointSize(20);
@@ -468,7 +468,14 @@ BoostExtendedWidget::BoostExtendedWidget ( QWidget *parent, QString caption, dou
 }
 
 void BoostExtendedWidget::setValue(MdDataRecord *dr) {
+#if defined (DIGIFANTVANAPP)
+    // D Starr
+ //   qreal afm_volts = (dr->getSensorR()-> df_boost_raw) * 5.00 / 255;
+ //   double boost = afm_volts;
+      double boost = (dr->getSensorR()->df_boost_raw)*5.00/255;
+#else
     double boost = dr->getSensorR()->getBoost();
+#endif
     quint8 n75_duty = dr->getSensorR()->getN75();
     quint8 n75_map_duty = dr->getSensorR()->getN75ReqBoostPWM();
     double n75_map_requested_boost = dr->getSensorR()->getN75ReqBoost();

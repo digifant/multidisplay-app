@@ -42,6 +42,7 @@
      <string>Config</string>
     </property>
     <addaction name="actionV2_N75_Settings"/>
+    <addaction name="separator"/>
     <addaction name="actionSettings"/>
     <addaction name="actionGearbox_settings"/>
    </widget>
