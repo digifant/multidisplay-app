@@ -19,6 +19,8 @@ some nice screenshots :-)
 ![multidisplay android app](http://mycorrado.de/pics/foren/mUI-android-Screenshot_2014-10-21-17-47-24.png "android screenshot"
 )
 
+App in google play: https://play.google.com/store/apps/details?id=de.gummelinformatics.mui
+
 ### multidisplay app for linux
 some nice screenshots :-)
 
