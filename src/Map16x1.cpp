@@ -123,7 +123,7 @@ void Map16x1_NTC_ECT::testIt () {
     v.append(2);
 
     foreach ( int i,  v ) {
-        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << Qt::endl;
+        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << endl;
     }
 }
 
@@ -195,7 +195,7 @@ void Map16x1_NTC_IAT::testIt () {
     v.append(2);
 
     foreach ( int i,  v ) {
-        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << Qt::endl;
+        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << endl;
     }
 }
 
@@ -353,7 +353,7 @@ void Map16x1_10Bit_VDO5::testIt () {
     v.append(1024);
 
     foreach ( int i,  v ) {
-        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << Qt::endl;
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
     }
 }
 
@@ -393,6 +393,6 @@ void Map16x1_10Bit_VDO10::testIt () {
     v.append(888);
 
     foreach ( int i,  v ) {
-        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << Qt::endl;
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
     }
 }
