@@ -33,6 +33,11 @@ maemo5 {
     MOBILITY += location systeminfo sensors
 }
 
+ANDROID_VERSION_NAME = "1.2.4"
+ANDROID_VERSION_CODE = "7"
+
+DEFINES += ANDROID_VERSION_NAME=$${ANDROID_VERSION_NAME}
+DEFINES += ANDROID_VERSION_CODE=$${ANDROID_VERSION_CODE}
 android {
     #necessitas sets Q_OS_ANDROID
     DEFINES += ANDROID
@@ -51,6 +56,7 @@ ios {
 #}
 
 HEADERS += evaluation/EvalSpectrogramPlot.h \
+    builddatetime.h \
     com/MdBluetoothCom.h \
     com/MdBluetoothLECom.h \
     com/MdBluetoothWrapper.h \
@@ -359,3 +365,5 @@ ios {
     app_launch_images.files = $$files(../ios/LaunchImage*.png)
     QMAKE_BUNDLE_DATA += app_launch_images
 }
+
+ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64

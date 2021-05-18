@@ -21,7 +21,9 @@
 
 #include <qpainter.h>
 #include <qtransform.h>
+#if not defined(Q_OS_IOS)
 #include <qprinter.h>
+#endif
 #include <qfiledialog.h>
 #include <qfileinfo.h>
 #include <qimagewriter.h>

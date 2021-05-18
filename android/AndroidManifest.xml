@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!-- app name bugfix: https://bugreports.qt.io/browse/QTCREATORBUG-13958 -->
-<manifest package="de.gummelinformatics.mui" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.2" android:versionCode="3" android:installLocation="auto">
+<manifest package="de.gummelinformatics.mui" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="-- %%INSERT_VERSION_NAME%% --" android:versionCode="-- %%INSERT_VERSION_CODE%% --" android:installLocation="auto">
 <!-- Theme.Holo.Light Theme.Holo Theme.Material Theme.Material.Light -->
     <application android:requestLegacyExternalStorage="true" android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="@string/app_name" android:icon="@drawable/icon">
-<!-- default activity: org.qtproject.qt5.android.bindings.QtActivity -->
+        <!-- default activity: org.qtproject.qt5.android.bindings.QtActivity -->
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="de.gummelinformatics.mui.MuiActivity" android:label="@string/app_name" android:screenOrientation="unspecified" android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -17,7 +17,6 @@
             <meta-data android:name="android.app.bundled_libs_resource_id" android:resource="@array/bundled_libs"/>
             <!-- Deploy Qt libs as part of package -->
             <meta-data android:name="android.app.bundle_local_qt_libs" android:value="-- %%BUNDLE_LOCAL_QT_LIBS%% --"/>
-
             <!-- Run with local libs -->
             <meta-data android:name="android.app.use_local_qt_libs" android:value="-- %%USE_LOCAL_QT_LIBS%% --"/>
             <meta-data android:name="android.app.libs_prefix" android:value="/data/local/tmp/qt/"/>
@@ -32,11 +31,9 @@
             <meta-data android:value="@string/fatal_error_msg" android:name="android.app.fatal_error_msg"/>
             <meta-data android:value="@string/unsupported_android_version" android:name="android.app.unsupported_android_version"/>
             <!--  Messages maps -->
-
+            <!-- Splash screen -->
             <!-- Splash screen -->
             <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/splash_hochkant"/>
-
-            <!-- Splash screen -->
         </activity>
     </application>
     <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29"/>
@@ -51,7 +48,7 @@
     <!-- %%INSERT_FEATURES -->
 
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>

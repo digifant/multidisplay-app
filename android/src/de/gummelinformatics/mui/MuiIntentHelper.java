@@ -37,6 +37,22 @@ public class MuiIntentHelper extends QtActivity
         instance = this;
     }
 
+    //public static void sendEmail(String to) {
+    public static void sendEmail() {
+        String[] addresses = {"info@digifant-onlineabstimmung.de"};
+        String subject = "mUI android feedback";
+        if (DEBUG)
+            Log.d(TAG, "email intent to " + addresses[0]);
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        MuiActivity.getActivityInstance().startActivity(intent);
+
+        if (DEBUG)
+            Log.d(TAG, "email intent fired");
+    }
 
     public static void openUrl(String url) {
         if (DEBUG)

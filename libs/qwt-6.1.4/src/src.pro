@@ -27,6 +27,7 @@ contains(QWT_CONFIG, QwtDll) {
     win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
 }
 else {
+    # aab
     !android: { CONFIG += staticlib }
 } 
 
@@ -71,7 +72,14 @@ contains(QWT_CONFIG, QwtPkgConfig) {
     greaterThan(QT_MAJOR_VERSION, 4) {
 
         QMAKE_PKGCONFIG_FILE = Qt$${QT_MAJOR_VERSION}$${QMAKE_PKGCONFIG_NAME}
-        QMAKE_PKGCONFIG_REQUIRES = Qt5Widgets Qt5Concurrent Qt5PrintSupport
+        !ios {
+            QMAKE_PKGCONFIG_REQUIRES = Qt5Widgets Qt5Concurrent Qt5PrintSupport
+        }
+        ios {
+            # no printing support on IOS
+            QMAKE_PKGCONFIG_REQUIRES = Qt5Widgets Qt5Concurrent
+            DEFINES += QT_NO_PRINTER
+        }
 
         contains(QWT_CONFIG, QwtSvg) {
             QMAKE_PKGCONFIG_REQUIRES += Qt5Svg

@@ -15,6 +15,10 @@ public:
     explicit AboutDialog(QWidget *parent = 0);
     ~AboutDialog();
 
+public slots:
+    void emailIntend();
+    void httpIntend();
+
 private:
     Ui::AboutDialog *ui;
 };
