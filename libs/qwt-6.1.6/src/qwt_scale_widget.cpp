@@ -20,7 +20,7 @@
 #include <qmath.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
-#include <qapplication.h>
+//#include <qapplication.h>
 
 class QwtScaleWidget::PrivateData
 {
@@ -577,7 +577,7 @@ void QwtScaleWidget::layoutScale( bool update_geometry )
     {
         updateGeometry();
 
-#if 1
+#if 0
         /*
             for some reason updateGeometry does not send a LayoutRequest event
             when the parent is not visible and has no layout
