@@ -1,4 +1,5 @@
 #include "rtwidget.h"
+#include "realtimevis.h"
 
 #include <QVBoxLayout>
 #include <QDebug>
@@ -92,20 +93,28 @@ void LambdaBarGraphWidget::wotOn() {
 #if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 GLGauge::GLGauge ( QWidget *parent )
     : QGLWidget (parent) {
-//    : QFrame (parent) {
+//    : QGLWidget (parent) {
+//    : QWidget (parent) {
 
-}
-#else
+#endif
+#if defined (Q_OS_IOS)
 GLGauge::GLGauge ( QWidget *parent )
+    : QGLWidget (parent) {
+#endif
+#if defined (Q_OS_ANDROID)
+GLGauge::GLGauge ( QWidget *parent )
+    //: QGLWidget (parent) {
     : QFrame (parent) {
-#ifdef DIGIFANTAPP
+#endif
+
+#if defined Q_OS_ANDROID
     // we use black holo theme on android (white text color) and have to set custom text color to view black text for the widgets!
     qDebug() << "GLGauge styleSheet = " << this->styleSheet();
     this->setStyleSheet( "color:black" );
     qDebug() << "GLGauge styleSheet after setting black text color = " << this->styleSheet();
 #endif
 }
-#endif
+
 
 QColor GLGauge::overblend (QColor startColor, QColor stopColor, short level) const {
     short redDelta = (startColor.red()*(255-level)+stopColor.red()*level)/255;

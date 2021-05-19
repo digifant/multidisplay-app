@@ -605,6 +605,7 @@ void AppEngine::setupAndroid () {
 
     //Bluetooth
     connect (mds, SIGNAL(portOpened()), mvis1w, SLOT(disableReplay()));
+    connect (mds, SIGNAL(portOpened()), this, SLOT(androidStartLocationQuery()));
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
@@ -667,6 +668,7 @@ void AppEngine::setupAndroid () {
         connect (amw->ui->dashboardPushButton, SIGNAL(clicked()), add, SLOT(showMaximized()) );
     */
 
+    connect (rtvis, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mdcom, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (mds, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
     connect (this, SIGNAL(showStatusMessage(QString)), amw, SLOT(showStatusMessage(QString)) );
@@ -680,11 +682,11 @@ void AppEngine::setupAndroid () {
     connect (amw->ui->actionClear, SIGNAL(triggered()) , this, SLOT(clearData()) );
 
 
-    QSettings settings("MultiDisplay", "UI");
-    if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
-        mGps = new MobileGPS (this);
-    else
-        mGps = nullptr;
+    QSettings settings;
+    //if ( settings.value("mobile/use_gps", QVariant(true)).toBool() )
+    //    mGps = new MobileGPS (this);
+    //else
+    mGps = nullptr;
     if ( settings.value("mobile/use_accel", QVariant(true)).toBool() )
         accelMeter = new Accelerometer(this);
     else
@@ -716,6 +718,7 @@ void AppEngine::setupIos() {
 
     //Bluetooth
     connect (mds, SIGNAL(portOpened()), mvis1w, SLOT(disableReplay()));
+    connect (mds, SIGNAL(portOpened()), this, SLOT(androidStartLocationQuery()));
     connect (mds, SIGNAL(portClosed()), mvis1w, SLOT(enableReplay()));
 
     //V2 settings
@@ -1257,3 +1260,11 @@ void AppEngine::changeDVSliderMax() {
     DataViewSlider->setValue( DataViewSlider->maximum() );
 }
 
+void AppEngine::androidStartLocationQuery() {
+    QSettings settings;
+    if ( settings.value("mobile/use_gps", QVariant(true)).toBool() ) {
+        mGps = new MobileGPS (this);
+        qDebug() << "created MobileGPS instance";
+    } else
+      mGps = nullptr;
+}

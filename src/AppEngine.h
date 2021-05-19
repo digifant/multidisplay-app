@@ -150,6 +150,7 @@ public slots:
 
     //! used by AndroidMainWindows eventhandler to re-create the dialog after destroy on close
     void reCreateDialogsAndroidFix();
+    void androidStartLocationQuery();
 
 protected:
     void closeEvent ( QCloseEvent * event );

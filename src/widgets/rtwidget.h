@@ -8,7 +8,10 @@
 
 #include "ColorOverBlend.h"
 
+//deprecated!
 #include <QtOpenGL>
+
+#include <QOpenGLWidget>
 
 class QwtThermo;
 class MdDataRecord;
@@ -74,11 +77,26 @@ protected:
     bool wot;
 };
 
-
+/*
+ * QGLWidget deprecated ; QOpenGLWidget draws only black screen!
+ *
+ * replay performance
+ * qframe / qwidget macos 15-20% ios 100% android 100%
+ * QGLWidget macos 10-15%  ios 31%
+ * QOpenGLWidget macos black screen
+ *
+ */
 #if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 class GLGauge : public QGLWidget {
-//class GLGauge : public QFrame {
-#else
+//class GLGauge : public QGLWidget {
+//class GLGauge : public QWidget {
+#endif
+#if defined (Q_OS_IOS)
+class GLGauge : public QGLWidget {
+#endif
+#if defined (Q_OS_ANDROID)
+//TODO FIXME graphics error
+//class GLGauge : public QGLWidget {
 class GLGauge : public QFrame {
 #endif
 
