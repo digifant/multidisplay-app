@@ -1261,10 +1261,12 @@ void AppEngine::changeDVSliderMax() {
 }
 
 void AppEngine::androidStartLocationQuery() {
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     QSettings settings;
     if ( settings.value("mobile/use_gps", QVariant(true)).toBool() ) {
         mGps = new MobileGPS (this);
         qDebug() << "created MobileGPS instance";
     } else
       mGps = nullptr;
+#endif
 }
