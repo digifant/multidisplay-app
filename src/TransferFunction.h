@@ -111,5 +111,12 @@ class TransferFunctionWbLambdaBreitbandLambdaDe40 : public TransferFunction {
     double map ( double input ) { double l = (5.0*( ( input) /1023)) * 0.12 + 0.7; return static_cast<double>(static_cast<int>(l*100+0.5))/100.0; }
     int name () { return -1; }
 };
+//!
+//! \brief The TransferFunctionWbLambdaAEM for AEM X-Series P/N 30-0300 https://www.aemelectronics.com/files/instructions/30-0300.pdf
+//!
+class TransferFunctionWbLambdaAEMXSeries : public TransferFunction {
+    double map ( double input ) { double l = (5.0*( ( input) /1023)) * 0.1621 + 0.499; return l; }
+    int name () { return -1; }
+};
 
 #endif // TRANSFERFUNCTION_H

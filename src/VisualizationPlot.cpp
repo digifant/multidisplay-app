@@ -66,99 +66,99 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     //        setTitle(t);
     //#endif
 
-    boostCurve = new QwtPlotCurve ("boost");
+    boostCurve = new QwtPlotCurve (tr("boost"));
     boostCurve->attach(this);
 
-    rpmCurve = new QwtPlotCurve ("RPM");
+    rpmCurve = new QwtPlotCurve (tr("RPM"));
     rpmCurve->attach(this);
     rpmCurve->setYAxis(QwtPlot::yRight);
 
-    lambdaCurve = new QwtPlotCurve ("Lambda");
+    lambdaCurve = new QwtPlotCurve (tr("Lambda"));
     lambdaCurve->attach(this);
 
-    throttleCurve = new QwtPlotCurve ("Throttle");
+    throttleCurve = new QwtPlotCurve (tr("Throttle"));
     throttleCurve->attach(this);
 
-    egt0Curve = new QwtPlotCurve ("EGT 0");
+    egt0Curve = new QwtPlotCurve (tr("EGT 0"));
     egt0Curve->attach(this);
     egt0Curve->setYAxis(QwtPlot::yRight);
 
-    egt1Curve = new QwtPlotCurve ("EGT 1");
+    egt1Curve = new QwtPlotCurve (tr("EGT 1"));
     egt1Curve->attach(this);
     egt1Curve->setYAxis(QwtPlot::yRight);
 
-    egt2Curve = new QwtPlotCurve ("EGT 2");
+    egt2Curve = new QwtPlotCurve (tr("EGT 2"));
     egt2Curve->attach(this);
     egt2Curve->setYAxis(QwtPlot::yRight);
 
-    egt3Curve = new QwtPlotCurve ("EGT 3");
+    egt3Curve = new QwtPlotCurve (tr("EGT 3"));
     egt3Curve->attach(this);
     egt3Curve->setYAxis(QwtPlot::yRight);
 
-    egt4Curve = new QwtPlotCurve ("EGT 4");
+    egt4Curve = new QwtPlotCurve (tr("EGT 4"));
     egt4Curve->attach(this);
     egt4Curve->setYAxis(QwtPlot::yRight);
 
-    egt5Curve = new QwtPlotCurve ("EGT 5");
+    egt5Curve = new QwtPlotCurve (tr("EGT 5"));
     egt5Curve->attach(this);
     egt5Curve->setYAxis(QwtPlot::yRight);
 
-    VDOTemp1Curve = new QwtPlotCurve ("VDO Temp1");
+    VDOTemp1Curve = new QwtPlotCurve (tr("VDO Temp1"));
     VDOTemp1Curve->attach(this);
     VDOTemp1Curve->setYAxis(QwtPlot::yRight);
     VDOTemp1Curve->setVisible(false);
 
-    VDOTemp2Curve = new QwtPlotCurve ("VDO Temp2");
+    VDOTemp2Curve = new QwtPlotCurve (tr("VDO Temp2"));
     VDOTemp2Curve->attach(this);
     VDOTemp2Curve->setYAxis(QwtPlot::yRight);
     VDOTemp2Curve->setVisible(false);
 
-    VDOTemp3Curve = new QwtPlotCurve ("VDO Temp3");
+    VDOTemp3Curve = new QwtPlotCurve (tr("VDO Temp3"));
     VDOTemp3Curve->attach(this);
     VDOTemp3Curve->setYAxis(QwtPlot::yRight);
     VDOTemp3Curve->setVisible(false);
 
-    VDOPres1Curve = new QwtPlotCurve ("VDO Pres 1");
+    VDOPres1Curve = new QwtPlotCurve (tr("VDO Pres 1"));
     VDOPres1Curve->attach(this);
     VDOPres1Curve->setYAxis(QwtPlot::yRight);
     VDOPres1Curve->setVisible(false);
 
-    VDOPres2Curve = new QwtPlotCurve ("VDO Pres 2");
+    VDOPres2Curve = new QwtPlotCurve (tr("VDO Pres 2"));
     VDOPres2Curve->attach(this);
     VDOPres2Curve->setYAxis(QwtPlot::yRight);
     VDOPres2Curve->setVisible(false);
 
 
-    VDOPres3Curve = new QwtPlotCurve ("VDO Pres 3");
+    VDOPres3Curve = new QwtPlotCurve (tr("VDO Pres 3"));
     VDOPres3Curve->attach(this);
     VDOPres3Curve->setYAxis(QwtPlot::yRight);
     VDOPres3Curve->setVisible(false);
 
-    lmmCurve = new QwtPlotCurve ("LMM");
+    lmmCurve = new QwtPlotCurve (tr("MAF"));
     lmmCurve->attach(this);
     lmmCurve->setYAxis(QwtPlot::yRight);
 
-    speedCurve = new QwtPlotCurve ("Speed");
+    speedCurve = new QwtPlotCurve (tr("Speed"));
     speedCurve->attach(this);
     speedCurve->setYAxis(QwtPlot::yRight);
 
-    gearCurve = new QwtPlotCurve ("Gear");
+    gearCurve = new QwtPlotCurve (tr("Gear"));
     gearCurve->attach(this);
     gearCurve->setYAxis(QwtPlot::yLeft);
 
-    n75Curve = new QwtPlotCurve ("N75");
+    n75Curve = new QwtPlotCurve (tr("N75"));
     n75Curve->attach(this);
     n75Curve->setYAxis(QwtPlot::yLeft);
 
-    dfRetardCurve = new QwtPlotCurve ("Ignition Retard");
+    dfRetardCurve = new QwtPlotCurve (tr("Ignition Retard"));
     dfRetardCurve->attach(this);
     dfRetardCurve->setYAxis(QwtPlot::yLeft);
 
-    dfKnockCurve = new QwtPlotCurve ("Knock");
+    dfKnockCurve = new QwtPlotCurve (tr("Knock"));
     dfKnockCurve->attach(this);
     dfKnockCurve->setYAxis(QwtPlot::yLeft);
 
-    dfIgnCurve = new QwtPlotCurve ("Ignition");
+    dfIgnCurve = new QwtPlotCurve (tr("Ignition"));
     dfIgnCurve->attach(this);
     dfIgnCurve->setYAxis(QwtPlot::yLeft);
 
@@ -213,11 +213,11 @@ VisualizationPlot::VisualizationPlot(QMainWindow* mw, QWidget *parent, QTableVie
     boostCurve->setStyle( QwtPlotCurve::Lines );
 
     // Axis
-    setAxisTitle(QwtPlot::xBottom, "Time / minutes");
+    setAxisTitle(QwtPlot::xBottom, tr("Time / minutes"));
     setAxisScale(QwtPlot::xBottom, 0, 100000);
-    setAxisTitle(QwtPlot::yLeft, "Boost / Throttle / Lambda");
+    setAxisTitle(QwtPlot::yLeft, tr("Boost / Throttle / Lambda"));
     setAxisScale(QwtPlot::yLeft, -1.0, 12.0);
-    setAxisTitle(QwtPlot::yRight, "RPM");
+    setAxisTitle(QwtPlot::yRight, tr("RPM"));
     setAxisScale(QwtPlot::yRight, 0, 7500);
     enableAxis(QwtPlot::yRight, true);
     setAxisAutoScale(QwtPlot::xBottom);

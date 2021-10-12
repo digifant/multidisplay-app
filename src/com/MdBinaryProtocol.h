@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QTime>
 #include <QTimer>
-
+#include <QElapsedTimer>
 
 #define MD_FRAMEBEGIN 2
 #define MD_FRAMEEND 3
@@ -144,9 +144,13 @@ protected:
     Map16x1_NTC_IAT *dfIatMap;
     Map16x1_Voltage *dfVoltageMap;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QTime timeHelper;
     QTime freqMeasure;
-
+#else
+    QElapsedTimer timeHelper;
+    QElapsedTimer freqMeasure;
+#endif
     //debug data generation
     int debugRPMCounter;
     int debugTime;

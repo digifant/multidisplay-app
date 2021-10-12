@@ -23,6 +23,7 @@
 
 #include <qwt_plot_picker.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_text.h>
 
 class MdPlot;
 

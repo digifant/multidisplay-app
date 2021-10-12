@@ -5,13 +5,19 @@
 #include <QPen>
 #include <QColor>
 #include <QFrame>
+#include <QTapGesture>
 
 #include "ColorOverBlend.h"
+#include "Map16x1.h"
 
 //deprecated!
 #include <QtOpenGL>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QOpenGLWidget>
+#else
+#include <QOpenGLWidget>
+#endif
 
 class QwtThermo;
 class MdDataRecord;
@@ -87,7 +93,11 @@ protected:
  *
  */
 #if !defined (Q_WS_MAEMO_5) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 class GLGauge : public QGLWidget {
+#else
+class GLGauge : public QOpenGLWidget {
+#endif
 //class GLGauge : public QGLWidget {
 //class GLGauge : public QWidget {
 #endif
@@ -95,9 +105,7 @@ class GLGauge : public QGLWidget {
 class GLGauge : public QGLWidget {
 #endif
 #if defined (Q_OS_ANDROID)
-//TODO FIXME graphics error
-//class GLGauge : public QGLWidget {
-class GLGauge : public QFrame {
+class GLGauge : public QGLWidget {
 #endif
 
 public:
@@ -165,14 +173,38 @@ protected:
     bool recalcDataFontSize;
 };
 
+class LambdaExtWidget : public MeasurementWidget {
+    Q_OBJECT
+public:
+    LambdaExtWidget ( QWidget *parent );
+
+    virtual void setValue(MdDataRecord *d);
+    virtual void paint() override ;
+
+signals:
+    void showStatusMessage ( const QString& );
+
+protected:
+    bool event(QEvent *event) override;
+    bool tapTriggered(QTapGesture *pTap);
+    bool tapAndHoldTriggered(QTapAndHoldGesture *pTapHold);
+    bool gestureEvent(QGestureEvent *event);
+
+    bool wideBand = true;
+    bool colorOnlyWOT = false;
+    quint8 load = 100;
+    quint8 idx;
+    QPointer<Map16x1_NbLambda> nbLambdaMap = nullptr;
+};
+
 class MaxEgtWidget : public MeasurementWidget {
     Q_OBJECT
 public:
     MaxEgtWidget ( QWidget *parent, QString caption, double lo=0, double mid=800, double hi=920,
                     QColor loColor=Qt::cyan, QColor midColor=QColor(Qt::green), QColor hiColor=Qt::red );
 
-    void setValue(double egt, quint8 idx);
-    virtual void paint();
+    virtual void setValue(double egt, quint8 idx);
+    virtual void paint() override;
 
 protected:
     quint8 idx;

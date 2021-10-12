@@ -31,7 +31,6 @@
 #include <list>
 
 #include <QList>
-#include <QLinkedList>
 #include <QVector>
 #include <QString>
 #include <QDataStream>
@@ -41,6 +40,7 @@
 #include <QSplitter>
 #include <QMenu>
 #include <QAction>
+#include <QPointer>
 
 #define MAXVALUES 9
 #define MAXVAL_BOOST 0
@@ -360,15 +360,16 @@ private:
 
     QVector<QString> headerColNames;
 
-    QSplashScreen* splash;
-    QProgressBar* progressBar;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QSplashScreen* splash = nullptr;
+    QProgressBar* progressBar = nullptr;
     QLabel* splashLabel;
+#endif
 
     QMainWindow* mainWindow;
 
-    BoostPidPlot* boostPidPlot;
-    VisualizationPlot* visPlot;
-//    VisualizationPlot* visPlot2;
+    QPointer<BoostPidPlot> boostPidPlot;
+    QPointer<VisualizationPlot> visPlot;
 
     V2PowerDialog* powerDialog;
     WotEventsDialog* wotEventsDialog;
@@ -387,6 +388,7 @@ private:
     QAction *dataViewContextMenuSaveMarkedRows;
     QAction *dataViewContextMenuDelItemAction;
     QAction *dataViewContextMenuDigifantBoost2MdBoost;
+    QAction *dataViewContextMenuDigifantNbLambda2WbLambda;
     QAction *dataViewContextMenuShowinVis1;
     QAction *dataViewContextMenuPowerPlot;
     QAction *dataViewContextMenuPowerPlotGPS;
@@ -411,6 +413,7 @@ private:
     ColorOverBlend *injectorDutyBlend;
 
     Map16x1_ISV *isvMap;
+    QPointer<Map16x1_NbLambda> nbLambdaMap = nullptr;
 
     MaxDataSet* maxValues[MAXVALUES];
 

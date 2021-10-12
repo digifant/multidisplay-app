@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         //a.setStyleSheet( "GLGauge {color:black}");
 
 #if defined ( Q_OS_ANDROID)
-        {
+    {
         //FIX android dark holo theme default has light background and text color! -> set background to black!
         QColor fr = a.palette().color(QPalette::Window);
         //light 243 dark 0
@@ -64,6 +64,42 @@ int main(int argc, char *argv[]) {
                        )";
         //qDebug() << fr.lightness();
         if ( fr.lightness() == 0 ) {
+            a.setStyleSheet(teststyle);
+        }
+    }
+#endif
+
+#if defined ( Q_OS_IOS)
+    {
+        QColor fr = a.palette().color(QPalette::Window);
+        //light 243 dark 0
+        //QPushButton { color: yellow; }
+        auto teststyle = R"(
+                QWidget { background-color: black; }
+                QComboBox { background-color: black; }
+
+                QPushButton { background-color: black; }
+            
+                MeasurementWidget { color: black; }
+                DFExtendedWidget { color: black; }
+                       )";
+        //qDebug() << "lightness=" << fr.lightness();
+        if ( fr.lightness() == 0 ) {
+            a.setStyleSheet(teststyle);
+        }
+    }
+#endif
+
+#if defined ( Q_OS_MACX)
+    {
+        QColor fr = a.palette().color(QPalette::Window);
+        //light ?
+        //dark 50
+        auto teststyle = R"(
+                MeasurementWidget { color: black; }
+                       )";
+        //qDebug() << "lightness=" << fr.lightness();
+        if ( fr.lightness() <= 50 ) {
             a.setStyleSheet(teststyle);
         }
     }

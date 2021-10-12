@@ -1,7 +1,7 @@
 #
 TEMPLATE = subdirs
 CONFIG   += ordered
-SUBDIRS  = libs/qwt-6.1.6 \
+SUBDIRS  = libs/qwt-6.2.0 \
 	   src
 
 lessThan(QT_MAJOR_VERSION, 5) {

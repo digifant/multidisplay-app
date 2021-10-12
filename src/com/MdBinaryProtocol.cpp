@@ -24,10 +24,15 @@ MdBinaryProtocol::MdBinaryProtocol(QObject *parent, MdData *data, MdAbstractCom 
     dfEctMap = new Map16x1_NTC_ECT();
     dfIatMap = new Map16x1_NTC_IAT();
     dfVoltageMap = new Map16x1_Voltage();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     timeHelper = QTime::currentTime();
     timeHelper.start();
     freqMeasure = QTime::currentTime();
     freqMeasure.start();
+#else
+    timeHelper.start();
+    freqMeasure.start();
+#endif
 
     QSettings settings;
     if ( settings.value("debug/generate_data", QVariant(false)).toBool() ) {

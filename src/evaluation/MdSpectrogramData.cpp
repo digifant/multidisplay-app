@@ -62,6 +62,16 @@ QRectF MdSpectrogramData::boundingRect( ) const {
 //	return QSize (xcount,ycount);
 //}
 
+QwtInterval MdSpectrogramData::interval( Qt::Axis axis ) const {
+    return d_intervals[axis];
+}
+
+void MdSpectrogramData::setInterval( Qt::Axis axis, const QwtInterval &interval )
+{
+    d_intervals[axis] = interval;
+}
+
+
 double MdSpectrogramData::value(double x, double y) const {
     //qDebug() << "MdSpectrogram::value x=" << x << " y=" << y;
 	if ( (x >= xlower) && (x <= xupper) && (y >= ylower) && (y <= yupper) ) {

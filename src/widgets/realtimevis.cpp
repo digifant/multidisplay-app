@@ -5,6 +5,7 @@
 #include "DFExtendedWidget.h"
 #include <widgets/VR6Widget.h>
 
+#include <QGridLayout>
 #include <QVBoxLayout>
 #include <QTime>
 #include <QSettings>

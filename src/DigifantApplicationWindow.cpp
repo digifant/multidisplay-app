@@ -62,8 +62,13 @@ DigifantApplicationWindow::DigifantApplicationWindow(QWidget *parent) :
      l->setHorizontalSpacing(0);
      l->setVerticalSpacing(0);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
      t = QTime::currentTime();
      t.start();
+#else
+     t = QElapsedTimer();
+     t.start();
+#endif
 }
 
 
@@ -75,6 +80,9 @@ void DigifantApplicationWindow::visualize (MdDataRecord *d) {
         if ( t.elapsed() > 500 ) {
 #else
         if ( t.elapsed() > 100 ) {
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            t.restart();
 #endif
 
             lw->setValue(  d->getSensorR()->getLambda() );

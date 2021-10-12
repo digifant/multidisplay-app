@@ -96,9 +96,9 @@ N75TableWidget::N75TableWidget(quint8 mode, QWidget *parent) :
     MyTableWidget(parent), mode(mode)
 {
     if (mode==0) {
-        setToolTip("low boost");
+        setToolTip(tr("low boost"));
     } else {
-        setToolTip("high boost");
+        setToolTip(tr("high boost"));
     }
 
     dutyOb = new ColorOverBlend(Qt::cyan, Qt::yellow, Qt::red, 0, 128, 255);

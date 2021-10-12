@@ -54,6 +54,38 @@ double Map16x1::mapValue12Bit ( int dval ) {
     return idx < 0xF ? (( ( w * mapData[idx+1] ) + ( -1 * (w-256) * mapData[idx]) ) / 256) : mapData[idx];
 }
 
+quint8 Map16x1::reverse(double realValue) {
+    bool desc = true;
+    if ( mapData.at(1) > mapData.at(0) )
+        desc = false;
+    int loIdx = 0;
+    int hiIdx = 0;
+    double w = 0;
+    if ( desc ) {
+        for ( int i=0 ; i < mapData.size()-1 ; i++ ) {
+            if ( mapData.at(i) >= realValue )
+                hiIdx = i;
+            if ( mapData.at(i) < realValue ) {
+                loIdx = i;
+                break;
+            }
+        }
+    } else {
+        //asc
+        for ( int i=0 ; i < mapData.size()-1 ; i++ ) {
+            if ( mapData.at(i) <= realValue )
+                loIdx = i;
+            if ( mapData.at(i) > realValue ) {
+                hiIdx = i;
+                break;
+            }
+        }
+    }
+    double f = abs ( ( mapData.at(hiIdx) - realValue ) / (mapData.at(hiIdx) - mapData.at(loIdx)) );
+    //130-115 / 130 - 90
+    return hiIdx * 16 + f * 16;
+}
+
 void Map16x1::testIt () {
     qDebug() << "implement me!";
 }
@@ -121,9 +153,11 @@ void Map16x1_NTC_ECT::testIt () {
     v.append(5);
     v.append(3);
     v.append(2);
+    v.append(0x18);
+    v.append(0x2C);
 
     foreach ( int i,  v ) {
-        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << endl;
+        qDebug() << "ECT::testIt df ad=" << i << " mapped value=" << mapValue(i) << " reversed=" << reverse(mapValue(i)) << Qt::endl;
     }
 }
 
@@ -195,7 +229,7 @@ void Map16x1_NTC_IAT::testIt () {
     v.append(2);
 
     foreach ( int i,  v ) {
-        qDebug() << "df val=" << i << " mapped value=" << mapValue(i) << endl;
+        qDebug() << "ECT::testIt df ad=" << i << " mapped value=" << mapValue(i) << " reversed=" << reverse(mapValue(i)) << Qt::endl;
     }
 }
 
@@ -247,6 +281,11 @@ double Map16x1_Voltage::mapValue(int dval)
     return dval * 1127/12087.0;
 }
 
+quint8 Map16x1_Voltage::reverse(double realValue)
+{
+    return ( realValue * 12087.0 ) / 1127;
+}
+
 
 Map16x1_NbLambda::Map16x1_NbLambda() {
     //https://bimmerprofs.com/wp-content/uploads/2017/07/o2sensor_output_afetr_CO_converter.png
@@ -274,6 +313,28 @@ double Map16x1_NbLambda::mapValue ( int dval ) {
     int m255 = qRound (dval / 3.9216);
     return Map16x1::mapValue( m255 );
 }
+
+Map16x1_CO::Map16x1_CO() {
+    mapData.resize(17);
+    mapData[0]=0;
+    mapData[1]=67;
+    mapData[2]=143;
+    mapData[3]=232;
+    mapData[4]=335;
+    mapData[5]=457;
+    mapData[6]=491;
+    mapData[7]=604;
+    mapData[8]=783;
+    mapData[9]=1008;
+    mapData[10]=1297;
+    mapData[11]=1684;
+    mapData[12]=2000;
+    mapData[13]=2000;
+    mapData[14]=2000;
+    mapData[15]=2000;
+    mapData[16]=2000;
+}
+
 
 Map16x1_RPM6500::Map16x1_RPM6500() {
     mapData.resize(17);
@@ -353,7 +414,7 @@ void Map16x1_10Bit_VDO5::testIt () {
     v.append(1024);
 
     foreach ( int i,  v ) {
-        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << Qt::endl;
     }
 }
 
@@ -393,6 +454,6 @@ void Map16x1_10Bit_VDO10::testIt () {
     v.append(888);
 
     foreach ( int i,  v ) {
-        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << endl;
+        qDebug() << "ad value=" << i << " mapped value=" << mapValue(i) << Qt::endl;
     }
 }

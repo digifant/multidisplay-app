@@ -70,7 +70,11 @@ MdPlot::MdPlot( QMainWindow* mw, QWidget* parent, QTableView *tableView ) {
 //    d_zoomer[1] = new MdPlotZoomer(QwtPlot::xTop, QwtPlot::yRight, this->canvas());
 
     d_panner = new QwtPlotPanner(this->canvas());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     d_panner->setMouseButton(Qt::MidButton);
+#else
+    d_panner->setMouseButton(Qt::MiddleButton);
+#endif
 
     //qwt5
 //    d_picker[0] = new MdPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,

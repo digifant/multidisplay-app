@@ -33,8 +33,10 @@ public:
     virtual double mapValue8Bit ( int dval );
     virtual double mapValue10Bit ( int dval );
     virtual double mapValue12Bit ( int dval );
+    virtual quint8 reverse ( double realValue );
     virtual void testIt ();
     virtual QString name () = 0;
+    virtual void setMap ( const QVector<double> &new_map) { mapData = new_map; };
 
 protected:
     QVector<double> mapData;
@@ -67,6 +69,7 @@ class Map16x1_Voltage : public Map16x1 {
 public:
     Map16x1_Voltage();
     double mapValue(int dval);
+    quint8 reverse ( double realValue );
     QString name () { return "DF_Voltage"; };
 };
 
@@ -74,7 +77,14 @@ class Map16x1_NbLambda : public Map16x1 {
 public:
     Map16x1_NbLambda();
     QString name () { return "DF_NbLambda"; };
+    //! wants milliVolts
     double mapValue ( int dval );
+};
+
+class Map16x1_CO : public Map16x1 {
+public:
+    Map16x1_CO();
+    QString name () { return "DF_CO"; };
 };
 
 class Map16x1_RPM6500 : public Map16x1 {

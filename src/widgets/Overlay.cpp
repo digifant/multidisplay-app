@@ -35,12 +35,12 @@ void Overlay::paintEvent(QPaintEvent *event)
     painter.setFont({"arial,helvetica", 48});
     painter.drawText(rect(), "TEST 1234", Qt::AlignHCenter | Qt::AlignTop);
 
-    qDebug() << "Overlay::paintEvent";
+    //qDebug() << "Overlay::paintEvent";
 }
 
 void Overlay::resizeEvent ( QResizeEvent * event ) {
     QWidget::resizeEvent( event );
-    qDebug() << "Overlay::resizeEvent old=" << event->oldSize() << "  new=" << event->size();
+    //qDebug() << "Overlay::resizeEvent old=" << event->oldSize() << "  new=" << event->size();
 }
 
 void Overlay::newParent()

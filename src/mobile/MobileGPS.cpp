@@ -55,8 +55,10 @@ MobileGPS::MobileGPS(QObject *parent)
 #endif
 
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     freqMeasure = QTime::currentTime();
     deltaMdFrame = QTime::currentTime();
+#endif
     freqMeasure.start();
 
 }
@@ -88,7 +90,7 @@ bool MobileGPS::saveTrack(QString fn) {
     if ( !file.open (QIODevice::WriteOnly | QIODevice::Truncate) )
             return false;
     QTextStream ts (&file);
-    ts << "#md timestamp\ttimedelta\tgps time\tgps coordinate\tgps speed\tgps directon\tGPSHorizontalAccuracy\tGPSVerticalAccuracy" << endl;
+    ts << "#md timestamp\ttimedelta\tgps time\tgps coordinate\tgps speed\tgps directon\tGPSHorizontalAccuracy\tGPSVerticalAccuracy";
     foreach (MdPos* e , track ) {
         if ( e->pos.isValid() ) {
             ts << e->time << '\t'
@@ -98,10 +100,9 @@ bool MobileGPS::saveTrack(QString fn) {
                << e->pos.attribute(QGeoPositionInfo::GroundSpeed) << '\t'
                << e->pos.attribute(QGeoPositionInfo::Direction) << '\t'
                << e->pos.attribute(QGeoPositionInfo::HorizontalAccuracy) << '\t'
-               << e->pos.attribute(QGeoPositionInfo::VerticalAccuracy) << '\t'
-               << endl;
+               << e->pos.attribute(QGeoPositionInfo::VerticalAccuracy) << '\t';
         } else {
-            qDebug() << "no valid position!" << endl;
+            qDebug() << "no valid position!";
         }
     }
     file.close();
@@ -142,9 +143,13 @@ bool MobileGPS::loadTrack(QString fn)
             QString degreesMinutesSecondsWithHemisphereOptionalHeigth = l[3];
             QStringList dmsHs = degreesMinutesSecondsWithHemisphereOptionalHeigth.split(",");
             //            51° 5' 60.0" N, 10° 29' 60.0" E, 211.5m
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QRegExp dmshR ("(\\d+)\\D\\s*(\\d+)\\D\\s*(\\d+)\\D\\s*(\\w)");
             QRegExp heigthR ("(\\d+\\.\\d+)m");
-
+#else
+            QRegularExpression dmshR ("(\\d+)\\D\\s*(\\d+)\\D\\s*(\\d+)\\D\\s*(\\w)");
+            QRegularExpression heigthR ("(\\d+\\.\\d+)m");
+#endif
             QGeoPositionInfo pi;
             pi.setTimestamp( QDateTime::fromString( QString(line[2])) );
 

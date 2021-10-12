@@ -61,7 +61,7 @@ void WotEventsDialog::show ( QList<int> idxL ) {
     ui->tableWidget->setRowCount( idxL.size() );
 
     QList<QString> tl;
-    tl << "time" << "RPM" << "boost";
+    tl << tr("time") << tr("RPM") << tr("boost");
     ui->tableWidget->setHorizontalHeaderLabels( tl );
 
 

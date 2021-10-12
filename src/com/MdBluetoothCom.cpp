@@ -127,10 +127,18 @@ void MdBluetoothCom::togglePort()
 //            openPort();
 //        }
         switch ( socket->state() ) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         case QBluetoothSocket::ConnectedState:
+#else
+        case QBluetoothSocket::SocketState::ConnectedState:
+#endif
             closePort();
             break;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         case QBluetoothSocket::UnconnectedState:
+#else
+        case QBluetoothSocket::SocketState::UnconnectedState:
+#endif
             setupPort();
             break;
         }
@@ -158,7 +166,11 @@ void MdBluetoothCom::openPort()
     socket->open(QIODevice::ReadWrite);
     qDebug("is open: %d", socket->isOpen());
     if ( socket->isOpen() ) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         if ( socket->state()==QBluetoothSocket::ConnectedState ) {
+#else
+        if ( socket->state()==QBluetoothSocket::SocketState::ConnectedState ) {
+#endif
             emit showStatusMessage( "Bluetooth: SPP opened" );
             emit portOpened();
         }
@@ -359,19 +371,31 @@ void MdBluetoothCom::disconnected()
 void MdBluetoothCom::socketStateChanged(QBluetoothSocket::SocketState s)
 {
     switch (s) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     case QBluetoothSocket::ConnectedState:
+#else
+    case QBluetoothSocket::SocketState::ConnectedState:
+#endif
         setState(bluetoothState::Connected);
         emit showStatusMessage( "Bluetooth: socket connected!");
         openPort();
         qDebug() << "socket connected";
         break;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     case QBluetoothSocket::UnconnectedState:
+#else
+    case QBluetoothSocket::SocketState::UnconnectedState:
+#endif
         setState(bluetoothState::Idle);
         emit showStatusMessage( "Bluetooth: socket unconnected!");
         closePort();
         qDebug() << "socket unconnected";
         break;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     case QBluetoothSocket::ConnectingState:
+#else
+    case QBluetoothSocket::SocketState::ConnectingState:
+#endif
         setState(bluetoothState::Connecting);
         emit showStatusMessage( "Bluetooth: socket is attempting to connect to a device.!");
         qDebug() << "Socket is attempting to connect to a device";

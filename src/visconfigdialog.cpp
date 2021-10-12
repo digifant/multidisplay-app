@@ -21,6 +21,8 @@
 #include "visconfigdialog.h"
 
 #include <QDebug>
+#include <qwt_text.h>
+#include <QPen>
 
 VisConfigDialog::VisConfigDialog(QWidget *parent)
     : QDialog(parent) {

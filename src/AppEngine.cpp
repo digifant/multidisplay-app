@@ -26,7 +26,6 @@
 #include <QDebug>
 #include <QSettings>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QTableWidget>
 #include <QDesktopServices>
 #include <QDir>
@@ -993,6 +992,7 @@ void AppEngine::openData ( QString fn ) {
         mmw->setAttribute(Qt::WA_Maemo5ShowProgressIndicator);
 #endif
         mds->closePort();
+        //clearData();
 
         dashboardActualizeSave = getActualizeDashboard() ;
         vis1ActualizeSave = getActualizeVis1();
@@ -1112,7 +1112,8 @@ void AppEngine::writeSettings () {
     settings.endGroup();
 #endif
 
-    data->getVisPlot()->writeSettings();
+    if ( data->getVisPlot() )
+        data->getVisPlot()->writeSettings();
 
     //FIXME -> V2
 //    settings.beginGroup("boostpid");
@@ -1169,7 +1170,8 @@ void AppEngine::readSettings () {
     settings.endGroup();
 #endif
 
-    data->getVisPlot()->readSettings();
+    if ( data->getVisPlot() )
+        data->getVisPlot()->readSettings();
 
 
     mySerialOptionsDialog->getUi()->portComboBox->setCurrentIndex( settings.value ("mdserial/port", 0).toInt() );

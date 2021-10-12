@@ -64,9 +64,9 @@ MultidisplayUIMainWindow::MultidisplayUIMainWindow(QWidget *parent)
     ui.StopButton->setText("");
 #endif
 
-    grabGesture(Qt::PanGesture);
-    grabGesture(Qt::PinchGesture);
-    grabGesture(Qt::SwipeGesture);
+    //grabGesture(Qt::PanGesture);
+    //grabGesture(Qt::PinchGesture);
+    //grabGesture(Qt::SwipeGesture);
 
     connect (ui.action100kpa, SIGNAL(triggered(bool)), this, SLOT(dfMapSelected100(bool)));
     connect (ui.action200kpa, SIGNAL(triggered(bool)), this, SLOT(dfMapSelected200(bool)));

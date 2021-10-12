@@ -6,6 +6,7 @@
 
 /**
  * @brief Overlay Widget
+ * @broken 2021-07: broken again! :(
  * Works in Android, IOS, Linux, Windows and MacOS (Catalina, not on HighSierra)
  */
 class Overlay : public QWidget

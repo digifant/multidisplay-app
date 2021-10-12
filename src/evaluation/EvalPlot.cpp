@@ -80,10 +80,10 @@ void EvalPlotBoostLambda::compute ( MdData *md ) {
 
 	if ( dl.size() > 0 ) {
 		foreach ( MdDataRecord* r , dl ) {
-                    if ( r->getSensorR() != NULL ) {
-			if ( r->getSensorR()->getThrottle() >= 90 )
-				d.add (r->getSensorR()->getBoost(), r->getSensorR()->getLambda() );
-                    }
+          if ( r->getSensorR() != NULL ) {
+            if ( r->getSensorR()->getThrottle() >= 90 )
+              d.add (r->getSensorR()->getBoost(), r->getSensorR()->getLambda() );
+            }
 		}
         ec->setSamples ( d.x(), d.y() );
 //        ec->setSamples (&d);

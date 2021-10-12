@@ -162,7 +162,10 @@ void EvalSpectrogramPlot::compute ( MdData *md ) {
                 }
             }
 		}
-        sampleIntervall = time / samples; //msecs
+        if ( samples > 0 )
+            sampleIntervall = time / samples; //msecs
+        else
+            sampleIntervall = 0;
         qDebug() << "EvalSpectrogramPlot::compute finished: sampleIntervall=" << sampleIntervall  << " msecs" << " samples=" << samples;
 
 		replot();

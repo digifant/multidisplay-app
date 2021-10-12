@@ -5,7 +5,7 @@
 #include <QGeoPositionInfo>
 #include <QGeoPositionInfoSource>
 #include <QGeoCoordinate>
-
+#include <QElapsedTimer>
 
 #include "MdGpsSerial.h"
 
@@ -57,8 +57,13 @@ private:
     QGeoCoordinate lastCoord;
     QList<MdPos*> track;
     quint32 gpsUpdateCount;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QTime freqMeasure;
     QTime deltaMdFrame;
+#else
+    QElapsedTimer freqMeasure;
+    QElapsedTimer deltaMdFrame;
+#endif
     MdGpsSerial *gpsSerial;
 };
 

@@ -210,6 +210,8 @@ void DFExtendedWidget::setValue( MdDataRecord *d )
         } else {
             speedGps = false;
         }
+    } else {
+        speedGps = false;
     }
     gear = d->getSensorR()->getGear();
     
@@ -259,7 +261,7 @@ void DFExtendedWidget::paint() {
         textFont.setPointSizeF( textFont.pointSizeF() - 0.5 );
     //up
     while ( ( ( QFontMetrics(textFont).lineSpacing() * 14 ) < height() ) &&
-            ( QFontMetrics(textFont).boundingRect(QString("LC OFF   knock detection OFF")).width() < width() ) )
+            ( QFontMetrics(textFont).boundingRect(QString(tr("LC OFF   knock detection OFF"))).width() < width() ) )
         textFont.setPointSizeF( textFont.pointSizeF() + 0.5 );
 
     QFontMetrics fm = painter.fontMetrics();
@@ -273,13 +275,17 @@ void DFExtendedWidget::paint() {
     textFont.setBold(false);
 
 #if defined (DIGIFANTAPP)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     w = fm.width(caption) + fm.maxWidth();
+#else
+    w = fm.horizontalAdvance(caption) + fm.maxWidth();
+#endif
 
     int ps = textFont.pointSize();
     textFont.setPointSize(ps * 0.75);
     painter.setFont(textFont);
     if ( landscape_for_text )
-        painter.drawText( QPoint(w,h), "programmed by digifant-onlineabstimmung.de" );
+        painter.drawText( QPoint(w,h), tr("programmed by digifant-onlineabstimmung.de") );
     w=0;
     textFont.setPointSize(ps);
     painter.setFont(textFont);
@@ -363,7 +369,7 @@ void DFExtendedWidget::paint() {
 
     //make 0-250kpa
 #if defined ( DIGIFANTAPP )
-    QString boost = "Boost " +
+    QString boost = tr("Boost") + " " +
             QString::number( AppEngine::getInstance()->getDfBoostTransferFunction()->map( df_boost_raw ), 'f', 2 ) + " kpa";
 #else
     QString boost = "Boost " + QString::number(df_boost_raw) + " (raw) "  +
@@ -415,7 +421,7 @@ void DFExtendedWidget::paint() {
     else if ( df_wot_flag & 0x10 )
         dk = "idle";
     
-    QString speedStr = QString::number(speed) + " km/h ";
+    QString speedStr = QString::number(speed, 'f', 1) + " km/h ";
     if ( speedGps )
         speedStr += "(GPS) ";
     if ( gear > 0 )
@@ -523,18 +529,27 @@ void DFExtendedWidget::paint() {
     h += fm.lineSpacing();
     painter.drawText( QPoint(0, h), lc );
 
-    QString racemode = "knock detection ON";
+    QString racemode = tr("knock detection ON");
     if (!landscape_for_text)
-        racemode = "knock det. ON";
+        racemode = tr("knock det. ON");
 
     if ( setPositionForCol(fm.lineSpacing(),2) )
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         w = fm.width(lc) + fm.maxWidth();
+#else
+        w = fm.horizontalAdvance(lc) + fm.maxWidth();
+#endif
     if ( df_lc_flags & 16) {
-        racemode = "knock detection OFF";
+        racemode = tr("knock detection OFF");
         if (!landscape_for_text)
-            racemode = "knock det. OFF";
+            racemode = tr("knock det. OFF");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         painter.fillRect( QRect(w, h - fm.lineSpacing(),
                                 fm.width (racemode), fm.height() ), Qt::red);
+#else
+        painter.fillRect( QRect(w, h - fm.lineSpacing(),
+                                fm.horizontalAdvance(racemode), fm.height() ), Qt::red);
+#endif
     }
     painter.drawText( QPoint(w, h), racemode );
 
@@ -563,7 +578,7 @@ void DFExtendedWidget::paint() {
         int ps = textFont.pointSize();
         textFont.setPointSize(ps * 0.75);
         painter.setFont(textFont);
-        painter.drawText( QPoint(0, h), "by digifant-onlineabstimmung.de" );
+        painter.drawText( QPoint(0, h), tr("by digifant-onlineabstimmung.de") );
         textFont = backupFont;
         painter.setFont(textFont);
     }
@@ -588,7 +603,7 @@ void DFExtendedWidget::paint() {
 //    int textpos = knockBarHeigth - textFont.pointSize();
 //    if ( textpos > 0 ) {
         painter.drawText( QRect(0, size().height()-knockBarHeigth + QFontMetrics(textFont).leading(), this->size().width(), this->size().height() ),
-                          Qt::AlignLeft, "knock " + QString::number (df_knock_raw));
+                          Qt::AlignLeft, tr("knock") + " " + QString::number (df_knock_raw));
 //    }
 #endif
     painter.end();

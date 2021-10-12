@@ -127,7 +127,11 @@ void PowerPlot::setData ( QList<MdDataRecord*>&dl, QList<int> &rn, bool useGpsSp
     rowNums = rn;
 
     //clean data -> remove rows without changing speed!
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qSort (rowNums.begin(), rowNums.end());
+#else
+    std::sort (rowNums.begin(), rowNums.end());
+#endif
     QList<int> removeIdx;
     for ( quint32 i = 0 ; i < rowNums.size() ; i++ ) {
         if ( i>0) {

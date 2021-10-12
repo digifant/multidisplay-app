@@ -120,7 +120,7 @@ void MdBluetoothLECom::addDevice(const QBluetoothDeviceInfo &device)
                    << device.address().toString();
         BluetoothDeviceInfo *dev = new BluetoothDeviceInfo(device);
         m_qlDevices.append(dev);
-        qDebug() << "Low Energy device found. Scanning for more..." << endl;
+        qDebug() << "Low Energy device found. Scanning for more...";
     }
 
 }
@@ -129,7 +129,7 @@ void MdBluetoothLECom::addDevice(const QBluetoothDeviceInfo &device)
 void MdBluetoothLECom::deviceScanFinished()
 {    
     if (m_qlDevices.size() == 0) {
-        qWarning() << "No Low Energy devices found" << endl;
+        qWarning() << "No Low Energy devices found";
         emit couldNotConnect2BtDevice();
     } else {
         for (int i = 0; i < m_qlDevices.size(); i++) {
@@ -213,7 +213,11 @@ void MdBluetoothLECom::startConnectDevice(const QString &address){
     //-> no parent to get m_control not auto deleted
     m_control = new QLowEnergyController(m_currentDevice.getDevice());
 #else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_control = new QLowEnergyController(m_currentDevice.getDevice(), this);
+#else
+    m_control = QLowEnergyController::createCentral(m_currentDevice.getDevice(), this);
+#endif
 #endif
     m_control ->setRemoteAddressType(QLowEnergyController::RandomAddress);
 
@@ -338,11 +342,16 @@ void MdBluetoothLECom::serviceStateChanged(QLowEnergyService::ServiceState s) {
         }
 
 
-       // Bluetooth LE spec Where a characteristic can be notified, a Client Characteristic Configuration descriptor
-       // shall be included in that characteristic as required by the Bluetooth Core Specification
-       // Tx notify is enabled
-       const QLowEnergyDescriptor m_notificationDescTx = TxChar.descriptor(
+        // Bluetooth LE spec Where a characteristic can be notified, a Client Characteristic Configuration descriptor
+        // shall be included in that characteristic as required by the Bluetooth Core Specification
+        // Tx notify is enabled
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        const QLowEnergyDescriptor m_notificationDescTx = TxChar.descriptor(
                    QBluetoothUuid::ClientCharacteristicConfiguration);
+#else
+        const QLowEnergyDescriptor m_notificationDescTx = TxChar.descriptor(
+          QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
+#endif
         if (m_notificationDescTx.isValid()) {
             // enable notification
             m_service->writeDescriptor(m_notificationDescTx, QByteArray::fromHex("0100"));
@@ -387,7 +396,11 @@ void MdBluetoothLECom::transmitMsg(const QString &s){
         const QLowEnergyCharacteristic  RxChar = m_service->characteristic(QBluetoothUuid(QUuid(rn4871_sp_uuid_rx)));
         qDebug()<< "transmitMsg " << s;
         QByteArray Data;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         Data.append(s);
+#else
+        Data.append(s.toLatin1());
+#endif
         m_service->writeCharacteristic(RxChar, Data,QLowEnergyService::WriteWithoutResponse);
     }
 }
