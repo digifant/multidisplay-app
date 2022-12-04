@@ -18,7 +18,9 @@ Accelerometer::Accelerometer(QObject *parent) :
     //sensor->setDataRate(10);
     connect(sensor, SIGNAL(readingChanged()), this, SLOT(checkReading()));
     sensor->start();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     freqMeasure = QTime::currentTime();
+#endif
     freqMeasure.start();
 }
 

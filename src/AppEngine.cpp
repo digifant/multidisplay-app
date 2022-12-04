@@ -78,7 +78,11 @@
 #if defined (Q_OS_ANDROID)
     #include "com/MdBluetoothCom.h"
     #include "com/MdBluetoothLECom.h"
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     #include <QtAndroid>
+#else
+    #include <QtCore/private/qandroidextras_p.h>
+#endif
 #endif
 
 #if defined (Q_OS_IOS)
@@ -86,6 +90,7 @@
     #include "com/MdBluetoothLECom.h"
     #include "mobile/MobileGPS.h"
     #include "mobile/Accelerometer.h"
+    #include "mobile/IosHelper.h"
 #endif
 
 #if defined (Q_WS_MAEMO_5) || defined(ANDROID)
@@ -195,7 +200,7 @@ AppEngine::AppEngine() {
 #if defined (Q_OS_ANDROID)
     qDebug() << "ANDROID mobile version";
 
-#if QT_VERSION > QT_VERSION_CHECK(5, 10, 0)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     auto  result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
     if(result == QtAndroid::PermissionResult::Denied){
         QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
@@ -220,13 +225,71 @@ AppEngine::AppEngine() {
         if(resultHash["android.permission.BLUETOOTH_ADMIN"] == QtAndroid::PermissionResult::Denied)
             qDebug() << "BLUETOOTH_ADMIN permission denied!";
     }
+    result = QtAndroid::checkPermission(QString("android.permission.BLUETOOTH_SCAN"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.BLUETOOTH_SCAN"}));
+        if(resultHash["android.permission.BLUETOOTH_SCAN"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "BLUETOOTH_SCAN permission denied!";
+    }
+    result = QtAndroid::checkPermission(QString("android.permission.BLUETOOTH_CONNECT"));
+    if(result == QtAndroid::PermissionResult::Denied){
+        QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.BLUETOOTH_CONNECT"}));
+        if(resultHash["android.permission.BLUETOOTH_CONNECT"] == QtAndroid::PermissionResult::Denied)
+            qDebug() << "BLUETOOTH_CONNECT permission denied!";
+    }
     result = QtAndroid::checkPermission(QString("android.permission.ACCESS_FINE_LOCATION"));
     if(result == QtAndroid::PermissionResult::Denied){
         QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.ACCESS_FINE_LOCATION"}));
         if(resultHash["android.permission.ACCESS_FINE_LOCATION"] == QtAndroid::PermissionResult::Denied)
             qDebug() << "ACCESS_FINE_LOCATION permission denied!";
     }
+#else
+   //Qt 6
+   //https://forum.qt.io/topic/140111/qt-6-4-and-permissions/4
+    QString permission = QString("android.permission.READ_EXTERNAL_STORAGE");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+    permission = QString("android.permission.WRITE_EXTERNAL_STORAGE");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+    permission = QString("android.permission.BLUETOOTH");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+    permission = QString("android.permission.BLUETOOTH_ADMIN");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+    permission = QString("android.permission.BLUETOOTH_SCAN");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+    permission = QString("android.permission.BLUETOOTH_CONNECT");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
+
+
+    permission = QString("android.permission.ACCESS_FINE_LOCATION");
+    if ( ! AndroidMainWindow::checkAndroidPermission(permission) ) {
+        if ( ! AndroidMainWindow::requestAndroidPermission(permission) )
+            qDebug() << permission << " permission denied!";
+    }
 #endif
+
 
     amw = new AndroidMainWindow ();
 
@@ -324,8 +387,12 @@ AppEngine::AppEngine() {
     directory = QDesktopServices::storageLocation (QDesktopServices::DocumentsLocation);
 #endif
 #if defined Q_OS_ANDROID
-    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#else
+    QJniObject s = QJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#endif
     directory = s.toString();
     qDebug() << "android path 2020: " << directory;
 #endif
@@ -837,8 +904,11 @@ void AppEngine::saveData () {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
 #endif
 #if defined (ANDROID)
-    //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
-    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+#else
+    QJniObject s = QJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+#endif
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
     qDebug() << "android save path 2020: " << path;
 #endif
@@ -869,7 +939,11 @@ void AppEngine::saveDataAsCSV() {
             + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".csv";
 #endif
 #if defined (ANDROID)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+#else
+    QJniObject s = QJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+#endif
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
     qDebug() << "android save path 2019: " << path;
 #endif
@@ -905,7 +979,11 @@ void AppEngine::saveDataAs () {
 #endif
 #if defined (ANDROID)
     //QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDocumentPath", "()Ljava/lang/String;" );
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QAndroidJniObject s = QAndroidJniObject::callStaticObjectMethod( "de/gummelinformatics/mui/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#else
+    QJniObject s = QJniObject::callStaticObjectMethod( "de/gummelinformatics/digifant/MuiIntentHelper", "getPublicDownloadsPath", "()Ljava/lang/String;" );
+#endif
     path = s.toString() + QDir::separator() + QDateTime::currentDateTime ().toString("yyyy-MM-ddThhmm") + ".mdv2";
     qDebug() << "android save path 2019: " << path;
 #endif
@@ -939,9 +1017,15 @@ void AppEngine::saveDataAs () {
             emit showStatusMessage( "save failed!" );
         } else {
 #if defined (ANDROID)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QAndroidJniObject jsPath = QAndroidJniObject::fromString(path);
             QAndroidJniObject jsTitle = QAndroidJniObject::fromString("digifant log");
             QAndroidJniObject jsMimeType = QAndroidJniObject::fromString("application/digifant-ecu");
+#else
+            QJniObject jsPath = QJniObject::fromString(path);
+            QJniObject jsTitle = QJniObject::fromString("digifant log");
+            QJniObject jsMimeType = QJniObject::fromString("application/digifant-ecu");
+#endif
             int requestId = 0;
             /*
                         QAndroidJniObject::callStaticObjectMethod("de/gummelinformatics/mui/MuiIntentHelper",

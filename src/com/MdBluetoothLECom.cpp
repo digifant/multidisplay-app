@@ -211,7 +211,13 @@ void MdBluetoothLECom::startConnectDevice(const QString &address){
 #ifdef ANDROID
     //sigsev deleting m_control on android on exit if there was a established BLE conn
     //-> no parent to get m_control not auto deleted
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_control = new QLowEnergyController(m_currentDevice.getDevice());
+    //m_control = new QLowEnergyController(m_currentDevice.getDevice(), this);
+#else
+    m_control = QLowEnergyController::createCentral(m_currentDevice.getDevice(), this);
+#endif
+
 #else
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     m_control = new QLowEnergyController(m_currentDevice.getDevice(), this);

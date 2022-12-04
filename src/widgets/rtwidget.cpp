@@ -98,7 +98,7 @@ GLGauge::GLGauge ( QWidget *parent )
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     : QGLWidget (parent) {
 #else
-    : QOpenGLWidget (parent) {
+    : QWidget (parent) {
 #endif
 //    : QGLWidget (parent) {
 //    : QWidget (parent) {
@@ -110,7 +110,13 @@ GLGauge::GLGauge ( QWidget *parent )
 #endif
 #if defined (Q_OS_ANDROID)
 GLGauge::GLGauge ( QWidget *parent )
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     : QGLWidget (parent) {
+#else
+    //2022-06 Qt-6.3 QGLWidget still black
+    //class GLGauge : public QOpenGLWidget {
+    : QWidget (parent) {
+#endif
 #endif
 
 #if defined Q_OS_ANDROID

@@ -142,7 +142,7 @@ void MdBinaryProtocol::incomingData(const QByteArray &bytes) {
                     if ( d != MD_FRAMEEND ) {
                             discarded_frames++;
                             if ( discarded_frames % 100 == 0 )
-                                qDebug() << "(WARN) frame discarded! expected framelength=" << framelength << " #discarded frames=" << discarded_frames << " d=" << d << " data=" << sdata->toHex();
+                                qDebug() << "(WARN) frame discarded! low bt signal quality? expected length=" << framelength << " #discarded frames=" << discarded_frames << " d=" << d << " data=" << sdata->toHex();
                             status = MD_STATUS_FRAMEERROR;
                     } else {
                             rcvData.asBytes[index] = d;

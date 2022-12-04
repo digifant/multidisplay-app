@@ -96,7 +96,9 @@ protected:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 class GLGauge : public QGLWidget {
 #else
-class GLGauge : public QOpenGLWidget {
+//2022-06 Qt-6.4 QGLWidget still broken
+//class GLGauge : public QOpenGLWidget {
+class GLGauge : public QWidget {
 #endif
 //class GLGauge : public QGLWidget {
 //class GLGauge : public QWidget {
@@ -105,7 +107,13 @@ class GLGauge : public QOpenGLWidget {
 class GLGauge : public QGLWidget {
 #endif
 #if defined (Q_OS_ANDROID)
-class GLGauge : public QGLWidget {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    class GLGauge : public QGLWidget {
+#else
+    //2022-06 Qt-6.3 QGLWidget still black
+    //class GLGauge : public QOpenGLWidget {
+    class GLGauge : public QWidget {
+#endif
 #endif
 
 public:

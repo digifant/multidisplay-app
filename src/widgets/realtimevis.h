@@ -23,13 +23,15 @@ public:
     explicit RealTimeVis(QWidget *parent = 0);
 
 signals:
+    void showStatusMessage ( const QString& );
 
 public slots:
     void visualize (MdDataRecord *d);
     void possibleCfgChange ();
 
+    void triggerEmitShowStatusMessage ( const QString & msg ) { emit showStatusMessage(msg); };
     void showMessage (const QString &msg, const int forSeconds=0);
-    void showStatusMessage ( const QString &msg );
+    void showStatusMessageAsOverlay ( const QString &msg );
     void showMessage3 (const QString &msg);
     void hideMessage ();
 
@@ -40,12 +42,15 @@ protected:
 
     void switchEcu ();
 
+    bool isDigifantApp();
+    bool isMultidisplayApp();
     bool mdMode();
 private:
+    QGridLayout *gl = nullptr;
     QwtThermo *boostT;
-    BarGraphWidget *bg1;
-    BarGraphWidget *bg2;
-    BarGraphWidget *bg3;
+    BarGraphWidget *bg1 = nullptr;
+    BarGraphWidget *bg2 = nullptr;
+    BarGraphWidget *bg3 = nullptr;
 
     MeasurementWidget *boostW;
     MeasurementWidget *lambdaW;

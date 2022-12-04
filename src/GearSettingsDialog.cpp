@@ -10,7 +10,7 @@ GearSettingsDialog::GearSettingsDialog(QWidget *parent) :
     ui(new Ui::GearSettingsDialog)
 {
     ui->setupUi(this);
-    connect (ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(loadDefaultTransmission(QString)));
+    connect (ui->comboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(loadDefaultTransmission(QString)));
 #ifdef Q_OS_ANDROID
     //we want no ok / cancel button on android. data is saved on close by back button
     //back button triggers 1. rejected and 2. finished

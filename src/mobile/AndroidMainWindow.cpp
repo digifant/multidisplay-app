@@ -1,15 +1,21 @@
 #include <QCloseEvent>
 #include <QtCore/qmath.h>
 #include <QDebug>
+#include <QLabel>
 
 #include "AndroidMainWindow.h"
 #include "ui_AndroidMainWindow.h"
 #include "AppEngine.h"
 
 #if defined(Q_OS_ANDROID)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     #include <QAndroidJniObject>
     #include <QAndroidJniEnvironment>
     #include <QtAndroid>
+#else
+    #include <QCoreApplication>
+    #include <QtCore/private/qandroidextras_p.h>
+#endif
     //FIX hack! fix for "java.lang.UnsatisfiedLinkError: dlopen failed: library libQt5Concurrent_x86.so libQt5PrintSupport_x86.so not found.
     #include <QtPrintSupport>
     #include <QtConcurrent>
@@ -44,6 +50,31 @@ AndroidMainWindow::AndroidMainWindow(QWidget *parent) :
          ui->menuData->setTitle("Digifant 1");
          ui->actionMdSupportForum->setText("more information");
      }
+
+#if defined (DIGIFANTVANAPP)
+     ui->actionV2_N75_Settings->setVisible(false);
+     ui->actionGearbox_settings->setVisible(false);
+     ui->menuData->setTitle("Digifant 1");
+     ui->actionMdSupportForum->setText("more information");
+#endif
+
+#if not defined (Q_OS_IOS)
+     _pixmapBg.load(":/mm/img/dfo_schwarz.png");
+#endif
+    
+#if defined (Q_OS_IOS)
+    ui->actionMdSupportForum->setVisible(false);
+    statusBarLabel = new QLabel(ui->statusbar);
+    ui->statusbar->addWidget(statusBarLabel);
+    statusBarLabel->setText(tr("BT not connected"));
+    //ui->statusbar->showMessage ("G60 digifantview for IOS build on " + BUILDDATETIME);
+    ui->statusbar->showMessage ("G60 / IOS", 3000);
+#endif
+#if defined (Q_OS_ANDROID)
+    statusBarLabel = new QLabel(ui->statusbar);
+    ui->statusbar->addWidget(statusBarLabel);
+    statusBarLabel->setText(tr("BT not connected"));
+#endif
 }
 
 AndroidMainWindow::~AndroidMainWindow()
@@ -123,6 +154,31 @@ void AndroidMainWindow::resizeEvent(QResizeEvent *event)
 ////    }
 //}
 
+#if defined Q_OS_ANDROID
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+bool AndroidMainWindow::checkAndroidPermission(QString permission)
+{
+    auto result = QtAndroidPrivate::checkPermission(permission).then([](
+        QtAndroidPrivate::PermissionResult result) {
+            return result;
+        });
+    result.waitForFinished();
+
+    return result.result() != QtAndroidPrivate::PermissionResult::Denied;
+}
+
+bool AndroidMainWindow::requestAndroidPermission(QString permission)
+{
+    auto result = QtAndroidPrivate::requestPermission(permission).then([](
+        QtAndroidPrivate::PermissionResult result) {
+            return result;
+        });
+    result.waitForFinished();
+    return result.result() != QtAndroidPrivate::PermissionResult::Denied;
+}
+#endif
+#endif
+
 void AndroidMainWindow::showStatusMessage(const QString &msg)
 {
     qDebug() << "showStatusMessage" << msg;
@@ -133,12 +189,30 @@ void AndroidMainWindow::showStatusMessage(const QString &msg)
     */
 #if defined(Q_OS_ANDROID)
     showToast(msg);
+    if ( msg.contains("connected") ) {
+        statusBarLabel->setText(tr("BT connected"));
+    }
+    if ( msg.contains("disconnected") ) {
+        statusBarLabel->setText(tr("BT not connected"));
+    //qDebug() << "STATUS " << msg;
+    }
+#endif
+#if defined(Q_OS_IOS)
+    ui->statusbar->showMessage(msg, 4000);
+    if ( msg.contains("connected") ) {
+        statusBarLabel->setText(tr("BT connected"));
+    }
+    if ( msg.contains("disconnected") ) {
+        statusBarLabel->setText(tr("BT not connected"));
+    }
+    //qDebug() << "STATUS " << msg;
 #endif
 }
 
 void AndroidMainWindow::showToast(const QString &message, ToastDuration duration)
 {
 #if defined(Q_OS_ANDROID)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // all the magic must happen on Android UI thread
     QtAndroid::runOnAndroidThread([message, duration] {
         QAndroidJniObject javaString = QAndroidJniObject::fromString(message);
@@ -149,6 +223,20 @@ void AndroidMainWindow::showToast(const QString &message, ToastDuration duration
                                                                             jint(duration));
         toast.callMethod<void>("show");
     });
+#else
+    // Qt 6 TODO TEST
+    // all the magic must happen on Android UI thread
+    // https://bugreports.qt.io/browse/QTBUG-90501
+     QNativeInterface::QAndroidApplication::runOnAndroidMainThread([message, duration] {
+        QJniObject javaString = QJniObject::fromString(message);
+        QJniObject toast = QJniObject::callStaticObjectMethod("android/widget/Toast", "makeText",
+                                                                            "(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;",
+                                                                            QNativeInterface::QAndroidApplication::context(), //QtAndroid::androidActivity().object(),
+                                                                            javaString.object(),
+                                                                            jint(duration));
+        toast.callMethod<void>("show");
+    });
+#endif
 #else
     qDebug() << "toasts are availabe in androiy only!";
 #endif
@@ -170,18 +258,48 @@ void AndroidMainWindow::fireSupportForumIntent()
 {
 #ifdef Q_OS_ANDROID
 //    qDebug() << "fireSupportForumIntent()";
-    QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/viewtopic.php?f=15&t=334");
     QSettings settings;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QAndroidJniObject s1 = QAndroidJniObject::fromString("http://mdforum.designer2k2.at/viewtopic.php?f=15&t=334");
     if ( settings.value("md/md", QVariant ( MDMODE ).toBool() )  == false ) {
         s1 = QAndroidJniObject::fromString("http://digifant-einzelabstimmung.de/bofh-ng/de/digifant-1/live-daten-auslesen");
     }
+#else
+     QJniObject s1 = QJniObject::fromString("http://mdforum.designer2k2.at/viewtopic.php?f=15&t=334");
+     if ( settings.value("md/md", QVariant ( true ).toBool() )  == false ) {
+         s1 = QJniObject::fromString("http://digifant-einzelabstimmung.de/bofh-ng/de/digifant-1/live-daten-auslesen");
+     }
+#endif
 
 
+
+#if defined ( DIGIFANTAPP ) or defined ( DIGIFANTVANAPP )
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QAndroidJniObject::callStaticMethod<void>( "de/gummelinformatics/digifant/MuiIntentHelper",
+                                           "openUrl",
+                                           "(Ljava/lang/String;)V",
+                                            s1.object<jstring>() );
+#else
+     QJniObject::callStaticMethod<void>( "de/gummelinformatics/digifant/MuiIntentHelper",
+                                         "openUrl",
+                                         "(Ljava/lang/String;)V",
+                                         s1.object<jstring>() );
+#endif
+#else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QAndroidJniObject::callStaticMethod<void>( "de/gummelinformatics/mui/MuiIntentHelper",
                                            "openUrl",
                                            "(Ljava/lang/String;)V",
                                             s1.object<jstring>() );
+#else
+     QJniObject::callStaticMethod<void>( "de/gummelinformatics/mui/MuiIntentHelper",
+                                            "openUrl",
+                                            "(Ljava/lang/String;)V",
+                                             s1.object<jstring>() );
+#endif
+#endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QAndroidJniEnvironment env;
     if (env->ExceptionCheck()) {
         // Handle exception here.
@@ -192,6 +310,18 @@ void AndroidMainWindow::fireSupportForumIntent()
     } else {
         qDebug() << "NO JNI exception";
     }
+#else
+    QJniEnvironment env;
+    if (env->ExceptionCheck()) {
+        // Handle exception here.
+        qDebug() << "*** JNI exception ***";
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        env->ExceptionClear();
+    } else {
+        qDebug() << "NO JNI exception";
+    }
+#endif
 
 //    QDesktopServices::openUrl( QUrl("http://mdforum.designer2k2.at/") );
 

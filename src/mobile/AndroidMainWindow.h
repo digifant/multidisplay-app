@@ -30,7 +30,12 @@ public:
     void closeEvent(QCloseEvent *event);
     void resizeEvent ( QResizeEvent * event );
     //void paintEvent(QPaintEvent *pe);
-
+#if defined Q_OS_ANDROID
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    static bool checkAndroidPermission(QString permission);
+    static bool requestAndroidPermission(QString permission);
+#endif
+#endif
     enum ToastDuration {
         SHORT = 0,
         LONG = 1
@@ -57,6 +62,9 @@ private:
     MeasurementWidget *lw;
     MaxEgtWidget *egtw;
     QPixmap _pixmapBg;
+#if defined (Q_OS_IOS) or defined (Q_OS_ANDROID)
+    QLabel *statusBarLabel = nullptr;
+#endif
 };
 
 #endif // ANDROIDMAINWINDOW_H

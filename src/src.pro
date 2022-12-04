@@ -28,7 +28,12 @@ win32: CONFIG += console
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 android {
-    QT += svg androidextras
+    lessThan(QT_MAJOR_VERSION, 6) {
+        QT += svg androidextras
+    } else {
+        #HACK to get jndi androidextras stuff! https://doc-snapshots.qt.io/qt6-dev/extras-changes-qt6.html
+        QT += svg core-private
+    }
     ##FIX hack! fix for "java.lang.UnsatisfiedLinkError: dlopen failed: library libQt5Concurrent_x86.so libQt5PrintSupport_x86.so not found.
     QT += printsupport concurrent
 }
@@ -38,8 +43,8 @@ maemo5 {
     MOBILITY += location systeminfo sensors
 }
 
-ANDROID_VERSION_NAME = "1.2.5"
-ANDROID_VERSION_CODE = "8"
+ANDROID_VERSION_NAME = "1.3"
+ANDROID_VERSION_CODE = "9"
 
 DEFINES += ANDROID_VERSION_NAME=$${ANDROID_VERSION_NAME}
 DEFINES += ANDROID_VERSION_CODE=$${ANDROID_VERSION_CODE}
@@ -289,7 +294,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
             android:  {
                         #message("android: static linking!")
                         #unix:LIBS += ../libs/qwt-6.2.0/lib/libqwt.a
-                        message("android AAB: dynamic linking!")                        
+                        message("android AAB: dynamic linking (debug)! QT_ARCH=$${QT_ARCH} ANDROID_TARGET_ARCH=$${ANDROID_TARGET_ARCH}")
                         unix:LIBS += -L../libs/qwt-6.2.0/lib -lqwt_$${QT_ARCH}
                        }
             maemo5:    {
@@ -303,6 +308,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                   message ("IOS debug")
                   message ("IOS: static qwt6 linking")
                   LIBS += ../libs/qwt-6.2.0/lib/libqwt.a
+                  #LIBS += UIKit
                   message( $$QMAKESPEC )
                 }
         }
@@ -322,7 +328,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
         android:  {
             #message("android: static linking!")
             #unix:LIBS += ../libs/qwt-6.2.0/lib/libqwt.a
-            message("android AAB: dynamic linking!")
+            message("android AAB: dynamic linking (release)! QT_ARCH=$${QT_ARCH} ANDROID_TARGET_ARCH=$${ANDROID_TARGET_ARCH}")
             unix:LIBS += -L../libs/qwt-6.2.0/lib -lqwt_$${QT_ARCH}
         }
         maemo5: {
@@ -333,6 +339,7 @@ win32:INCLUDEPATH = $$quote(..\libs\qextserialport\src) \
                message ("IOS release")
                message ("IOS: static qwt6 linking")
                LIBS += ../libs/qwt-6.2.0/lib/libqwt.a
+               #LIBS += UIKit
                message( $$QMAKESPEC )
         }
     }
@@ -371,4 +378,10 @@ ios {
     QMAKE_BUNDLE_DATA += app_launch_images
 }
 
-ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64
+ANDROID_ABIS = arm64-v8a x86_64 x86 armeabi-v7a
+
+ANDROID_EXTRA_LIBS = $$OUT_PWD/../libs/qwt-6.2.0/lib/libqwt_x86_64.so $$OUT_PWD/../libs/qwt-6.2.0/lib/libqwt_x86.so $$OUT_PWD/../libs/qwt-6.2.0/lib/libqwt_arm64-v8a.so $$OUT_PWD/../libs/qwt-6.2.0/lib/libqwt_armeabi-v7a.so
+
+
+
+
